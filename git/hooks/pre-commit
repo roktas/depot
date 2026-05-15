@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Avoid doing commit in environment branches.
+
+declare -gr forbidden_branches='^(master|main|release)$'
+
+check() {
+	local branch; branch=$(git rev-parse --abbrev-ref HEAD)
+
+	if [[ $branch =~ $forbidden_branches ]]; then
+		cat >&2 <<-EOF
+			You should not commit directly into $branch branch.
+			Please create a new branch from '$branch' and try again.
+		EOF
+
+		exit 1
+	fi
+}
+
+main() {
+	if [[ $(git for-each-ref --format='%(refname)' refs/heads/ | wc -l) -le 1 ]]; then
+		exit 0
+	fi
+
+	if [[ $(git config hooks.pre-commit 2>/dev/null || true) == false ]]; then
+		exit 0
+	fi
+
+	check
+}
+
+main "$@"

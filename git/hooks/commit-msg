@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+abort()   { printf '\e[1m\e[38;5;9m✗\e[0m   \e[1m%s\e[0m\n'  "$*" >&2; exit 1;     }
+warn()    { printf '\e[1m\e[38;5;11m!\e[0m   \e[1m%s\e[0m\n' "$*" >&2;             }
+succeed() { printf '\e[1m\e[38;5;10m✓\e[0m   \e[1m%s\e[0m\n' "$*" >&2;             }
+
+verify() {
+	local message=$1
+
+	if ! command -v cog &>/dev/null; then
+		warn 'Cog required to verify commit message'
+		return 0
+	fi
+
+	if ! cog verify "$message"; then
+		abort 'Commit message does not conform to https://www.conventionalcommits.org/en/v1.0.0'
+	fi
+}
+
+nitpick() {
+	local message=$1
+
+	if ! echo "$message" | sed -E 's/^[^:]+: +(.*)$/\1/g' | grep -Eq '^([a-zığüşöç]|[A-ZİĞÜŞÖÇ]{2,})'; then
+		abort 'Description must start with lowercase'
+	fi
+
+	if echo "$message" | grep -Eq '^refact(:|\()'; then
+		abort 'Do not abbreviate "refactor"'
+	fi
+}
+
+main() {
+	local commit_message_file=$1 message
+
+	if [[ $(git config hooks.conventional-commits 2>/dev/null || true) != true ]]; then
+		exit 0
+	fi
+	if [[ $(git config hooks.commit-msg 2>/dev/null || true) == false ]]; then
+		exit 0
+	fi
+
+	message=$(<"$commit_message_file")
+
+	if verify "$message" && nitpick "$message"; then
+		succeed 'Commit parse succeeded'
+	fi
+}
+
+main "$@"

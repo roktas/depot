@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+set -euo pipefail; [[ -z ${TRACE:-} ]] || set -x
+
+ask() {
+	local answer
+
+	echo -e -n >&2 "\033[1;33m$*\033[0m [y/n] "
+	read -r answer
+
+	[[ ${answer:-} == y ]]
+}
+
+asky() { # default to yes
+	local answer
+
+	echo -e -n >&2 "\033[1;33m$*\033[0m [Y/n] "
+	read -r answer
+
+	[[ ${answer:-} == y ]] || [[ -z ${answer:-} ]]
+}
+
+askn() { # default to no
+	local answer
+
+	echo -e -n >&2 "\033[1;33m$*\033[0m [y/N] "
+	read -r answer
+
+	[[ ${answer:-} == y ]]
+}
+
+bye() {
+	cry "$@"
+	exit 0
+}
+
+cry() {
+	echo -e >&2 "\033[1;36m$*\033[0m"
+}
+
+die() {
+	echo -e >&2 "\033[1;31m$*\033[0m"
+	exit 1
+}
+
+main() {
+	cd "$(git rev-parse --show-toplevel 2>/dev/null)" || die "Not a Git repository"
+
+	local remote
+	remote=$(git config remote.origin.url || true)
+	[[ -n ${remote:-} ]] || die "No remote found"
+
+	local default
+	default=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+
+	ask "This will reset '$default' branch on '$remote'" || bye "Bye"
+
+	local filelist
+	filelist=$(mktemp "${TMPDIR:-/tmp}/filelist.XXXXXXXX") || exit
+	# shellcheck disable=2154
+	trap 'err=$? && rm -f "'"$filelist"'" || exit $err' EXIT HUP INT QUIT TERM
+
+	local path
+	while IFS= read -r -d $'\0' path; do
+		[[ -e $path ]] || continue
+		echo "$path"
+	done < <(
+		git ls-tree --full-tree -r -z --name-only HEAD
+		git diff -z --name-only --cached --diff-filter=A
+	) >"$filelist"
+
+	local message=${1:-}
+	if [[ -z $message ]]; then
+		message=$(git rev-list --max-parents=0 --format='%s' --no-commit-header HEAD || true)
+		[[ -n ${message:-} ]] || message="Initial commit"
+	fi
+
+	rm -rf .git
+
+	git init --initial-branch="$default"
+	git add --force --pathspec-from-file="$filelist"
+	git commit --no-verify -a -m "$message"
+	git remote add origin "$remote"
+	git push --force --set-upstream origin "$default"
+
+	local purge=
+	if askn "Delete all remote branches except '$default'"; then
+		purge=true
+	fi
+
+	if [[ -n ${purge:-} ]]; then
+		git fetch --all
+
+		local branch
+		while read -r branch; do
+			cry "✗    $branch"
+			git push origin -d "$branch"
+		done < <(
+			git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin |
+				grep -vxF HEAD |
+				grep -vxF "$default"
+		)
+	fi
+}
+
+main "$@"
