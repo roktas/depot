@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+editor() {
+	${VISUAL:-${EDITOR:-vi}} "$todo_file"
+}
+
+ensure_file() {
+	local owner=$1
+
+	mkdir -p "${todo_file%/*}"
+	if [[ -e $todo_file ]]; then
+		return
+	fi
+
+	cat >"$todo_file" <<-EOF
+	# ${owner^} TODO
+
+	## Inbox
+
+	EOF
+}
+
+repo_root() {
+	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
+}
+
+usage() {
+	cat <<-EOF
+	Usage:
+	  todo human TEXT
+	  todo agent TEXT
+	  todo human --edit
+	  todo agent --path
+	EOF
+}
+
+warn() {
+	echo -e "$*" >&2
+}
+
+main() {
+	if (($# < 1)); then
+		usage
+		exit 2
+	fi
+
+	local owner=$1
+	shift
+
+	case $owner in
+	human|agent)
+	;;
+	*)
+		abort "owner must be human or agent"
+	;;
+	esac
+
+	local root
+	root=$(repo_root)
+	todo_file=$root/.agents/state/$owner/todo.md
+	ensure_file "$owner"
+
+	if (($# == 0)); then
+		editor
+		return
+	fi
+
+	case $1 in
+	--edit|edit)
+		editor
+	;;
+	--path|path)
+		printf '%s\n' "$todo_file"
+	;;
+	--help|-h|help)
+		usage
+	;;
+	*)
+		printf -- '- [ ] %s\n' "$*" >>"$todo_file"
+		printf '%s\n' "$todo_file"
+	;;
+	esac
+}
+
+main "$@"

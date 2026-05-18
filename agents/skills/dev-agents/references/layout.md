@@ -8,6 +8,7 @@ Load this reference when examples, templates, or placement edge cases are useful
 .agents/skills/   Reusable agent capabilities
 .agents/specs/    Durable repo-level or feature-level specifications
 .agents/tasks/    Versioned work areas for bounded tasks
+.agents/tests/    Agent-facing validation harnesses and fixtures
 .agents/state/    Local, untracked runtime residue
 ```
 
@@ -17,6 +18,7 @@ Mental model:
 skills/ = reusable agent behavior
 specs/  = what must be true
 tasks/  = how a bounded piece of work is being done
+tests/  = how agent-facing behavior is validated
 state/  = local runtime residue
 ```
 
@@ -101,6 +103,23 @@ Example:
 - [ ] Run validation
 ```
 
+## Tests
+
+Examples:
+
+```text
+.agents/tests/provision/smoke.sh
+.agents/tests/provision/Dockerfile
+.agents/tests/skill-validation/fixtures/
+.agents/tests/prompt-contracts/golden/
+```
+
+Use `.agents/tests/` for reviewable validation harnesses, fixtures, smoke tests, linter configs, or helper scripts that
+support specs, skills, task workflows, or repository automation conventions.
+
+Do not use `.agents/tests/` for temporary output, logs, downloaded dependencies, caches, or generated artifacts. Put
+those under `.agents/state/` or a normal ignored build/cache location.
+
 ## State
 
 Examples:
@@ -119,7 +138,7 @@ Examples:
 Use a category directory before runtime entity names:
 
 ```text
-.agents/state/hosts/kant/
+.agents/state/hosts/<host>/
 .agents/state/sessions/2026-05-12T101500Z/
 ```
 
@@ -142,6 +161,19 @@ intermediate outputs
 local caches
 ```
 
+### Human And Agent TODO
+
+Use these untracked checklists for lightweight notes that should not become tracked task work yet:
+
+```text
+.agents/state/human/todo.md
+.agents/state/agent/todo.md
+```
+
+- `human/todo.md` is user-owned inbox material.
+- `agent/todo.md` is assistant-owned operational scratch work.
+- Promote items into `.agents/tasks/<task>/todo.md` when they become tracked work.
+
 ## Avoid Extra Top-Level Directories
 
 Avoid creating:
@@ -155,4 +187,5 @@ Avoid creating:
 .agents/work/
 .agents/plans/
 .agents/todos/
+.agents/test-output/
 ```
