@@ -25,6 +25,36 @@ warn() {
 	echo -e "$*" >&2
 }
 
+apt_get() {
+	lxc exec "$instance" -- env DEBIAN_FRONTEND=noninteractive apt-get \
+		-o Acquire::Retries=3 \
+		-o Acquire::ForceIPv4=true \
+		"$@"
+}
+
+apt_update() {
+	local attempt
+
+	for attempt in {1..5}; do
+		if apt_get -o APT::Update::Error-Mode=any update; then
+			return
+		fi
+		warn "apt update failed in $instance; retrying ($attempt/5)..."
+		sleep 5
+	done
+
+	abort "apt update failed after retries in instance: $instance"
+}
+
+check_outbound_http() {
+	if lxc exec "$instance" -- bash -lc 'timeout 5 bash -lc "</dev/tcp/1.1.1.1/80"' >/dev/null 2>&1; then
+		return
+	fi
+
+	lxc exec "$instance" -- bash -lc 'ip -4 addr show dev eth0; ip route; resolvectl dns eth0 || true' >&2 || true
+	abort "outbound HTTP is not reachable from instance: $instance; check LXD bridge NAT/firewall forwarding"
+}
+
 wait_for_systemd() {
 	for _ in {1..30}; do
 		if lxc exec "$instance" -- test -S /run/systemd/private >/dev/null 2>&1; then
@@ -49,9 +79,9 @@ wait_for_network() {
 }
 
 prepare_boot_user() {
+	apt_update
+	apt_get install -y --no-install-recommends sudo
 	lxc exec "$instance" -- bash -lc '
-		apt-get update
-		apt-get install -y --no-install-recommends sudo
 		id -u ubuntu >/dev/null 2>&1 || useradd -m -s /bin/bash ubuntu
 		mkdir -p /home/ubuntu
 		chown ubuntu:ubuntu /home/ubuntu
@@ -132,13 +162,14 @@ main() {
 	lxc restart "$instance"
 	wait_for_systemd
 	wait_for_network
+	check_outbound_http
 	if [[ $mode == boot ]]; then
 		prepare_boot_user
 		lxc exec "$instance" -- su - ubuntu -c /repo/_/bin/bootstrap
 		lxc exec "$instance" -- su - ubuntu -c 'ruby --version; git --version; curl --version | head -n 1'
 	else
-		lxc exec "$instance" -- apt-get update
-		lxc exec "$instance" -- apt-get install -y --no-install-recommends ca-certificates git ruby
+		apt_update
+		apt_get install -y --no-install-recommends ca-certificates git ruby
 		lxc exec "$instance" -- /repo/.agents/tests/provision/smoke.sh
 	fi
 

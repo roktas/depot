@@ -60,4 +60,27 @@ Use `--boot` to test the Linux boot bootstrap instead of the normal provision sm
 Use `security.nesting=true` for Ubuntu 26.04 LXD containers. Without it, `systemd-networkd` and `systemd-resolved` can
 fail during credential mount namespacing with `status=226/NAMESPACE`, leaving the container without working DHCP/DNS.
 
+The smoke helper restarts the container after setting `security.nesting=true`; if you reproduce the steps manually, do
+the same before diagnosing network failures. Treat active `systemd-networkd` and `systemd-resolved` as necessary but not
+sufficient: LXD image downloads use the host network, while apt runs from inside the container and depends on bridge
+NAT/firewall forwarding. A cached image can therefore exist even when container outbound HTTP is broken.
+
+When apt mirror access is flaky or IPv6 is broken, use retrying apt commands, force IPv4, and make `apt-get update`
+fail on unreachable indexes instead of silently reusing stale lists:
+
+```bash
+apt-get -o Acquire::Retries=3 -o Acquire::ForceIPv4=true -o APT::Update::Error-Mode=any update
+apt-get -o Acquire::Retries=3 -o Acquire::ForceIPv4=true install -y --no-install-recommends ruby
+```
+
+If apt still times out, verify outbound HTTP from inside the container before changing package commands:
+
+```bash
+lxc exec INSTANCE -- bash -lc 'timeout 5 bash -lc "</dev/tcp/1.1.1.1/80"'
+lxc exec INSTANCE -- bash -lc 'ip -4 addr show dev eth0; ip route; resolvectl dns eth0 || true'
+```
+
+If the route and DNS look valid but outbound HTTP times out, inspect host-side LXD bridge NAT, firewall, and forwarding
+rules before rerunning the smoke test.
+
 Delete LXD smoke instances after the test run unless the user explicitly asks to keep them for manual inspection.
