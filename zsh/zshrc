@@ -1,0 +1,323 @@
+# shellcheck disable=1091,2148,2155
+# Adapted from: https://github.com/myfreeweb/zshuery
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Settings
+# ----------------------------------------------------------------------------------------------------------------------
+
+case :$PATH: in *:"$HOME"/.local/bin:*) export PATH=$HOME/.local/bin:$PATH ;; esac
+case :$PATH: in *:"$HOME"/Dropbox/bin:*) export PATH=$HOME/Dropbox/bin:$PATH ;; esac
+
+export SHELL=$(command -v zsh)
+
+autoload colors; colors
+
+setopt auto_name_dirs
+setopt pushd_ignore_dups
+setopt prompt_subst
+setopt no_beep
+setopt auto_cd
+setopt multios
+setopt cdablevarS
+setopt transient_rprompt
+setopt extended_glob
+autoload -U url-quote-magic
+zle -N self-insert url-quote-magic
+autoload -U zmv
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt hist_ignore_dups
+setopt hist_reduce_blanks
+setopt share_history
+setopt append_history
+setopt hist_verify
+setopt inc_append_history
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_space
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Bindings
+# ----------------------------------------------------------------------------------------------------------------------
+
+bindkey -s '^[q' '^d'
+bindkey '^[m' copy-prev-shell-word
+bindkey '^R' history-incremental-pattern-search-backward
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Portability
+# ----------------------------------------------------------------------------------------------------------------------
+
+case $OSTYPE in
+linux*)
+	XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/${EUID:-$(id -u)}}
+
+	if command -v dircolors &>/dev/null; then
+		if [[ -r ~/.dircolors ]]; then
+			eval "$(dircolors -b ~/.dircolors)"
+		else
+			eval "$(dircolors -b)"
+		fi
+	fi
+
+	alias ls='ls --color=auto'
+	;;
+darwin*)
+	XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-"$HOME"/Library/Caches/TemporaryItems}
+
+	alias ls='ls -G'
+	alias readlink=greadlink
+	;;
+esac
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Completion
+# ----------------------------------------------------------------------------------------------------------------------
+
+autoload -U compinit
+fpath=($* $fpath)
+fignore=(.DS_Store $fignore)
+compinit -i
+compdef mcd=cd
+zmodload -i zsh/complist
+setopt complete_in_word
+setopt auto_remove_slash
+unsetopt always_to_end
+[[ -f ~/.ssh/known_hosts ]] && hosts=(`awk '{print $1}' ~/.ssh/known_hosts | tr ',' '\n' `)
+[[ -f ~/.ssh/config ]] && hosts=($hosts `grep '^Host' ~/.ssh/config | sed s/Host\ // | egrep -v '^\*$'`)
+[[ -f /var/lib/misc/ssh_known_hosts ]] && hosts=($hosts `awk -F "[, ]" '{print $1}' /var/lib/misc/ssh_known_hosts | sort -u`)
+zstyle ':completion:*' insert-tab pending
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+highlights='${PREFIX:+=(#bi)($PREFIX:t)(?)*==31=1;32}':${(s.:.)LS_COLORS}}
+highlights2='=(#bi) #([0-9]#) #([^ ]#) #([^ ]#) ##*($PREFIX)*==1;31=1;35=1;33=1;32=}'
+zstyle -e ':completion:*' list-colors 'if [[ $words[1] != kill && $words[1] != strace ]]; then reply=( "'$highlights'" ); else reply=( "'$highlights2'" ); fi'
+unset highlights
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*' expand 'yes'
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+zstyle ':completion:*:hosts' hosts $hosts
+zstyle ':completion::complete:*' use-cache 1
+zstyle ':completion::complete:*' cache-path ./cache/
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+zstyle ':completion:*:mpg321:*' file-patterns '*.(mp3|MP3):mp3\ files *(-/):directories'
+zstyle ':completion:*:ogg123:*' file-patterns '*.(ogg|OGG):ogg\ files *(-/):directories'
+zstyle ':completion:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:processes' command "ps -u `whoami` -o pid,user,comm -w -w"
+zstyle ':completion:*' rehash true
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Prompt
+# ----------------------------------------------------------------------------------------------------------------------
+
+prompt_minimal_collapsed_dir() {
+	echo "${PWD/#$HOME/\~}"
+}
+
+prompt_minimal_collapsed_basename() {
+	local collapsed=${PWD/#$HOME/}
+
+	collapsed=${collapsed##*/}
+
+	echo "%{$fg_bold[cyan]%}${collapsed}%{$reset_color%} "
+}
+
+prompt_minimal_collapsed_dirname() {
+	[[ $PWD != "$HOME" ]] || return 0
+
+	local collapsed=${PWD/#$HOME/}
+
+	collapsed=${collapsed%/*}
+
+	echo "%{$fg_bold[grey]%}${collapsed}/%{$reset_color%}"
+}
+
+if [[ ${EUID:-} -eq 0 ]]; then
+	prompt_minimal_character() {
+		echo '#'
+	}
+
+	prompt_minimal_hostname() {
+		[[ -n $SSH_CLIENT ]] || return 0
+		echo "%{$fg_bold[red]%}%m%{$reset_color%}:"
+	}
+else
+	prompt_minimal_character() {
+		echo '>'
+	}
+
+	prompt_minimal_hostname() {
+		[[ -n $SSH_CLIENT ]] || return 0
+		echo "%{$fg[cyan]%}%m%{$reset_color%}:"
+	}
+fi
+
+prompt_minimal_colored_character() {
+	local color
+
+	if [[ $prompt_minimal_exit_status = success ]] || [[ -z $prompt_minimal_exit_status ]]; then
+		color=yellow
+	else
+		color=red
+	fi
+
+	echo "%{$fg_bold[$color]%}$(prompt_minimal_character)%{$reset_color%}"
+}
+
+preexec() {
+	prompt_minimal_preexec_called=true
+}
+
+precmd() {
+	if [[ $? -ne 0 ]] && [[ $prompt_minimal_preexec_called = true ]]; then
+		prompt_minimal_exit_status=failure
+		unset prompt_minimal_preexec_called
+	else
+		prompt_minimal_exit_status=success
+	fi
+}
+
+prompt_minimal_setup() {
+	PROMPT='$(
+		prompt_minimal_hostname
+	)$(
+		prompt_minimal_collapsed_dirname
+	)$(
+		prompt_minimal_collapsed_basename
+	)$(
+		prompt_minimal_colored_character
+	) '
+}
+
+prompt_minimal_setup "$@"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Aliases and/or Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+autoload -Uz run-help
+alias help=run-help
+
+setopt correct
+alias man='nocorrect man'
+alias mv='nocorrect mv'
+alias mkdir='nocorrect mkdir'
+alias curl='nocorrect curl'
+alias rake='nocorrect rake'
+alias make='nocorrect make'
+
+alias ...='cd $(git rev-parse --show-toplevel)'
+
+alias A='sudo apt'
+alias a=apt
+
+b() {
+	local cmd=$1
+	shift
+
+	if [[ -z $cmd ]] &&  [[ ! -f .envrc ]]; then
+		echo "layout ruby" >.envrc
+		sleep 0.1
+		direnv allow .
+
+		return
+	fi
+
+	case $cmd in
+	i) bundle install "$@" ;;
+	u) bundle update "$@" ;;
+	e) bundle exec "$@" ;;
+	c) bundle config "$@" ;;
+	*) bundle "$@" ;;
+	esac
+}
+
+alias e=nvim
+alias E='sudo nvim'
+
+alias g=git
+
+alias i='inkscape'
+alias I='inkview'
+
+alias j='journalctl --user --unit'
+alias J='sudo journalctl'
+
+alias l='lazygit'
+
+alias m='ramake'
+alias M='ramake'
+
+alias o='open'
+
+alias r='bundle exec rails'
+
+alias s='systemctl --user'
+alias S='sudo systemctl'
+
+alias t='todo.sh -t'
+alias T='todo.sh'
+
+alias v=vi
+alias V='sudo vi'
+
+alias x='bundle exec'
+
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+
+# ----------------------------------------------------------------------------------------------------------------------
+# External
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Command not found
+[[ -x /etc/zsh_command_not_found ]] && /etc/zsh_command_not_found
+
+# Direnv
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+
+# Fzf
+[[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+[[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+
+# Midnight Commander
+mc() {
+	local -i err=0 file=$XDG_RUNTIME_DIR/mc
+
+	COLORTERM=truecolor /usr/bin/mc -P "$file" "$@" || err=$?
+
+	if [ -r "$file" ]; then
+		dir=$(cat "$file")
+		if [ -n "$dir" ] && [ -d "$dir" ] && [ ! "$dir" = "$PWD" ]; then
+			cd "$dir" || err=$?
+		fi
+	fi
+
+	rm -f "$file"
+
+	return $err
+}
+
+# Zoxide
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Customization
+# ----------------------------------------------------------------------------------------------------------------------
+
+if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/zsh ]]; then
+	if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/conf.d ]]; then
+		for f in "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/conf.d/*.sh; do
+			builtin source "$f"
+		done
+
+		unset f
+	fi
+
+	if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/config.sh ]]; then
+		builtin source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/config.sh
+	fi
+fi

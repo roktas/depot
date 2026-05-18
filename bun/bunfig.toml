@@ -1,0 +1,10 @@
+[install]
+globalDir = "~/.cache/bun/install/global"
+globalBinDir = "~/.local/bin"
+
+[install.cache]
+dir = "~/.cache/bun/install/cache"
+
+[install.lockfile]
+path = ".cache/bun/bun.lockb"
+savePath = ".cache/bun/bun.lockb"

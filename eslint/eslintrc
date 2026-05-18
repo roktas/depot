@@ -1,0 +1,21 @@
+{
+  "extends": "airbnb",
+  "plugins": ["promise"],
+  "rules": {
+    "accessor-pairs": 2,
+    "comma-dangle": [2, "never"],
+    "handle-callback-err": [2, "^(err|error)$" ],
+    "indent": [2, 2, { "SwitchCase": 1 }],
+    "no-native-reassign": 2,
+    "no-negated-in-lhs": 2,
+    "no-unmodified-loop-condition": 2,
+    "no-unused-vars": [2, { "vars": "all", "args": "none" }],
+    "no-useless-call": 2,
+    "operator-linebreak": [2, "after", { "overrides": { "?": "before", ":": "before" } }],
+    "promise/param-names": 2,
+    "semi": [2, "never"],
+    "space-before-blocks": [2, "always"],
+    "space-before-function-paren": [2, "always"],
+    "template-curly-spacing": [2, "never"]
+  }
+}

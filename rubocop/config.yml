@@ -1,0 +1,58 @@
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
+plugins:
+  - "rubocop-md"
+  - "rubocop-rake"
+require:
+  - "rubocop-packaging"
+
+Layout/HashAlignment:
+  Enabled: true
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - "test/**/*.rb"
+
+Metrics/BlockLength:
+  Exclude:
+    - "test/**/*.rb"
+    - "*.gemspec"
+Metrics/ClassLength:
+  Exclude:
+    - "test/**/*.rb"
+Metrics/MethodLength:
+  Exclude:
+    - "test/**/*.rb"
+
+Naming/FileName:
+  Exclude:
+    - "**/Vagrantfile"
+    - ".*/**/Vagrantfile"
+
+Rails/RefuteMethods:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/ParallelAssignment:
+  Enabled: false
+Style/LambdaCall:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  Exclude:
+    - "**/Vagrantfile"
+    - ".*/**/Vagrantfile"
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/Vagrantfile"
+    - ".*/**/Vagrantfile"
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "vendor/**/*"

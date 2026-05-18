@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Direnv doesn't properly work under some programs, e.g. tmux + midnight commander combo.
+exec direnv exec . "$(command -v bat)" --paging=always "$@"

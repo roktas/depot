@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lang: Ruby"
+  short_description: "Modern Ruby, tests, gems, and style"
+  default_prompt: "Use $lang-ruby to write or review modern Ruby code."

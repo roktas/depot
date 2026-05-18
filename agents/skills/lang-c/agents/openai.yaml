@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lang: C Programming"
+  short_description: "C style, safety, and systems code"
+  default_prompt: "Use $lang-c to write or review maintainable C code."

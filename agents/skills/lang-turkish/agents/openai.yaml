@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lang: Turkish Prose"
+  short_description: "Natural Turkish prose and terminology"
+  default_prompt: "Use $lang-turkish to review or improve Turkish prose."

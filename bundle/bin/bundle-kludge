@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; unset CDPATH; IFS=$' \t\n'; [[ -z ${TRACE:-} ]] || set -x
+export LC_ALL=C.UTF-8 LANG=C.UTF-8
+
+KLUDGE_PROGNAME=${0##*/}
+KLUDGE_CONFIG=${XGD_CONFIG_HOME:-$HOME/.config}/bundle
+KLUDGE_STATE=${XDG_STATE_HOME:-$HOME/.local/state}/bundle
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+abort() {
+	warn "$@"
+	exit 1
+}
+
+kludge() {
+	[[ ! -f $KLUDGE_CONFIG/environment ]] || builtin source "$KLUDGE_CONFIG"/environment
+
+	export GEM_HOME=$KLUDGE_STATE
+	export BUNDLE_GEMFILE=$KLUDGE_STATE/Gemfile
+	export BUNDLE_APP_CONFIG=$KLUDGE_STATE
+	export BUNDLE_BIN=$KLUDGE_STATE/bin
+
+	export PATH=$BUNDLE_BIN:$PATH
+}
+
+gemfile() {
+	if [[ -f $KLUDGE_CONFIG/Gemfile ]]; then
+		cat "$KLUDGE_CONFIG"/Gemfile
+
+		return 0
+	fi
+
+	cat <<-'EOF'
+		source "https://rubygems.org"
+
+		if File.exist?(file = File.expand_path(".ruby-version", __dir__))
+		  ruby File.read(file).strip
+		end
+
+		group :development do
+		  gem "debug", platforms: :mri
+		  gem "rubocop"
+		  gem "rubocop-minitest"
+		  gem "rubocop-packaging"
+		  gem "rubocop-performance"
+		  gem "rubocop-rails-omakase"
+		  gem "rubocop-rake"
+		  gem "ruby-lsp"
+		end
+	EOF
+}
+
+gemfiled() {
+	[[ -n ${BUNDLE_GEMFILE:-} ]] || locate "$PWD" Gemfile &>/dev/null
+}
+
+locate() {
+	local cwd=${1?${FUNCNAME[0]}: missing argument}; shift
+
+	local err=0; local root; root=$(
+		[[ -z $cwd ]] || cd "$cwd" || exit
+
+		while :; do
+			local try
+
+			for try; do
+				if [[ -e $try ]]; then
+					echo "$PWD"
+					exit 0
+				fi
+			done
+
+			# shellcheck disable=2128
+			if [[ $PWD == "/" ]]; then
+				break
+			fi
+
+			cd .. || exit
+		done
+
+		exit 1
+	) || err=$?
+
+	if [[ $err -eq 0 ]] && [[ -n ${root:-} ]]; then
+		echo "$root"
+		return 0
+	fi
+
+	return 1
+}
+
+warn() {
+	echo "$KLUDGE_PROGNAME: $*" >&2
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Commands
+# ----------------------------------------------------------------------------------------------------------------------
+
+bexec.destroy() {
+	rm -rf "$KLUDGE_STATE"
+}
+
+bexec.init() {
+	rm -rf "$KLUDGE_STATE" && mkdir -p "$KLUDGE_STATE"
+
+	kludge
+
+	pushd "$KLUDGE_STATE" &>/dev/null
+
+	gemfile >Gemfile
+
+	bundle install --jobs=4
+
+	popd &>/dev/null
+}
+
+bexec.update() {
+	if [[ -f $KLUDGE_STATE/Gemfile.lock ]]; then
+		kludge
+
+		pushd "$KLUDGE_STATE" &>/dev/null && bundle update --all --jobs=4 && popd &>/dev/null
+	else
+		bexec.init
+	fi
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Main
+# ----------------------------------------------------------------------------------------------------------------------
+
+main() {
+	command -v bundle &>/dev/null || abort "A valid Ruby development environment with bundler required"
+
+	case "${1:-}" in
+	--*|-*)
+		case $1 in
+		-i|-ini|-init|--init)
+			bexec.init
+			;;
+		-u|-up|-update|--update)
+			bexec.update
+			;;
+		-d|-destroy|--destroy)
+			bexec.destroy
+			;;
+		*)
+			abort "Unrecognized maintenance option: $1"
+			;;
+		esac
+		;;
+	*)
+		if [[ -z ${NO_KLUDGE:-} ]]; then
+			[[ -d "$KLUDGE_STATE" ]] || bexec.init
+
+			gemfiled || kludge
+		fi
+
+		exec bundle "$@"
+		;;
+	esac
+}
+
+main "$@"

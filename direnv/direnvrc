@@ -1,0 +1,57 @@
+# shellcheck shell=bash
+
+export DIRENV_WARN_TIMEOUT=10s
+
+export LOCAL_CACHE_ROOT=${XDG_CACHE_DIR:-$HOME/.cache}/_
+[[ -d $LOCAL_CACHE_ROOT ]] || mkdir -p "$LOCAL_CACHE_ROOT"
+
+local_cache_dir() {
+	local dir=${1:-$PWD}
+
+	echo "$LOCAL_CACHE_ROOT"/"${dir//\//+}"
+}
+
+direnv_layout_dir() {
+	echo "${direnv_layout_dir:-$PWD/.cache}"
+}
+
+use-() {
+	export NO_KLUDGE=true
+
+	use "$@"
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Vagrant
+# ----------------------------------------------------------------------------------------------------------------------
+
+layout_vagrant() {
+	VAGRANT_DOTFILE_PATH="$(local_cache_dir)"/vagrant
+	export VAGRANT_DOTFILE_PATH
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Ruby
+# ----------------------------------------------------------------------------------------------------------------------
+
+use_ruby() {
+	local version=${1:-}
+
+	if [[ -z $version ]] && [[ -r .ruby-version ]]; then
+		version=$(< .ruby-version)
+	fi
+
+	if [[ -n ${version:-} ]] && [[ -d /opt/ruby/$version ]]; then
+		load_prefix /opt/ruby/"$version"
+	fi
+
+	layout ruby
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Local
+# ----------------------------------------------------------------------------------------------------------------------
+
+layout_local() {
+	[[ ! -d $PWD/.local/bin ]] || PATH_add "$PWD"/.local/bin
+}

@@ -1,0 +1,7 @@
+[filemanager]
+Quit = f10; alt-q
+
+[panel]
+SortByName = alt-N
+SortByMTime = alt-M
+SortBySize = alt-S

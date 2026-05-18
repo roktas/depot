@@ -1,0 +1,10 @@
+version: "1"
+aliases:
+    co: pr checkout
+    new: repo create --private --source . --push
+    new-: repo create --public --source . --push
+    "repo rm": "repo delete"
+    "repo mv": "repo rename"
+    "repo transfer": api -X POST "repos/$1/transfer" -f new_owner="$2" --jq ".html_url"
+git_protocol: https
+editor:

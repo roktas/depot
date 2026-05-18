@@ -55,10 +55,13 @@ main() {
 
 	ask "This will reset '$default' branch on '$remote'" || bye "Bye"
 
-	local filelist
-	filelist=$(mktemp "${TMPDIR:-/tmp}/filelist.XXXXXXXX") || exit
+	local tmpdir
+	tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/git-renew.XXXXXXXX") || exit
 	# shellcheck disable=2154
-	trap 'err=$? && rm -f "'"$filelist"'" || exit $err' EXIT HUP INT QUIT TERM
+	trap 'err=$? && rm -rf "'"$tmpdir"'" || exit $err' EXIT HUP INT QUIT TERM
+
+	local filelist=$tmpdir/filelist
+	local gitinfo=$tmpdir/info
 
 	local path
 	while IFS= read -r -d $'\0' path; do
@@ -69,6 +72,8 @@ main() {
 		git diff -z --name-only --cached --diff-filter=A
 	) >"$filelist"
 
+	cp -a .git/info "$gitinfo"
+
 	local message=${1:-}
 	if [[ -z $message ]]; then
 		message=$(git rev-list --max-parents=0 --format='%s' --no-commit-header HEAD || true)
@@ -78,6 +83,8 @@ main() {
 	rm -rf .git
 
 	git init --initial-branch="$default"
+	rm -rf .git/info
+	cp -a "$gitinfo" .git/info
 	git add --force --pathspec-from-file="$filelist"
 	git commit --no-verify -a -m "$message"
 	git remote add origin "$remote"

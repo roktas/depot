@@ -1,0 +1,2 @@
+#!/bin/sh
+NVIM_APPNAME="vi" exec nvim "$@"

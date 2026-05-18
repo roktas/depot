@@ -1,0 +1,510 @@
+" ----------------------------------------------------------------------------------------------------------------------
+" Settings
+" ----------------------------------------------------------------------------------------------------------------------
+
+set confirm=permdelete
+set history=500
+set hlsearch
+set ignorecase
+set incsearch
+set nofollowlinks
+set norunexec
+set scrolloff=4
+set shell=/bin/bash
+set smartcase
+set sortnumbers
+set statusline="  %A %8u:%-8g %16d %8s %T  "
+set suggestoptions=normal,visual,view,otherpane,keys,marks,registers
+set syscalls
+set timefmt='%Y/%m/%d %H:%M'
+set trash
+set undolevels=100
+set vifminfo=dhistory,chistory,state,tui,shistory,phistory,fhistory,dirstack,registers,bookmarks,bmarks
+set vimhelp
+set wildmenu
+set wildstyle=popup
+
+if executable('rg')
+	set grepprg='rg --color=never -Hn %i %a %s'
+endif
+
+if executable('fd')
+	set findprg='fd --color=never %p'
+endif
+
+if !has('win')
+	set slowfs=curlftpfs
+endif
+
+if executable('nvim')
+	set vicmd=nvim
+elseif executable('vim')
+	set vicmd=vim
+elseif $EDITOR != ''
+	echo 'Note: using `'.$EDITOR.'` as an editor'
+	let &vicmd = $EDITOR
+endif
+
+colorscheme Default-256 Default
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Commands
+" ----------------------------------------------------------------------------------------------------------------------
+
+command! df df -h %m 2> /dev/null
+command! diff nvim -d %f %F
+command! make !!make %a
+command! mkcd :mkdir %a | cd %a
+command! rake !!rake %a
+command! reload :write | restart full
+command! run !! ./%f
+command! zip zip -r %c.zip %f
+command! tar tar -czvf %c.tar.gz %f
+
+command! Ffind : set noquickview
+			\| let $FZF_PICK = term('find | fzf 2>/dev/tty')
+                	\| if $FZF_PICK != ''
+                	\|     execute 'goto' fnameescape($FZF_PICK)
+                	\| endif
+command! Fgo : set noquickview
+                	\| let $FZF_PICK = term('find | fzf 2>/dev/tty')
+	                \| if $FZF_PICK != ''
+        	        \|     execute system('[ -f "$FZF_PICK" ] && echo goto || echo cd') fnameescape($FZF_PICK)
+	                \| endif
+
+" variation that automatically enters directories
+command! Flocate : set noquickview
+			\| let $FZF_PICK = term('locate $HOME | fzf 2>/dev/tty')
+        	        \| if $FZF_PICK != ''
+	                \|     execute system('[ -f "$FZF_PICK" ] && echo goto || echo cd') fnameescape($FZF_PICK)
+	                \| endif
+
+command! Goq :set noquickview
+			\| :execute 'cd' fnameescape(system('zoxide query -l "%a" | fzf --height 20 2>/dev/tty')) '%IU'
+			\| redraw
+
+command! Go :set noquickview
+			\| :execute 'cd' fnameescape(system('zoxide query "%a"')) '%IU'
+			\| redraw
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Keymaps
+" ----------------------------------------------------------------------------------------------------------------------
+
+nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+nnoremap ,w :set wrap!<cr>
+nnoremap <a-o> :sync %c<cr>
+nnoremap <a-q> : quit<cr>
+nnoremap <a-q> :quit<cr>
+nnoremap <c-u> <c-w>x
+nnoremap <f10> :quit<cr>
+nnoremap <f3> :!less %f<cr>
+nnoremap <f4> :edit<cr>
+nnoremap <f5> :copy<cr>
+nnoremap <f6> :move<cr>
+nnoremap <f7> :mkdir<space>
+nnoremap <f8> :delete<cr>
+nnoremap <insert> :select<cr><down>
+nnoremap <s-f5> :alink<cr>
+nnoremap <space> :sync<cr>
+nnoremap A cw
+nnoremap G :Fgo<cr>
+nnoremap I cw<c-a>
+nnoremap b :!tmux split-window -v -p40 'exec bash'%n<cr>
+nnoremap cc cw<c-u>
+nnoremap f :Ffind<cr>
+nnoremap g :Flocate<space>
+nnoremap s :sort<cr>
+nnoremap w :view<cr>
+vnoremap w :view<cr>gv
+
+nnoremap ü '
+nnoremap Ğ :Goq<space>
+nnoremap ğ :Go<space>
+nnoremap ı :grep<space>
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Special settings and keymaps
+" ----------------------------------------------------------------------------------------------------------------------
+
+" Activate screen/tmux support
+screen!
+
+if $DISPLAY && executable('nvim')
+	" Open file in existing instance of nvim
+	nnoremap o :!nvim --remote-tab-silent %f<cr>
+	" Open file in new instance of nvim
+	nnoremap O :!nvim %f<cr>
+endif
+
+" Interaction with system clipboard
+if has('win')
+	" Yank current directory path to Windows clipboard with forward slashes
+	nnoremap yp :!echo %"d:gs!\!/! %i | clip<cr>
+	" Yank path to current file to Windows clipboard with forward slashes
+	nnoremap yf :!echo %"c:gs!\!/! %i | clip<cr>
+elseif $WAYLAND_DISPLAY
+	if executable('wl-copy')
+		" Yank current directory path into primary and selection clipboards
+		nnoremap yd :!echo -n %d | wl-copy %i &&
+			\ echo -n %d | wl-copy -p %i<cr>
+		" Yank current file path into into primary and selection clipboards
+		nnoremap yf :!echo -n %c:p | wl-copy %i &&
+			\ echo -n %c:p | wl-copy -p %i<cr>
+	endif
+elseif $DISPLAY
+	if executable('xclip')
+		" Yank current directory path into the clipboard
+		nnoremap yd :!echo %d | xclip %i<cr>
+		" Yank current file path into the clipboard
+		nnoremap yf :!echo %c:p | xclip %i<cr>
+	elseif executable('xsel')
+		" Yank current directory path into primary and selection clipboards
+		nnoremap yd :!echo -n %d | xsel --input --primary %i &&
+			\ echo -n %d | xsel --clipboard --input %i<cr>
+		" Yank current file path into into primary and selection clipboards
+		nnoremap yf :!echo -n %c:p | xsel --input --primary %i &&
+			\ echo -n %c:p | xsel --clipboard --input %i<cr>
+	endif
+endif
+
+if $DISPLAY && executable('nvim')
+	nnoremap ,C :!nvim --remote-tab-silent $MYVIFMRC &<cr>
+endif
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Bookmarks
+" ----------------------------------------------------------------------------------------------------------------------
+
+mark D ~/Dropbox/
+mark d ~/Downloads/
+mark h ~/
+mark s ~/Dropbox/src/github.com
+mark t /tmp
+
+" ----------------------------------------------------------------------------------------------------------------------
+" File types
+" ----------------------------------------------------------------------------------------------------------------------
+
+" Pdf
+filextype {*.pdf},<application/pdf> zathura %c %i, apvlv %c, xpdf %c
+fileviewer {*.pdf},<application/pdf> pdftotext -nopgbrk %c -
+
+" PostScript
+filextype {*.ps,*.eps,*.ps.gz},<application/postscript>
+        \ {View in zathura}
+        \ zathura %f,
+        \ {View in gv}
+        \ gv %c %i,
+
+" Djvu
+filextype {*.djvu},<image/vnd.djvu>
+        \ {View in zathura}
+        \ zathura %f,
+        \ {View in apvlv}
+        \ apvlv %f,
+
+" Midi
+filetype {*.mid,*.kar}
+       \ {Play using TiMidity++}
+       \ timidity %f,
+
+" Audio
+filetype {*.wav,*.mp3,*.flac,*.m4a,*.wma,*.ape,*.ac3,*.og[agx],*.spx,*.opus,
+         \*.aac,*.mpga},
+        \<audio/*>
+       \ {Play using MPlayer}
+       \ mplayer %f,
+       \ {Play using mpv}
+       \ mpv --no-video %f %s,
+       \ {Play using ffplay}
+       \ ffplay -nodisp -hide_banner -autoexit %c,
+fileviewer {*.wav,*.mp3,*.flac,*.m4a,*.wma,*.ape,*.ac3,*.og[agx],*.spx,*.opus,
+           \*.aac,*.mpga},
+          \<audio/*>
+         \ ffprobe -hide_banner -pretty %c 2>&1
+
+" Video
+filextype {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
+          \*.fl[icv],*.m2v,*.mov,*.webm,*.ts,*.mts,*.m4v,*.r[am],*.qt,*.divx,
+          \*.as[fx],*.unknown_video},
+         \<video/*>
+        \ {View using ffplay}
+        \ ffplay -fs -hide_banner -autoexit %f,
+        \ {View using Dragon}
+        \ dragon %f:p,
+        \ {View using mplayer}
+        \ mplayer %f,
+        \ {Play using mpv}
+        \ mpv --no-video %f,
+fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
+           \*.fl[icv],*.m2v,*.mov,*.webm,*.ts,*.mts,*.m4v,*.r[am],*.qt,*.divx,
+           \*.as[fx],*.unknown_video},
+          \<video/*>
+         \ ffprobe -hide_banner -pretty %c 2>&1
+
+" Web
+filextype {*.xhtml,*.html,*.htm},<text/html>
+        \ {Open with qutebrowser}
+        \ qutebrowser %f %i,
+        \ {Open with firefox}
+        \ firefox %f &,
+filetype {*.xhtml,*.html,*.htm},<text/html> links, lynx
+
+" Object
+filetype {*.o},<application/x-object> nm %f | less
+
+" Man page
+filetype {*.[1-8]},<text/troff> man ./%c
+fileviewer {*.[1-8]},<text/troff> man ./%c | col -b
+
+" Images
+filextype {*.svg,*.svgz},<image/svg+xml>
+        \ {Edit in Inkscape}
+        \ inkscape %f,
+        \ {View in Inkview}
+        \ inkview %f,
+filextype {*.cr2}
+        \ {Open in Darktable}
+        \ darktable %f,
+        \ {Open in RawTherapee}
+        \ rawtherapee %f,
+filextype {*.xcf}
+        \ {Open in GIMP}
+        \ gimp %f,
+filextype {.kra}
+        \ {Open in Krita}
+        \ krita %f,
+filextype {.blend}
+        \ {Open in Blender}
+        \ blender %c,
+filextype {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
+        \ {View in sxiv}
+        \ sxiv %f,
+        \ {View in gpicview}
+        \ gpicview %c,
+        \ {View in shotwell}
+        \ shotwell,
+fileviewer {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
+         \ identify %f
+
+" OpenRaster
+filextype *.ora
+        \ {Edit in MyPaint}
+        \ mypaint %f,
+
+" Mindmap
+filextype *.vym
+        \ {Open with VYM}
+        \ vym %f &,
+
+" MD5
+filetype *.md5
+       \ {Check MD5 hash sum}
+       \ md5sum -c %f %S,
+
+" SHA1
+filetype *.sha1
+       \ {Check SHA1 hash sum}
+       \ sha1sum -c %f %S,
+
+" SHA256
+filetype *.sha256
+       \ {Check SHA256 hash sum}
+       \ sha256sum -c %f %S,
+
+" SHA512
+filetype *.sha512
+       \ {Check SHA512 hash sum}
+       \ sha512sum -c %f %S,
+
+" GPG signature
+filetype {*.asc},<application/pgp-signature>
+       \ {Check signature}
+       \ !!gpg --verify %c,
+
+" Torrent
+filetype {*.torrent},<application/x-bittorrent> ktorrent %f &
+fileviewer {*.torrent},<application/x-bittorrent>
+         \ dumptorrent -v %c,
+         \ transmission-show %c
+
+" FuseZipMount
+filetype {*.zip,*.jar,*.war,*.ear,*.oxt,*.apkg},
+        \<application/zip,application/java-archive>
+       \ {Mount with fuse-zip}
+       \ FUSE_MOUNT|fuse-zip %SOURCE_FILE %DESTINATION_DIR,
+       \ {View contents}
+       \ unzip -l %f | less,
+       \ {Extract here}
+       \ unzip %c,
+fileviewer *.zip,*.jar,*.war,*.ear,*.oxt unzip -l %f
+
+" ArchiveMount
+filetype {*.tar,*.tar.bz2,*.tbz2,*.tgz,*.tar.gz,*.tar.xz,*.txz,*.tar.zst,
+         \*.tzst},
+        \<application/x-tar>
+       \ {Mount with archivemount}
+       \ FUSE_MOUNT|archivemount %SOURCE_FILE %DESTINATION_DIR,
+fileviewer *.tgz,*.tar.gz tar -tzf %c
+fileviewer *.tar.bz2,*.tbz2 tar -tjf %c
+fileviewer *.tar.xz,*.txz tar -tJf %c
+fileviewer *.tar.zst,*.tzst tar -t --zstd -f %c
+fileviewer {*.tar},<application/x-tar> tar -tf %c
+
+" Rar2FsMount and rar archives
+filetype {*.rar},<application/x-rar>
+       \ {Mount with rar2fs}
+       \ FUSE_MOUNT|rar2fs %SOURCE_FILE %DESTINATION_DIR,
+fileviewer {*.rar},<application/x-rar> unrar v %c
+
+" IsoMount
+filetype {*.iso},<application/x-iso9660-image>
+       \ {Mount with fuseiso}
+       \ FUSE_MOUNT|fuseiso %SOURCE_FILE %DESTINATION_DIR,
+
+" SshMount
+filetype *.ssh
+       \ {Mount with sshfs}
+       \ FUSE_MOUNT2|sshfs %PARAM %DESTINATION_DIR %FOREGROUND,
+
+" FtpMount
+filetype *.ftp
+       \ {Mount with curlftpfs}
+       \ FUSE_MOUNT2|curlftpfs -o ftp_port=-,,disable_eprt %PARAM %DESTINATION_DIR %FOREGROUND,
+
+" Fuse7z and 7z archives
+filetype {*.7z},<application/x-7z-compressed>
+       \ {Mount with fuse-7z}
+       \ FUSE_MOUNT|fuse-7z %SOURCE_FILE %DESTINATION_DIR,
+fileviewer {*.7z},<application/x-7z-compressed> 7z l %c
+
+" Office files
+filextype {*.odt,*.doc,*.docx,*.xls,*.xlsx,*.odp,*.pptx,*.ppt},
+         \<application/vnd.openxmlformats-officedocument.*,
+          \application/msword,
+          \application/vnd.ms-excel>
+        \ libreoffice %f &
+fileviewer {*.doc},<application/msword> catdoc %c
+fileviewer {*.docx},
+          \<application/
+           \vnd.openxmlformats-officedocument.wordprocessingml.document>
+         \ docx2txt.pl %f -
+
+" TuDu files
+filetype *.tudu tudu -f %c
+
+" Qt projects
+filextype *.pro qtcreator %f &
+
+" Directories
+filextype */
+        \ {View in thunar}
+        \ Thunar %f &,
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Colorscheme Nord
+" ----------------------------------------------------------------------------------------------------------------------
+
+" Reset all styles first
+highlight clear
+
+highlight Border      	cterm=none		ctermfg=default ctermbg=default
+highlight TopLine    	cterm=none		ctermfg=152	ctermbg=236
+highlight TopLineSel	cterm=bold		ctermfg=152	ctermbg=237
+
+highlight Win         	cterm=none		ctermfg=7	ctermbg=default
+highlight OtherWin    	cterm=none		ctermfg=7	ctermbg=default
+highlight OtherLine   	cterm=bold		ctermfg=default	ctermbg=235
+highlight Selected    	cterm=bold,inverse	ctermfg=7	ctermbg=default
+highlight CurrLine    	cterm=bold,inverse	ctermfg=152	ctermbg=default
+
+highlight JobLine     	cterm=bold		ctermfg=116	ctermbg=238
+highlight StatusLine  	cterm=none		ctermfg=4	ctermbg=default
+highlight ErrorMsg    	cterm=bold		ctermfg=167	ctermbg=default
+highlight WildMenu    	cterm=bold,inverse	ctermfg=110	ctermbg=236
+highlight CmdLine     	cterm=none		ctermfg=7	ctermbg=default
+
+highlight Executable  	cterm=bold		ctermfg=003	ctermbg=default
+highlight Directory   	cterm=none		ctermfg=110	ctermbg=default
+highlight Link        	cterm=none		ctermfg=005	ctermbg=default
+highlight BrokenLink  	cterm=bold		ctermfg=007	ctermbg=167
+highlight Device      	cterm=none,standout	ctermfg=110	ctermbg=default
+highlight Fifo        	cterm=none		ctermfg=172	ctermbg=default
+highlight Socket      	cterm=bold		ctermfg=223	ctermbg=default
+
+" ----------------------------------------------------------------------------------------------------------------------
+" Icons (Ranger devicons for ViFM: https://github.com/cirala/vifm_devicons)
+" ----------------------------------------------------------------------------------------------------------------------
+
+" Filetypes/directories
+set classify='  :dir:/,  :exe:,  :reg:,  :link:,? :?:,  ::../::'
+
+" Specific files
+set classify+='  ::.Xdefaults,,.Xresources,,.bashprofile,,.bash_profile,,.bashrc,,.dmrc,,.d_store,,.fasd,,.gitconfig,,.gitignore,,.jack-settings,,.mime.types,,.nvidia-settings-rc,,.pam_environment,,.profile,,.recently-used,,.selected_editor,,.xinitpurc,,.zprofile,,.yarnc,,.snclirc,,.tmux.conf,,.urlview,,.config,,.ini,,.user-dirs.dirs,,.mimeapps.list,,.offlineimaprc,,.msmtprc,,.Xauthority,,config::'
+set classify+='  ::Dropbox/::'
+set classify+='  ::Virtualbox/::'
+set classify+='󱔔  ::Public/::'
+set classify+='󰊬  ::Desktop/::'
+set classify+='󰝚  ::Music/::'
+set classify+='  ::favicon.*,,README,,readme::'
+set classify+='  ::.vim,,.vimrc,,.gvimrc,,.vifm::'
+set classify+='  ::gruntfile.coffee,,gruntfile.js,,gruntfile.ls::'
+set classify+='  ::gulpfile.coffee,,gulpfile.js,,gulpfile.ls::'
+set classify+='  ::ledger::'
+set classify+='  ::license,,copyright,,copying,,LICENSE,,COPYRIGHT,,COPYING::'
+set classify+='  ::node_modules::'
+set classify+='  ::react.jsx::'
+
+" File extensions
+set classify+='λ  ::*.ml,,*.mli::'
+set classify+='  ::*.styl::'
+set classify+='  ::*.scss::'
+set classify+='  ::*.py,,*.pyc,,*.pyd,,*.pyo::'
+set classify+='  ::*.php::'
+set classify+='󰽛  ::*.markdown,,*.md,,Downloads/::'
+set classify+='  ::*.json::'
+set classify+='  ::*.js::'
+set classify+='  ::*.bmp,,*.gif,,*.ico,,*.jpeg,,*.jpg,,*.png,,*.svg,,*.svgz,,*.tga,,*.tiff,,*.xmb,,*.xcf,,*.xpm,,*.xspf,,*.xwd,,*.cr2,,*.dng,,*.3fr,,*.ari,,*.arw,,*.bay,,*.crw,,*.cr3,,*.cap,,*.data,,*.dcs,,*.dcr,,*.drf,,*.eip,,*.erf,,*.fff,,*.gpr,,*.iiq,,*.k25,,*.kdc,,*.mdc,,*.mef,,*.mos,,*.mrw,,*.obm,,*.orf,,*.pef,,*.ptx,,*.pxn,,*.r3d,,*.raf,,*.raw,,*.rwl,,*.rw2,,*.rwz,,*.sr2,,*.srf,,*.srw,,*.tif,,*.x3f,,*.webp,,*.avif,,*.jxl,,Pictures/::'
+set classify+='  ::*.ejs,,*.htm,,*.html,,*.slim,,*.xml::'
+set classify+='  ::*.mustasche::'
+set classify+='  ::*.css,,*.less,,*.bat,,*.conf,,*.ini,,*.rc,,*.yml,,*.cfg::'
+set classify+='  ::*.rss::'
+set classify+='  ::*.coffee::'
+set classify+='  ::*.twig::'
+set classify+='  ::*.c++,,*.cpp,,*.cxx,,*.h::'
+set classify+='  ::*.cc,,*.c::'
+set classify+='  ::*.hs,,*.lhs::'
+set classify+='  ::*.lua::'
+set classify+='  ::*.jl::'
+set classify+='  ::*.go::'
+set classify+='  ::*.ts::'
+set classify+='  ::*.db,,*.dump,,*.sql::'
+set classify+='  ::*.sln,,*.suo::'
+set classify+='  ::*.exe::'
+set classify+='  ::*.diff,,*.sum,,*.md5,,*.sha512::'
+set classify+='  ::*.scala::'
+set classify+='  ::*.java,,*.jar::'
+set classify+='  ::*.xul::'
+set classify+='  ::*.clj,,*.cljc::'
+set classify+='  ::*.pl,,*.pm,,*.t::'
+set classify+='  ::*.cljs,,*.edn::'
+set classify+='  ::*.rb::'
+set classify+='  ::*.fish,,*.sh,,*.bash::'
+set classify+='  ::*.dart::'
+set classify+='  ::*.f#,,*.fs,,*.fsi,,*.fsscript,,*.fsx::'
+set classify+='  ::*.rlib,,*.rs::'
+set classify+='  ::*.d::'
+set classify+='  ::*.erl,,*.hrl::'
+set classify+='  ::*.ai::'
+set classify+='  ::*.psb,,*.psd::'
+set classify+='  ::*.jsx::'
+set classify+='  ::*.aac,,*.anx,,*.asf,,*.au,,*.axa,,*.flac,,*.m2a,,*.m4a,,*.mid,,*.midi,,*.mp3,,*.mpc,,*.oga,,*.ogg,,*.ogx,,*.ra,,*.ram,,*.rm,,*.spx,,*.wav,,*.wma,,*.ac3::'
+set classify+='  ::*.avi,,*.flv,,*.mkv,,*.mov,,*.mp4,,*.mpeg,,*.mpg,,*.webm,,*.av1,,Videos/::'
+set classify+='  ::*.epub,,*.pdf,,*.fb2,,*.djvu::'
+set classify+='  ::*.7z,,*.apk,,*.bz2,,*.cab,,*.cpio,,*.deb,,*.gem,,*.gz,,*.gzip,,*.lh,,*.lzh,,*.lzma,,*.rar,,*.rpm,,*.tar,,*.tgz,,*.xz,,*.zip,,*.zst::'
+set classify+='  ::*.cbr,,*.cbz::'
+set classify+='  ::*.log::'
+set classify+='  ::*.doc,,*.docx,,*.adoc,,Documents/::'
+set classify+='  ::*.xls,,*.xlsmx::'
+set classify+='  ::*.pptx,,*.ppt::'

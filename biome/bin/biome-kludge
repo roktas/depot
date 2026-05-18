@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; unset CDPATH; IFS=$' \t\n'; [[ -z ${TRACE:-} ]] || set -x
+export LC_ALL=C.UTF-8 LANG=C.UTF-8
+
+KLUDGE_CONFIG_PATH=${XGD_CONFIG_HOME:-$HOME/.config}/biome
+KLUDGE_CONFIG_FILE=biome.json
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+abort() {
+	warn "$@"
+	exit 1
+}
+
+locate() {
+	local cwd=${1?${FUNCNAME[0]}: missing argument}; shift
+
+	local err=0; local root; root=$(
+		[[ -z $cwd ]] || cd "$cwd" || exit
+
+		while :; do
+			local try
+
+			for try; do
+				if [[ -e $try ]]; then
+					echo "$PWD"
+					exit 0
+				fi
+			done
+
+			# shellcheck disable=2128
+			if [[ $PWD == "/" ]]; then
+				break
+			fi
+
+			cd .. || exit
+		done
+
+		exit 1
+	) || err=$?
+
+	if [[ $err -eq 0 ]] && [[ -n ${root:-} ]]; then
+		echo "$root"
+		return 0
+	fi
+
+	return 1
+}
+
+warn() {
+	echo "kludge: $*" >&2
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Main
+# ----------------------------------------------------------------------------------------------------------------------
+
+main() {
+	command -v biome &>/dev/null || abort "Biome required"
+
+	local -a args=()
+
+	if ! locate "$KLUDGE_CONFIG_FILE" &>/dev/null && [[ -f "$KLUDGE_CONFIG_PATH"/"$KLUDGE_CONFIG_FILE" ]]; then
+		while [[ $# -gt 0 ]]; do
+			case "${1:-}" in
+			-*)
+				args+=("$1")
+				shift
+				;;
+			*)
+				break
+				;;
+			esac
+		done
+
+		case "${1:-}" in
+		stop)
+			args+=("$1")
+			shift
+			;;
+		"")
+			;;
+		*)
+			args+=("$1" --config-path "$KLUDGE_CONFIG_PATH")
+			shift
+			;;
+		esac
+	fi
+
+	exec biome "${args[@]}" "$@"
+}
+
+main "$@"

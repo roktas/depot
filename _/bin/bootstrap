@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+brew_prefix_linux() {
+	if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+		echo /home/linuxbrew/.linuxbrew
+		return
+	fi
+
+	if [[ -x "$HOME"/.linuxbrew/bin/brew ]]; then
+		echo "$HOME"/.linuxbrew
+		return
+	fi
+
+	return 1
+}
+
+brew_prefix_macos() {
+	if [[ -x /opt/homebrew/bin/brew ]]; then
+		echo /opt/homebrew
+		return
+	fi
+
+	if [[ -x /usr/local/bin/brew ]]; then
+		echo /usr/local
+		return
+	fi
+
+	return 1
+}
+
+detect_platform() {
+	case $(uname -s) in
+	Darwin)
+		echo macos
+	;;
+	Linux)
+		echo linux
+	;;
+	*)
+		abort "unsupported bootstrap platform: $(uname -s)"
+	;;
+	esac
+}
+
+ensure_command_line_tools() {
+	if xcode-select -p >/dev/null 2>&1; then
+		return
+	fi
+
+	xcode-select --install
+	abort "Xcode Command Line Tools installation started; rerun bootstrap after it finishes"
+}
+
+install_apt_base() {
+	command -v apt-get >/dev/null || return
+
+	sudo apt-get update
+	sudo apt-get install -y --no-install-recommends build-essential ca-certificates curl file git procps
+}
+
+install_homebrew() {
+	if command -v brew >/dev/null || "brew_prefix_$platform" >/dev/null; then
+		return
+	fi
+
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+}
+
+load_homebrew() {
+	local prefix
+
+	prefix=$("brew_prefix_$platform") || abort "Homebrew installation was not found"
+	eval "$("$prefix"/bin/brew shellenv)"
+}
+
+persist_homebrew() {
+	local line
+	local profile
+
+	case $platform in
+	linux)
+		profile=$HOME/.profile
+	;;
+	macos)
+		profile=$HOME/.zprofile
+	;;
+	*)
+		abort "unsupported bootstrap platform: $platform"
+	;;
+	esac
+
+	line="eval \"\$($(brew --prefix)/bin/brew shellenv)\""
+
+	touch "$profile"
+	if ! grep -Fqx "$line" "$profile"; then
+		printf '\n%s\n' "$line" >>"$profile"
+	fi
+}
+
+usage() {
+	cat <<-EOF
+	Usage: bootstrap [linux|macos]
+	EOF
+}
+
+warn() {
+	echo -e "$*" >&2
+}
+
+main() {
+	platform=${1:-$(detect_platform)}
+
+	if (($# > 1)); then
+		usage
+		exit 2
+	fi
+
+	case $platform in
+	linux)
+		install_apt_base
+	;;
+	macos)
+		ensure_command_line_tools
+	;;
+	*)
+		abort "unsupported bootstrap platform: $platform"
+	;;
+	esac
+
+	install_homebrew
+	load_homebrew
+	persist_homebrew
+
+	brew update
+	brew install curl git ruby
+
+	ruby --version
+	git --version
+	curl --version | head -n 1
+}
+
+main "$@"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ops: Oracle Cloud"
+  short_description: "OCI CLI operations, auth, budgets, quotas, and compute"
+  default_prompt: "Use $ops-oci to work with Oracle Cloud Infrastructure via the OCI CLI."

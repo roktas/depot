@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+die() {
+	echo >&2 "$*"
+	exit 1
+}
+
+climb() {
+	local cwd=${1?${FUNCNAME[0]}: missing argument}; shift
+
+	cd "$cwd" || exit
+
+	while :; do
+		local try
+
+		for try; do
+			if [[ -e $try ]]; then
+				return 0
+			fi
+		done
+
+		# shellcheck disable=2128
+		if [[ $PWD == "/" ]]; then
+			break
+		fi
+
+		cd .. || exit
+	done
+
+	return 1
+}
+
+main() {
+	climb . Rakefile Makefile make || die "No [MR]akefile found"
+
+	local -a args
+
+	if [[ -f Rakefile ]]; then
+		if [[ -f Gemfile ]] || [[ -f ../Gemfile ]]; then
+			args=(bundle exec rake)
+		else
+			args=(rake)
+		fi
+	elif [[ -f make ]]; then
+		[[ -x make ]] || die "Unexecutable make"
+		args=(./make)
+	else
+		args=(make)
+	fi
+
+	exec "${args[@]}" "$@"
+}
+
+main "$@"

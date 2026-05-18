@@ -1,0 +1,102 @@
+# Settings
+
+set abort_nosubject=no
+set attribution="* %n [%d]"
+set date_format="!%Y-%m-%d %T%Z"
+set delete=yes
+set edit_headers=yes
+set fast_reply=yes
+set help=no
+set history=1000
+set include=yes
+set index_format="%4C %Z %[!%d/%m] %-24.24n   %s"
+set mime_forward=ask-no
+set move=no
+set pgp_verify_sig=no
+set print=ask-yes
+set reverse_name=yes
+set reverse_realname=yes
+set save_history=1000
+set sort_aux=date-sent
+set sort=threads
+set status_format="%f%> %?n?(%n)? %?M?%M/?%m%?n? "
+set status_on_top=yes
+set tilde=yes
+set text_flowed=yes
+set editor='vim "+setlocal filetype=mail fo+=naw tw=72 comments+=nb:>"'
+set visual='vim "+setlocal filetype=mail fo+=naw tw=72 comments+=nb:>"'
+
+set certificate_file="~/.cache/mutt/certificates"
+set header_cache="~/.cache/mutt/headers"
+set history_file="~/.cache/mutt/history"
+set message_cachedir="~/.cache/mutt/bodies"
+
+ignore *
+unignore from subject to cc reply-to date
+hdr_order date to cc reply-to from subject
+
+bind browser <right> select-entry
+bind index,pager w sync-mailbox
+bind index <right> display-message
+bind pager <left> exit
+macro index <left> "<change-folder>?<enter>" "kutu seç"
+macro index,pager,browser \e<end> "<change-folder>=[Gmail]/Gönderilmiş<quote-char> Postalar<enter>" "gönderilen postalara geç"
+macro index,pager,browser \e<home> "<change-folder>!<enter>" "gelen kutusuna geç"
+macro index,pager \eo "<change-folder>?<enter>" "kutu seç"
+
+# IMAP
+
+unset record
+set copy=no
+set imap_check_subscribed=yes
+set imap_keepalive=120
+set folder="imaps://imap.gmail.com:993"
+set spoolfile="+INBOX"
+set postponed="+[Gmail]/Taslaklar"
+set query_command="goobook query '%s'"
+
+set smtp_url=smtp://$imap_user:$imap_pass@smtp.gmail.com:587/
+
+# Colors
+
+color attachment brightyellow black
+color body       brightblue default  "((ftp|http|https)://|news:)[^ >)\"\t]+"
+color body       color198 default "(^| )\\*[-a-z0-9*]+\\*[,.?]?[ \n]"
+color body       color198 default "(http|https|git)://gist[.]github[.]com/.*"
+color body       cyan  default "[-a-z_0-9.+]+@[-a-z_0-9.]+"
+color body       green default "(^| )_[-a-z0-9_]+_[,.?]?[ \n]"
+color body       green default "(^| )_[-a-z0-9_]+_[,.?]?[\n]"
+color hdrdefault color153 color233
+color header     brightyellow black 'from:'
+color header     color120 black 'subject:'
+color index      brightyellow black  ~T  # Tagged
+color index      color153 black  '~P'    # Mail from me
+color index      magenta black  ~F       # Flagged
+color index      red  black  ~D          # Deleted
+color index      yellow black  ~N        # New
+color index      yellow black  ~O        # Old
+color indicator  brightwhite color240
+color markers    brightred black
+color normal     white black
+color quoted1    color66  color232
+color quoted2    color32  color232
+color quoted3    color30  color232
+color quoted4    color99  color232
+color quoted5    color36  color232
+color quoted6    color114 color232
+color quoted7    color109 color232
+color quoted8    color41  color232
+color quoted9    color138 color232
+color quoted     color107 color232
+color signature  color240 color232
+color status     black color111
+color tilde      color240 black
+color tree       color198 black
+
+# Hooks
+
+folder-hook . 'push <limit>~N|~F|~d<3m<return>'
+
+# Local
+
+source local

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev: Agent Workspace"
+  short_description: "Organize repo-local agent files"
+  default_prompt: "Use $dev-agents to place agent-facing repo files under .agents/."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lang: Bash Scripting"
+  short_description: "Bash style, safety, and shell scripting"
+  default_prompt: "Use $lang-bash to write or review a safe Bash script."

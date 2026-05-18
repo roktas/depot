@@ -1,0 +1,253 @@
+# shellcheck disable=1091,2148,2155
+
+# Some parts are adapted from https://github.com/mrzool/bash-sensible
+[[ -n ${PS1:-} ]] || return
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Settings
+# ----------------------------------------------------------------------------------------------------------------------
+
+case :$PATH: in *:"$HOME"/.local/bin:*) export PATH=$HOME/.local/bin:$PATH ;; esac
+case :$PATH: in *:"$HOME"/Dropbox/bin:*) export PATH=$HOME/Dropbox/bin:$PATH ;; esac
+
+export SHELL=$(command -v bash)
+
+HISTSIZE=500000
+HISTFILESIZE=100000
+HISTCONTROL='erasedups:ignoreboth'
+HISTTIMEFORMAT='%F %T '
+HISTIGNORE='&:[ ]*:exit:ls:bg:fg:history:clear'; export HISTIGNORE
+
+shopt -s autocd
+shopt -s cdspell
+shopt -s checkwinsize
+shopt -s cmdhist
+shopt -s dirspell
+shopt -s globstar
+shopt -s histappend
+shopt -s nocaseglob
+shopt -s no_empty_cmd_completion
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Bindings
+# ----------------------------------------------------------------------------------------------------------------------
+
+bind '"\eq":"\C-d"'
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\e[C": forward-char'
+bind '"\e[D": backward-char'
+bind 'set completion-ignore-case on'
+bind 'set completion-map-case on'
+bind 'set mark-symlinked-directories on'
+bind 'set show-all-if-ambiguous on'
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Portability
+# ----------------------------------------------------------------------------------------------------------------------
+
+case $OSTYPE in
+linux*)
+	XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/${EUID:-$(id -u)}}
+
+	if command -v dircolors &>/dev/null; then
+		if [[ -r ~/.dircolors ]]; then
+			eval "$(dircolors -b ~/.dircolors)"
+		else
+			eval "$(dircolors -b)"
+		fi
+	fi
+
+	alias ls='ls --color=auto'
+	;;
+darwin*)
+	XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-"$HOME"/Library/Caches/TemporaryItems}
+
+	alias ls='ls -G'
+	alias readlink=greadlink
+	;;
+esac
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Completion
+# ----------------------------------------------------------------------------------------------------------------------
+
+# shellcheck disable=1091
+if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+	. /usr/share/bash-completion/bash_completion
+elif [[ -f /etc/bash_completion ]]; then
+	. /etc/bash_completion
+fi
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Prompt
+# ----------------------------------------------------------------------------------------------------------------------
+
+# shellcheck disable=2034
+declare -Ag ansi_colors_256=(
+	[black]='\e[1m\e[38;5;8m'
+	[blue]='\e[1m\e[38;5;12m'
+	[cyan]='\e[1m\e[38;5;14m'
+	[green]='\e[1m\e[38;5;10m'
+	[grey]='\e[1m\e[38;5;8m'
+	[magenta]='\e[1m\e[38;5;13m'
+	[red]='\e[1m\e[38;5;9m'
+	[white]='\e[1m\e[38;5;15m'
+	[yellow]='\e[1m\e[38;5;11m'
+
+	[null]='\e[0m'
+)
+
+prompt_command() {
+	local last_exit_code=$?
+
+	if ! [[ $PWD == "$HOME" ]]; then
+		local pwd=${PWD/#$HOME/\~}; local slug=${pwd##*/} dir=${pwd%/*}/
+	else
+		local slug='~' dir=''
+	fi
+
+	local char='>'; [[ ${EUID:-} -ne 0 ]] || char='#'
+
+	local -n c=ansi_colors_256
+	c[char]=${c[yellow]}; [[ $last_exit_code -eq 0 ]] || c[char]=${c[red]}
+
+	PS1="\[${c[grey]}\]${dir}\[${c[null]}\]\[${c[cyan]}\]${slug}\[${c[null]}\] \[${c[char]}\]${char}\[${c[null]}\] "
+}
+export PROMPT_COMMAND=prompt_command
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Aliases and/or Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+alias ...='cd $(git rev-parse --show-toplevel)'
+
+alias a=apt
+alias A='sudo apt'
+
+b() {
+	local cmd=$1
+	shift
+
+	if [[ -z $cmd ]] &&  [[ ! -f .envrc ]]; then
+		echo "layout ruby" >.envrc
+		sleep 0.1
+		direnv allow .
+
+		return
+	fi
+
+	case $cmd in
+	i) bundle install "$@" ;;
+	u) bundle update "$@" ;;
+	e) bundle exec "$@" ;;
+	c) bundle config "$@" ;;
+	*) bundle "$@" ;;
+	esac
+}
+
+alias e=nvim
+alias E='sudo nvim'
+
+alias g=git
+
+alias i='inkscape'
+alias I='inkview'
+
+alias j='journalctl --user --unit'
+alias J='sudo journalctl'
+
+alias l='lazygit'
+
+alias m='ramake'
+alias M='ramake'
+
+alias o='open'
+
+alias r='bundle exec rails'
+
+alias s='systemctl --user'
+alias S='sudo systemctl'
+
+alias t='todo.sh -t'
+alias T='todo.sh'
+
+alias v=vi
+alias V='sudo vi'
+
+alias x='bundle exec'
+
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+
+# ----------------------------------------------------------------------------------------------------------------------
+# External
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Command not found
+if [[ -x /usr/lib/command-not-found ]] || [[ -x /usr/share/command-not-found/command-not-found ]]; then
+	command_not_found_handle() {
+                if [[ -x /usr/lib/command-not-found ]]; then
+			/usr/lib/command-not-found -- "$1"
+                	return $?
+                elif [[ -x /usr/share/command-not-found/command-not-found ]]; then
+			/usr/share/command-not-found/command-not-found -- "$1"
+                	return $?
+		else
+			printf "%s: command not found\n" "$1" >&2
+			return 127
+		fi
+	}
+fi
+
+# Direnv
+command -v direnv &>/dev/null && eval "$(direnv hook bash)"
+
+# Fzf
+[[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]] && source /usr/share/doc/fzf/examples/key-bindings.bash
+[[ -f /usr/share/doc/fzf/examples/completion.bash ]] && source /usr/share/doc/fzf/examples/completion.bash
+
+
+# Midnight Commander
+mc() {
+	local -i err=0
+	local file=$XDG_RUNTIME_DIR/mc
+
+	COLORTERM=truecolor /usr/bin/mc -P "$file" "$@" || err=$?
+
+	if [ -r "$file" ]; then
+		dir=$(cat "$file")
+		if [ -n "$dir" ] && [ -d "$dir" ] && [ ! "$dir" = "$PWD" ]; then
+			cd "$dir" || err=$?
+		fi
+	fi
+
+	rm -f "$file"
+
+	return $err
+}
+
+# Zoxide
+command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Customization
+# ----------------------------------------------------------------------------------------------------------------------
+
+if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/bash ]]; then
+	if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/bash/conf.d ]]; then
+		for f in "${XDG_CONFIG_HOME:-$HOME/.config}"/bash/conf.d/*.sh; do
+			builtin source "$f"
+		done
+
+		unset f
+	fi
+
+	if [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/config.sh ]]; then
+		builtin source "${XDG_CONFIG_HOME:-$HOME/.config}"/bash/config.sh
+	fi
+fi
+
+# opencode
+export PATH=/home/roktas/.opencode/bin:$PATH

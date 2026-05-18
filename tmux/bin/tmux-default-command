@@ -1,0 +1,10 @@
+#!/bin/sh
+
+preferred_shell=/usr/bin/fish
+current_window=$(tmux display-message -p '#I')
+
+if [ "$current_window" = "0" ]; then
+	tmux rename-window "Hello" && exec "$preferred_shell" -l
+else
+	exec "$preferred_shell"
+fi

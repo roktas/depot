@@ -1,0 +1,3 @@
+#!/bin/bash
+
+"${EDITOR:-nvim}" "$TODO_DIR"/0000.md

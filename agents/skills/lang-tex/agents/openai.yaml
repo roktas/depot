@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lang: TeX Documents"
+  short_description: "TeX, LaTeX, and publication-quality source"
+  default_prompt: "Use $lang-tex to edit or review TeX and LaTeX documents."

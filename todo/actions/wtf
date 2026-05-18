@@ -1,0 +1,5 @@
+#!/bin/bash
+
+! command -v bat &>/dev/null || PAGER=bat
+
+[[ -f "$TODO_DIR"/README.md ]] && "${PAGER:-cat}" "$TODO_DIR"/README.md
