@@ -1,11 +1,10 @@
 ---
 all:
-  packages:
-    - alacritty
   links:
     alacritty.toml: ~/.config/alacritty/alacritty.toml
 ---
 
 # Alacritty
 
-Terminal emulator package and user configuration.
+Alacritty user configuration. Package installation is intentionally omitted until a current Linux-friendly source is
+chosen.

@@ -228,7 +228,9 @@ class ProvisionPlan
     def normalize_package(package)
       value      = package.to_s
       type, name = value.include?(":") ? value.split(":", 2) : [DEFAULT_PACKAGE_TYPE.fetch(@platform), value]
+      raise "Package type must not be empty: #{value}" if type.empty?
       raise "Unsupported package type: #{type}" unless PACKAGE_TYPES.include?(type)
+      raise "Package name must not be empty: #{value}" if name.empty?
 
       {
         type:,

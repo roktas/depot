@@ -1,5 +1,5 @@
 ---
-all:
+macos:
   packages:
     - cask:ghostty
 ---

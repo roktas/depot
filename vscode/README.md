@@ -1,10 +1,11 @@
 ---
 all:
   level: extra
-  packages:
-    - cask:visual-studio-code
   links:
     settings.json: ~/.config/Code/User/settings.json
+macos:
+  packages:
+    - cask:visual-studio-code
 ---
 
 # Visual Studio Code

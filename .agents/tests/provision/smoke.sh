@@ -89,11 +89,18 @@ EOF
 		c = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "c" }
 		abort "missing c extra module" unless c
 		abort "missing c llvm package" unless c.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:llvm" }
+		javascript = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "javascript" }
+		abort "missing javascript module" unless javascript
+		abort "missing tapped bun formula" unless javascript.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:oven-sh/bun/bun" }
 		virtualbox = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "virtualbox" }
 		abort "missing virtualbox extra module" unless virtualbox
 		abort "virtualbox should be virtual" unless virtualbox.fetch("virtual") == true
 		abort "missing virtualbox install section" unless virtualbox.fetch("special_sections").key?("Install")
 		abort "missing virtualbox postinstall section" unless virtualbox.fetch("special_sections").key?("Postinstall")
+		abort "ghostty should not be planned on linux" if extra_plan.fetch("modules").any? { |mod| mod.fetch("name") == "ghostty" }
+		vscode = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "vscode" }
+		abort "missing vscode module" unless vscode
+		abort "vscode linux plan should not install cask" if vscode.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:visual-studio-code" }
 	'
 
 	rm -rf "$PLATFORM_NULL_MODULE"
@@ -118,10 +125,34 @@ EOF
 		plan = JSON.parse(File.read("/tmp/macos-plan.json"))
 		abort "gnome should not be planned on macos" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "gnome" }
 		abort "linux should not be planned on macos" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "linux" }
+		ghostty = plan.fetch("modules").find { |mod| mod.fetch("name") == "ghostty" }
+		abort "missing ghostty module on macos" unless ghostty
+		abort "missing ghostty macos cask" unless ghostty.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:ghostty" }
 		smoke = plan.fetch("modules").find { |mod| mod.fetch("name") == "zz-platform-null-smoke" }
 		abort "missing platform null module" unless smoke
 		abort "missing platform null install section" unless smoke.fetch("special_sections").key?("Install")
 	'
+
+	rm -rf "$PLATFORM_NULL_MODULE"
+	mkdir -p "$PLATFORM_NULL_MODULE"
+	cat >"$PLATFORM_NULL_MODULE/README.md" <<'EOF'
+---
+all:
+  packages:
+    - "brew:"
+---
+
+# Invalid Package Smoke
+EOF
+
+	if .agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/invalid-package-plan.json 2>/tmp/invalid-package-plan.err; then
+		echo "expected invalid package name guard to fail" >&2
+		exit 1
+	fi
+
+	grep -q "Package name must not be empty" /tmp/invalid-package-plan.err
+
+	rm -rf "$PLATFORM_NULL_MODULE"
 
 	.agents/skills/provision/bin/plan --mode refresh --platform linux --host smoke >/tmp/refresh-plan.json
 

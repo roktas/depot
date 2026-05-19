@@ -648,21 +648,23 @@ Migrate in small groups:
 
 ## Handoff
 
-Session paused after the bootstrap redesign. Bootstrap moved from `_/bin/bootstrap` to the provision skill helper at
-`.agents/skills/provision/bin/bootstrap`; `_` is now the first normal virtual module for small shared declarations.
+First migration pass has been reviewed. Package names were checked against the active plan using Homebrew Formulae JSON
+API catalogs, Flathub remote metadata, npm registry metadata, RubyGems metadata, PyPI metadata, Debian/Ubuntu package
+references, and the GitHub release package assumption for `github:mweirauch/dropignore`.
 
-Validation run after the redesign:
+Review fixes:
 
-- `.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke --format markdown`
-- `.agents/tests/provision/smoke.sh`
-- `shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/lxd-smoke .agents/tests/provision/smoke.sh`
-- `RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan`
-- `git diff --check`
+- `javascript` now uses `brew:oven-sh/bun/bun`, because Bun is installed through the official `oven-sh/bun` Homebrew
+  tap rather than Homebrew core.
+- `alacritty` no longer declares a package. The Homebrew cask is macOS-only and deprecated, and no current Flathub app
+  was found during this pass.
+- `ghostty` now declares `cask:ghostty` only under `macos`, because the Homebrew cask is macOS-only.
+- `vscode` now declares `cask:visual-studio-code` only under `macos`. Linux installation remains undecided because the
+  current config and extension flow targets native VS Code paths and CLI behavior, while Flathub uses a different
+  application sandbox.
 
-All checks passed. The bootstrap redesign and this Debian migration task are not committed yet.
-
-Recommended next discussion: decide whether `terminal` and `desktop` still exist as root meta modules, or whether `_`,
-focused modules, and `linux` are sufficient.
+Remaining open design question: decide later how to represent Linux-heavy sections if `linux/README.md` becomes too
+large or too hard to review.
 
 ## Progress
 
@@ -682,6 +684,7 @@ focused modules, and `linux` are sufficient.
   settings.
 - Canceled deferred ambiguous packages and tools for now: `crush`, `git-cc`, `caddy`/`xcaddy`, Vifm archive helpers,
   Neomutt extras, KVM, HashiCorp, `regexxer`, and `ulauncher`.
+- Reviewed package declarations and platform-gated macOS-only casks out of the Linux plan.
 
 Validation:
 
