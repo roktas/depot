@@ -3,3 +3,4 @@
 .agents/state/
 __pycache__/
 *.pyc
+agents/skills/.system/

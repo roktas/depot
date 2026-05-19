@@ -154,13 +154,15 @@ Use `.agents/state/human/todo.md` for user-owned, untracked project notes that m
 truth; promote useful items into `.agents/tasks/<task>/todo.md` or `.agents/specs/` only when they become tracked work
 or durable behavior.
 
-Use `bin/todo` to append checklist items, print paths, or open these files:
+Use this skill's helper, resolved relative to the directory that contains this `SKILL.md`, to append checklist items,
+print paths, or open these files. Run these commands from the skill directory, or otherwise resolve `bin/todo` relative
+to the skill directory. Do not look for `bin/todo` in the target repository root.
 
 ```bash
-bin/todo human "Revisit Linux package baseline"
-bin/todo agent "Re-run smoke test after changing plan helper"
-bin/todo human --edit
-bin/todo agent --path
+./bin/todo human "Revisit Linux package baseline"
+./bin/todo agent "Re-run smoke test after changing plan helper"
+./bin/todo human --edit
+./bin/todo agent --path
 ```
 
 Prompt shortcuts:
