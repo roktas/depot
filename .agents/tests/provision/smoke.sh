@@ -44,6 +44,10 @@ main() {
 		abort "missing linux platform module" unless linux
 		abort "linux platform module should be second" unless plan.fetch("modules")[1].fetch("name") == "linux"
 		abort "missing linux install section" unless linux.fetch("special_sections").key?("Install")
+		chrome = plan.fetch("modules").find { |mod| mod.fetch("name") == "chrome" }
+		abort "missing chrome module" unless chrome
+		abort "missing chrome linux install section" unless chrome.fetch("special_sections").dig("Install", "body").include?("google-chrome-beta")
+		abort "chrome linux plan should not install macos cask" unless chrome.fetch("packages_to_install").empty?
 		abort "linux dash variant should not be planned at normal level" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "linux-" }
 		agents = plan.fetch("modules").find { |mod| mod.fetch("name") == "agents" }
 		abort "missing agents module" unless agents
@@ -147,10 +151,20 @@ macos: ~
 
 # Platform Null Smoke
 
-## Install
+## All Platforms
+
+### Install
 
 ```bash
-true
+echo all
+```
+
+## MacOS
+
+### Install
+
+```bash
+echo macos
 ```
 EOF
 
@@ -163,9 +177,16 @@ EOF
 		ghostty = plan.fetch("modules").find { |mod| mod.fetch("name") == "ghostty" }
 		abort "missing ghostty module on macos" unless ghostty
 		abort "missing ghostty macos cask" unless ghostty.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:ghostty" }
+		chrome = plan.fetch("modules").find { |mod| mod.fetch("name") == "chrome" }
+		abort "missing chrome module on macos" unless chrome
+		abort "missing chrome beta macos cask" unless chrome.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:google-chrome@beta" }
+		abort "chrome macos plan should not include linux install" if chrome.fetch("special_sections").key?("Install")
+		abort "virtualbox should not be planned on macos" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "virtualbox" }
 		smoke = plan.fetch("modules").find { |mod| mod.fetch("name") == "zz-platform-null-smoke" }
 		abort "missing platform null module" unless smoke
 		abort "missing platform null install section" unless smoke.fetch("special_sections").key?("Install")
+		body = smoke.fetch("special_sections").fetch("Install").fetch("body")
+		abort "platform scoped sections should preserve document order" unless body.index("echo all") < body.index("echo macos")
 	'
 
 	rm -rf "$PLATFORM_NULL_MODULE"

@@ -48,7 +48,7 @@ The following checks passed after the latest changes:
 ```bash
 ruby -c .agents/skills/provision/bin/plan
 rubocop --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck .agents/tests/provision/smoke.sh bin/bin/ramake biome/bin/biome-kludge bundle/bin/bundle-kludge fzf/bin/search todo/actions/edit todo/actions/note todo/actions/projectview todo/actions/revive todo/actions/wtf todo/actions/xp
+shellcheck .agents/tests/provision/smoke.sh bin/bin/ramake biome/bin/biome-kludge fzf/bin/search todo/actions/edit todo/actions/note todo/actions/projectview todo/actions/revive todo/actions/wtf todo/actions/xp
 .agents/tests/provision/smoke.sh
 docker run --rm -v /home/roktas/Dropbox/src/home:/repo:ro home-provision-smoke
 python3 /home/roktas/Dropbox/src/dotfiles/agents/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/provision

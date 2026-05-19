@@ -111,6 +111,10 @@ must be Bash, and must not require Ruby. It installs the platform package-manage
 - If a special README section contains only `bash` fenced blocks, run them in written order after confirmation.
 - Special README sections may contain lower-level headings such as `### GNOME`; keep those as instructions inside the
   selected section rather than adding new special-section semantics.
+- README bodies may scope special sections under `## All Platforms`, `## Linux`, `## MacOS`, or `## Windows`. Within
+  those scopes, write special sections one level lower, such as `### Install`. Select `All Platforms` and the active
+  platform only; ignore other platform scopes. Top-level special sections such as `## Install` remain valid and are
+  treated like all-platform instructions.
 - Special sections have plain exit-code semantics: `0` is success or intentional no-op; non-zero is failure. Do not use
   custom skip exit codes, fenced-block metadata, or a separate precondition protocol.
 

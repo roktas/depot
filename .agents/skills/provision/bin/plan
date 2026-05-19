@@ -146,11 +146,18 @@ class ProvisionPlan
       end
     end
 
-    def module_applicable?(frontmatter)
+    def module_applicable?(frontmatter, body)
       return true if frontmatter.empty? || frontmatter.key?("all") || frontmatter.key?(@platform)
+      return true if body_platform_applicable?(body)
 
       platform_keys = DEFAULT_PACKAGE_TYPE.keys
       !frontmatter.keys.intersect?(platform_keys)
+    end
+
+    def body_platform_applicable?(body)
+      platform_scopes(body).any? do |scope|
+        ["all", @platform].include?(scope.fetch(:platform))
+      end
     end
 
     def module_level(config)
@@ -278,7 +285,7 @@ class ProvisionPlan
     def planned_module(dir)
       readme = dir.join("README.md")
       frontmatter, body = frontmatter_and_body(readme)
-      return nil unless module_applicable?(frontmatter)
+      return nil unless module_applicable?(frontmatter, body)
 
       config = active_config(frontmatter)
       level = module_level(config)
@@ -432,20 +439,72 @@ class ProvisionPlan
 
     def special_sections(body)
       sections = {}
-      SPECIAL_SECTIONS.each do |name|
-        match = body.match(/^##\s+#{Regexp.escape(name)}\s*$\n(.*?)(?=^##\s+|\z)/m)
-        next unless match
-
-        content = match[1].strip
-        blocks  = bash_blocks(content)
-
-        sections[name] = {
-          body: content,
-          bash_blocks: blocks,
-          bash_only: content.gsub(/```(?:bash|sh)\s*\n.*?```/m, "").strip.empty? && !blocks.empty?
-        }
+      collected_special_sections(body).each do |section|
+        existing = sections[section.fetch(:name)]
+        sections[section.fetch(:name)] = merge_section(existing, section.fetch(:content))
       end
       sections
+    end
+
+    def collected_special_sections(body)
+      markdown_sections(body, 2).flat_map do |section|
+        name = special_heading(section.fetch(:title))
+        next [{ name:, content: section.fetch(:content) }] if name
+
+        platform = platform_heading(section.fetch(:title))
+        next [] unless ["all", @platform].include?(platform)
+
+        markdown_sections(section.fetch(:content), 3).filter_map do |subsection|
+          subsection_name = special_heading(subsection.fetch(:title))
+          next unless subsection_name
+
+          { name: subsection_name, content: subsection.fetch(:content) }
+        end
+      end
+    end
+
+    def markdown_sections(body, level)
+      heading = "#" * level
+      body.scan(/^#{heading}\s+(.+?)\s*$\n(.*?)(?=^#{heading}\s+|\z)/m).map do |title, content|
+        { title: title.strip, content: content.strip }
+      end
+    end
+
+    def merge_section(existing, content)
+      body = [existing&.fetch(:body), content].compact.reject(&:empty?).join("\n\n")
+      blocks = bash_blocks(body)
+
+      {
+        body:,
+        bash_blocks: blocks,
+        bash_only: body.gsub(/```(?:bash|sh)\s*\n.*?```/m, "").strip.empty? && !blocks.empty?
+      }
+    end
+
+    def platform_scopes(body)
+      markdown_sections(body, 2).filter_map do |section|
+        platform = platform_heading(section.fetch(:title))
+        next unless platform
+
+        { platform:, content: section.fetch(:content) }
+      end
+    end
+
+    def platform_heading(title)
+      case title.strip.downcase
+      when "all", "all platforms"
+        "all"
+      when "linux"
+        "linux"
+      when "macos", "darwin"
+        "macos"
+      when "windows"
+        "windows"
+      end
+    end
+
+    def special_heading(title)
+      SPECIAL_SECTIONS.find { |name| name == title }
     end
 
     def state_path

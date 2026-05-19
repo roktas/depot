@@ -228,6 +228,12 @@ gerektiği anlaşılır.
 bozmaz; literate provisioning için talimatı gruplandırır. Bu durumda bölüm yalnızca bash block'lardan oluşmadığı için
 agent, bölüm metnini de talimat olarak dikkate alır.
 
+README gövdesi platform scope kullanabilir. `## All Platforms`, `## Linux`, `## MacOS` veya `## Windows` başlıkları
+altındaki özel bölümler bir seviye aşağıda, örneğin `### Install` olarak yazılır. Plan aktif platformda `All Platforms`
+ve aktif platform scope'unu seçer; diğer platform scope'larını atlar. Geriye uyumluluk için top-level `## Install` gibi
+özel bölümler `All Platforms` kabul edilir. Platform scope içindeki özel bölüm ile top-level özel bölüm aynı ada sahipse
+içerikler dokümandaki sırayla aynı özel bölüm altında birleştirilir.
+
 Harness özel `Precondition` bölümü, fenced-block metadata veya özel skip exit code yorumlamaz. Runtime guard gerekiyorsa
 ilgili fenced block kendi koşulunu sınar. Exit code semantiği sadedir: `0` başarılı veya bilinçli no-op, non-zero hata.
 

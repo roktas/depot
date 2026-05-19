@@ -1,5 +1,5 @@
 ---
-all:
+linux:
   level: extra
 ---
 
@@ -7,7 +7,9 @@ all:
 
 Extra Linux VirtualBox host installation with explicit guards.
 
-## Install
+## Linux
+
+### Install
 
 Install VirtualBox from Oracle's apt repository only on physical Debian or Ubuntu hosts and only when explicitly
 requested.
@@ -59,7 +61,7 @@ elif command -v vboxmanage >/dev/null; then
 fi
 ```
 
-## Postinstall
+### Postinstall
 
 Install the Oracle VirtualBox Extension Pack only when explicitly requested. This may require accepting Oracle's license
 terms during installation.
