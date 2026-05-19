@@ -11,7 +11,6 @@ require "time"
 require "yaml"
 
 class ProvisionPlan
-  DEFAULT_BRANCH = "main"
   DEFAULT_PACKAGE_TYPE = {
     "linux" => "brew",
     "macos" => "brew",
@@ -84,7 +83,9 @@ class ProvisionPlan
       merge_config(all, platform)
     end
 
-    def actions_skipped?(skipped) = skipped || !apply?
+    def apply_like? = apply? || repair?
+
+    def actions_skipped?(skipped) = skipped || !apply_like?
 
     def bash_blocks(body)
       body.scan(/```(?:bash|sh)\s*\n(.*?)```/m).flatten.map(&:strip).reject(&:empty?)
@@ -249,9 +250,14 @@ class ProvisionPlan
     end
 
     def package_actions(packages, mode, skipped)
-      return [] if skipped || @mode != mode
+      return [] if skipped
+      return [] unless package_mode?(mode)
 
       packages
+    end
+
+    def package_mode?(mode)
+      mode == "apply" ? apply_like? : @mode == mode
     end
 
     def planned_module(dir)

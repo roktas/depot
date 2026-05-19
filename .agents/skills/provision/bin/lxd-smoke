@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \t\n'
 
 abort() {
 	warn "E: $*"
@@ -22,7 +22,7 @@ usage() {
 }
 
 warn() {
-	echo -e "$*" >&2
+	printf '%s\n' "$*" >&2
 }
 
 apt_get() {
