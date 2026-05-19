@@ -15,3 +15,5 @@
 - [x] Migrate first Linux system sections.
 - [x] Review first migration pass.
 - [x] Decide which deferred ambiguous packages should migrate: canceled for now.
+- [ ] Make Neovim postinstall non-interactive or move plugin synchronization out of minimal apply.
+- [ ] Decide how RubyGems user bin paths should enter `PATH` after `gem:` package installs.

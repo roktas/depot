@@ -9,10 +9,11 @@ main() {
 	script_dir=$(cd -- "${BASH_SOURCE[0]%/*}" >/dev/null && pwd)
 	repo=${REPO_ROOT:-$(cd -- "$script_dir/../../.." >/dev/null && pwd)}
 	LEVEL_EXTRA_MODULE=$repo/zz-level-extra-smoke
+	LINK_TARGET_LIST_MODULE=$repo/zz-link-target-list-smoke
 	PLATFORM_NULL_MODULE=$repo/zz-platform-null-smoke
 	REPAIR_REPO=
 
-	trap 'rm -rf "$LEVEL_EXTRA_MODULE" "$PLATFORM_NULL_MODULE"; [[ -z ${REPAIR_REPO:-} ]] || rm -rf "$REPAIR_REPO"' EXIT HUP INT QUIT TERM
+	trap 'rm -rf "$LEVEL_EXTRA_MODULE" "$LINK_TARGET_LIST_MODULE" "$PLATFORM_NULL_MODULE"; [[ -z ${REPAIR_REPO:-} ]] || rm -rf "$REPAIR_REPO"' EXIT HUP INT QUIT TERM
 
 	export GIT_CONFIG_GLOBAL=${GIT_CONFIG_GLOBAL:-/tmp/provision-smoke-gitconfig}
 
@@ -47,7 +48,10 @@ main() {
 		agents = plan.fetch("modules").find { |mod| mod.fetch("name") == "agents" }
 		abort "missing agents module" unless agents
 		abort "agents should default to normal level" unless agents.fetch("level") == "normal"
-		abort "agents should be virtual" unless agents.fetch("virtual") == true
+		abort "agents should not be virtual" unless agents.fetch("virtual") == false
+		abort "missing codex cask" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:codex" }
+		abort "missing opencode package" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:opencode" }
+		abort "missing gemini-cli package" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:gemini-cli" }
 		git = plan.fetch("modules").find { |mod| mod.fetch("name") == "git" }
 		abort "missing git module" unless git
 		abort "git should not be virtual" unless git.fetch("virtual") == false
@@ -58,6 +62,37 @@ main() {
 		abort "missing mc module" unless mc
 		abort "missing mc.ini copy" unless mc.fetch("copies_to_create").any? { |copy| copy.fetch("target") == "~/.config/mc/ini" }
 		abort "gnome module should not be planned" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "gnome" }
+	'
+
+	rm -rf "$LINK_TARGET_LIST_MODULE"
+	mkdir -p "$LINK_TARGET_LIST_MODULE/bin"
+	touch "$LINK_TARGET_LIST_MODULE/config" "$LINK_TARGET_LIST_MODULE/bin/tool"
+	cat >"$LINK_TARGET_LIST_MODULE/README.md" <<'EOF'
+---
+all:
+  links:
+    config:
+      - ~/.config/target-list/a
+      - ~/.config/target-list/b
+    bin/:
+      - ~/.local/bin
+      - ~/.local/sbin
+---
+
+# Link Target List Smoke
+EOF
+
+	.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/link-target-list-plan.json
+
+	ruby -rjson -e '
+		plan = JSON.parse(File.read("/tmp/link-target-list-plan.json"))
+		smoke = plan.fetch("modules").find { |mod| mod.fetch("name") == "zz-link-target-list-smoke" }
+		abort "missing link target list module" unless smoke
+		links = smoke.fetch("links_to_create")
+		abort "missing first scalar source target" unless links.any? { |link| link.fetch("source") == "config" && link.fetch("target") == "~/.config/target-list/a" }
+		abort "missing second scalar source target" unless links.any? { |link| link.fetch("source") == "config" && link.fetch("target") == "~/.config/target-list/b" }
+		abort "missing first fan-in list target" unless links.any? { |link| link.fetch("source") == "bin/tool" && link.fetch("target") == "~/.local/bin/tool" && link.fetch("fan_in") == true }
+		abort "missing second fan-in list target" unless links.any? { |link| link.fetch("source") == "bin/tool" && link.fetch("target") == "~/.local/sbin/tool" && link.fetch("fan_in") == true }
 	'
 
 	rm -rf "$LEVEL_EXTRA_MODULE"

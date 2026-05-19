@@ -54,6 +54,31 @@ support.
 - Keep Dropbox installation out of normal provisioning. Treat it as a separate bootstrap problem for Dropbox-backed
   hosts.
 
+## Validation Notes
+
+### LXD Ubuntu 26.04 Minimal Install
+
+Ran a real install test in LXD instance `home-install-ubuntu-2604`.
+
+- LXD bridge NAT could not reach outbound TCP from the container in this host setup. Switching the instance NIC to
+  macvlan on `enp0s31f6` gave the container LAN address `192.168.1.242` and restored outbound connectivity.
+- `bin/bootstrap` completed on the fresh Ubuntu user: apt baseline, Homebrew, `curl`, `git`, and `ruby` installed.
+- GitHub HTTPS clone could not authenticate in the container, so the install test used a clean local clone from the
+  mounted `/repo` checkout. The target clone was at `172f80a`.
+- Minimal packages installed successfully through Homebrew and RubyGems: Bash, ShellCheck, Direnv, Fish, Git/GH,
+  LazyGit, Tig, Midnight Commander, Neovim, Ruby/RuboCop, and Tmux.
+- Link and copy actions were applied successfully for the checked minimal modules, including Bash, Git, Fish, Neovim,
+  Midnight Commander, and the `vi` wrapper.
+- Linux special sections completed for apt policy, locales, timezone, Flatpak, desktop utility packages, Spleen fonts,
+  and GNOME no-op guarding.
+- Fish postinstall installed the configured Fundle plugins.
+- Neovim postinstall did not complete cleanly. `nvim --headless +qall!` triggered Lazy.nvim plugin work and reached an
+  interactive prompt related to Codeium auth, so the process was terminated and `neovim` was marked `notok` in state.
+- SSH install instructions were applied manually after the Neovim stop, and `/etc/ssh/sshd_config` plus
+  `/etc/sudoers.d/ssh` were updated.
+- RubyGems warned that the user gem bin directory is not on `PATH`:
+  `~/.local/share/gem/ruby/4.0.0/bin`.
+
 ## Script Review
 
 ### Root

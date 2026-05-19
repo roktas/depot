@@ -93,6 +93,8 @@ must be Bash, and must not require Ruby. It installs the platform package-manage
   threshold, so `normal` includes `minimal` and `normal`, while `extra` includes all three levels.
 - Link and copy sources are resolved relative to the module directory; `../` may reference shared files elsewhere in
   this repo, but sources must not escape the repository.
+- A `links` target may be either one string or a list of strings. Use a list when the same source must be linked to
+  multiple targets.
 - Link sources ending with `/` use fan-in semantics: link each direct child of the source directory into the target
   directory with the same basename, rather than linking the source directory itself.
 - `packages` must be a flat YAML list of `[package-type:]package-name` strings. Do not nest package types as mapping

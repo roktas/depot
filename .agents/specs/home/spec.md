@@ -146,7 +146,8 @@ süzgeci yer alır.
 
 **`links`**: Modül dizinine göre relatif kaynaklar ve sembolik linkleneceği hedefler. Kaynaklar normalde modül
 dizinindeki dosyalardır; ortak repo-içi kaynaklar için `../` kullanılabilir. Kaynak yolu normalize edildiğinde repo
-dışına çıkamaz. Linklemede hedef dizin yoksa önce o oluşturulur.
+dışına çıkamaz. Linklemede hedef dizin yoksa önce o oluşturulur. Hedef değeri tek bir string veya string listesi
+olabilir. Liste kullanıldığında aynı kaynak her hedefe ayrı ayrı linklenir.
 
 Kaynak anahtar `/` ile bitmiyorsa kaynak dosya veya dizinin kendisi hedefe sembolik linklenir. Kaynak anahtar `/` ile
 bitiyorsa bu bir **fan-in link** tanımıdır: kaynak dizinin kendisi hedefe linklenmez; kaynak dizinin içindeki doğrudan

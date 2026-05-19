@@ -1,3 +1,13 @@
+---
+all:
+  packages:
+    - cask:codex
+    - opencode
+    - gemini-cli
+  links:
+    skills/: ~/.agents/skills
+---
+
 # Agents
 
-Shared agent assets used by Codex, Gemini, and Opencode modules.
+Shared agent assets used by Codex, Gemini, and Opencode.

@@ -6,6 +6,7 @@ all:
     - gem:rubocop
   links:
     irbrc: ~/.config/irb/irbrc
+    gemrc: ~/.config/gem/gemrc
     rubocop.yml: ~/.config/rubocop/config.yml
 ---
 

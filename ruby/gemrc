@@ -1,0 +1,2 @@
+install: --user-install --bindir ~/.local/bin --no-document
+update: --user-install --bindir ~/.local/bin --no-document

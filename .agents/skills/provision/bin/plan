@@ -184,8 +184,21 @@ class ProvisionPlan
     end
 
     def normalize_links(config, dir)
-      normalize_map(config["links"]).flat_map do |source, target|
-        link_actions(dir, source, target)
+      normalize_map(config["links"]).flat_map do |source, targets|
+        normalize_link_targets(targets, source).flat_map do |target|
+          link_actions(dir, source, target)
+        end
+      end
+    end
+
+    def normalize_link_targets(value, source)
+      targets = value.is_a?(Array) ? value : [value]
+      raise "links target list must not be empty for #{source}" if targets.empty?
+
+      targets.map do |target|
+        raise "links target must be a string for #{source}" unless target.is_a?(String)
+
+        target
       end
     end
 
