@@ -13,7 +13,7 @@ usage() {
 
 	Options:
 	  --image IMAGE   LXD image alias (default: ubuntu:26.04)
-	  --boot          Run the Linux boot bootstrap instead of the smoke script
+	  --boot          Run the Linux bootstrap helper instead of the smoke script
 	  --keep          Keep the instance for manual inspection
 	  --name NAME     LXD instance name (default: home-lxd-smoke-<pid>)
 	  --repo PATH     Repository root (default: current working directory)
@@ -165,7 +165,7 @@ main() {
 	check_outbound_http
 	if [[ $mode == boot ]]; then
 		prepare_boot_user
-		lxc exec "$instance" -- su - ubuntu -c /repo/_/bin/bootstrap
+		lxc exec "$instance" -- su - ubuntu -c /repo/.agents/skills/provision/bin/bootstrap
 		lxc exec "$instance" -- su - ubuntu -c 'ruby --version; git --version; curl --version | head -n 1'
 	else
 		apt_update

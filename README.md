@@ -5,10 +5,10 @@ Home-style dotfiles and provisioning repository.
 The durable design lives in `.agents/specs/home/spec.md`. The repo-local provisioning skill lives in
 `.agents/skills/provision/`, and the plan helper is `.agents/skills/provision/bin/plan`.
 
-Fresh hosts may need the state-free bootstrap helper before normal provisioning:
+Fresh hosts may need the bootstrap helper before normal provisioning:
 
 ```bash
-_/bin/bootstrap
+.agents/skills/provision/bin/bootstrap
 ```
 
 Preview the provisioning plan:
@@ -17,5 +17,6 @@ Preview the provisioning plan:
 .agents/skills/provision/bin/plan --format markdown
 ```
 
-Support helpers live under `_` and are never recorded in provisioning state. Normal modules live at the repository root;
-platform modules such as `linux` run before the other root modules.
+`_` is the first normal provisioning module and is intended for small shared declarations without a focused module.
+Platform modules such as `linux` run after `_`; platform dash variants such as `linux-` run immediately after their
+base platform module.

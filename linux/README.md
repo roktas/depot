@@ -1,6 +1,119 @@
+---
+all:
+  level: minimal
+---
+
 # Linux
 
 ## Install
+
+### APT Policy
+
+Apply a small apt baseline only on apt-based systems.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+sudo install -d /etc/apt/apt.conf.d
+printf '%s\n' 'Acquire::Languages "none";' | sudo tee /etc/apt/apt.conf.d/99notranslations >/dev/null
+printf '%s\n' 'APT::Install-Recommends "false";' 'APT::Install-Suggests "false";' |
+	sudo tee /etc/apt/apt.conf.d/01norecommends >/dev/null
+```
+
+### Locale
+
+Generate English and Turkish UTF-8 locales when the system uses Debian or Ubuntu locale tooling.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+locale=${PROVISION_LOCALE:-en_US.UTF-8}
+
+case :en_US.UTF-8:tr_TR.UTF-8: in
+*:"$locale":*)
+;;
+*)
+	echo >&2 "Unsupported locale: $locale"
+	exit 1
+;;
+esac
+
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends locales
+
+distribution=$(unset ID && . /etc/os-release 2>/dev/null && echo "$ID")
+
+case $distribution in
+debian)
+	printf '%s\n' \
+		"locales locales/locales_to_be_generated multiselect tr_TR.UTF-8 UTF-8, en_US.UTF-8 UTF-8" \
+		"locales locales/default_environment_locale select $locale" |
+		sudo debconf-set-selections
+	sudo rm -f /etc/locale.gen
+	sudo dpkg-reconfigure -f noninteractive locales
+;;
+ubuntu)
+	sudo locale-gen tr_TR.UTF-8 en_US.UTF-8
+;;
+*)
+	exit 0
+;;
+esac
+
+sudo update-locale LANG="$locale"
+```
+
+### Timezone
+
+Set the system timezone when `timedatectl` is available.
+
+```bash
+timezone=${PROVISION_TIMEZONE:-Europe/Istanbul}
+
+if ! command -v timedatectl >/dev/null; then
+	exit 0
+fi
+
+sudo timedatectl set-timezone "$timezone"
+```
+
+### Desktop Packages
+
+Install baseline Linux desktop packages.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+	flatpak \
+	remmina \
+	remmina-plugin-rdp \
+	wl-clipboard
+```
+
+### Flatpak
+
+Configure Flathub for per-user Flatpak installs.
+
+```bash
+if ! command -v flatpak >/dev/null; then
+	if ! command -v apt-get >/dev/null; then
+		exit 0
+	fi
+
+	sudo apt-get update
+	sudo apt-get install -y --no-install-recommends flatpak
+fi
+
+flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+```
 
 ### GNOME
 
@@ -49,6 +162,4 @@ gsettings set org.gnome.desktop.peripherals.keyboard delay 250
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'Flameshot'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'sh -c -- "flameshot gui"'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Control>Print'
-
-xdg-mime default org.inkscape.Inkscape.desktop image/svg+xml
 ```

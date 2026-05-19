@@ -7,11 +7,14 @@ provizyonlamayı hedefler.
 
 - **Modül**: Repo kökündeki her uygulama veya provizyonlama birimi dizini. Önceki taslakta "görev" olarak geçen kavram
   budur. "Modül" terimi `.agents/tasks/` ile kavramsal çakışmayı azaltır.
-- **Support alanı**: `_` dizini altındaki state dışı provisioning yardımcıları. `_` normal modül değildir, planlara
-  dahil edilmez ve state'e yazılmaz.
+- **Genel modül**: `_` dizinindeki normal provisioning modülü. Focused modülü hak etmeyen küçük ortak tanımlar için
+  kullanılır. State dışı bootstrap davranışı içermez.
 - **Platform modülü**: Repo kökündeki `linux/README.md`, `macos/README.md` veya `windows/README.md` dosyasıyla
   tanımlanan jenerik platform modülü. Platformun kendi davranışını hazırlar; örneğin apt policy, Homebrew policy veya
   platform defaults.
+- **Platform varyantı**: Repo kökündeki `linux-/README.md`, `macos-/README.md` veya `windows-/README.md` dosyasıyla
+  tanımlanan, aktif platform modülünün hemen ardından işlenen varyant modülü. Sondaki `-` genel bir anlam taşımaz;
+  varyantın semantiği ilgili README tarafından belirlenir.
 - **Host**: `hostname -f` çıktısından sondaki domain kısmı çıkarılarak bulunan kısa makine adı. Örneğin `kant.local`
   için `kant`.
 - **State**: Bir host için daha önce hangi modüllerin provizyonlandığını kaydeden çalışma zamanı durumu.
@@ -23,15 +26,17 @@ provizyonlamayı hedefler.
   belirtilir.
 - Modül dizinlerinde `README.md` dosyası ve provizyonlamada kullanılacak dosyalar bulunur. README frontmatter'ı
   opsiyoneldir.
-- Kök modüller, repo kökündeki doğrudan alt dizinlerden seçilir. `.` ile başlayan dizinler, `.git`, `.agents` ve özel
-  `_` support dizini kök modül listesine dahil edilmez.
+- Kök modüller, repo kökündeki doğrudan alt dizinlerden seçilir. `.` ile başlayan dizinler, `.git` ve `.agents` kök
+  modül listesine dahil edilmez.
 - Modül olarak işlenecek kök dizinlerde `README.md` bulunmalıdır. `README.md` olmayan kök dizinler provizyonlama dışı
   bırakılır.
 - Provizyonlama kararı state yüklendikten sonra verilir.
-- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa `_` altındaki support helper'lar explicit olarak
-  çalıştırılır. Bu helper'lar state dışıdır ve idempotent olmalıdır.
-- Normal provizyonlama yapılacaksa önce aktif platformun kök platform modülü (`linux`, `macos` veya `windows`) varsa
-  uygulanır, sonra diğer kök modüller alfabetik sırayla uygulanır. Aktif olmayan platform kök modülleri plan dışıdır.
+- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa provision skill bootstrap helper'ı explicit olarak
+  çalıştırılır. Bu helper state dışıdır ve idempotent olmalıdır.
+- Normal provizyonlama yapılacaksa önce `_` modülü varsa uygulanır, sonra aktif platformun kök platform modülü (`linux`,
+  `macos` veya `windows`) varsa uygulanır, sonra aktif platformun `-` varyantı (`linux-`, `macos-` veya `windows-`)
+  varsa uygulanır, sonra diğer kök modüller alfabetik sırayla uygulanır. Aktif olmayan platform kök modülleri ve aktif
+  olmayan platform varyantları plan dışıdır.
 - Kök modüller platform anahtarlarıyla da süzülebilir. Örneğin bir kök modül yalnızca `linux:` anahtarı içeriyorsa
   modül Linux dışında planlanmaz.
 - Her modül uygulanırken önce modül dizinine geçilir, `README.md` okunur, frontmatter verisi ve gövde talimatları
@@ -45,9 +50,9 @@ provizyonlamayı hedefler.
 .
   _/
     README.md
-    bin/
-      bootstrap
   linux/
+    README.md
+  linux-/
     README.md
   macos/
     README.md
@@ -304,13 +309,12 @@ SSH yoluyla uzaktan provizyonlama yapılacaksa agent yerelde çalışabilir, fak
 
 ### Platform Bootstrapping
 
-Platform bootstrap helper'ı `_/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın çalışabilmesi için
-gereken en küçük ön hazırlığı yapar: temel transport araçları, Homebrew ve Ruby. Bootstrap Ruby'ye güvenemez; saf Bash
-olmalıdır.
+Platform bootstrap helper'ı `.agents/skills/provision/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın
+çalışabilmesi için gereken en küçük ön hazırlığı yapar: temel transport araçları, Homebrew ve Ruby. Bootstrap Ruby'ye
+güvenemez; saf Bash olmalıdır.
 
-`_` support alanı normal plan helper tarafından keşfedilmez, state'e yazılmaz ve normal paket semantiğine dayanmaz.
-Bootstrap paket yöneticisinin kendisini kurmakla sorumlu olabileceği için explicit olarak çağrılır ve idempotent olmak
-zorundadır.
+Bootstrap normal plan helper tarafından keşfedilmez, state'e yazılmaz ve normal paket semantiğine dayanmaz. Paket
+yöneticisinin kendisini kurmakla sorumlu olabileceği için explicit olarak çağrılır ve idempotent olmak zorundadır.
 
 Linux bootstrap akışı apt tabanlı sistemlerde Homebrew kurulumu için gerekli küçük tabanı (`build-essential`, `curl`,
 `file`, `git`, `procps` gibi) sistem paket yöneticisiyle kurar, ardından Homebrew'i kurar ve `curl`, `git`, `ruby`
@@ -365,8 +369,9 @@ atlanmazlar.
 
 ### Traverse
 
-- Daima önce geçerli platform modülünden başla.
-- Geçerli platform dizini altında modül dizinleri varsa bunları kök modüllerden önce alfabetik sırayla işle.
+- Daima önce `_` modülünden başla.
+- Sonra geçerli platform modülünü işle.
+- Sonra varsa geçerli platformun `-` varyantını işle.
 
 - Modül dizinine girerek `README.md` dosyasını oku ve provizyonlama sözlüğünü yükle. Bu yüklemede `all` ve varsa platforma
   ait sözlükler birleştirilir.
@@ -384,8 +389,9 @@ atlanmazlar.
 
 ### Sıralama
 
-- `_` altındaki geçerli platform modülü her zaman önce uygulanır.
-- `_/<platform>/` altındaki platforma özel modüller kök modüllerden önce alfabetik sırayla uygulanır.
+- `_` modülü varsa her zaman önce uygulanır.
+- Geçerli platform modülü ikinci sırada uygulanır.
+- Geçerli platformun `-` varyantı varsa platform modülünün hemen ardından uygulanır.
 - Diğer kök modüller dizin adına göre alfabetik sırayla uygulanır.
 - Gelecekte modül frontmatter'ına `order` anahtarı eklenebilir. Bu durumda `order` sayısal weight gibi yorumlanır;
   `order` belirtilmeyen modüller varsayılan weight değeriyle sıralanır. Weight eşitliğinde alfabetik sıra korunur.

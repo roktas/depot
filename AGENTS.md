@@ -10,6 +10,7 @@ messages, and documentation in English.
 - Durable provisioning spec: `.agents/specs/home/spec.md`
 - Repo-local provisioning skill: `.agents/skills/provision/SKILL.md`
 - Plan helper: `.agents/skills/provision/bin/plan`
+- Bootstrap helper: `.agents/skills/provision/bin/bootstrap`
 - Provisioning state: `.agents/state/hosts/HOST/home.md`
 - Migration task notes: `.agents/tasks/2026-05-15-dotfiles-migration/`
 
@@ -18,10 +19,13 @@ Read the spec before changing provisioning behavior.
 ## Conventions
 
 - Root modules must have `README.md`; YAML frontmatter is optional when a module has no explicit provisioning config.
-- `_` is reserved for state-free support helpers. Normal plans never include `_`; run `_/bin/bootstrap` explicitly on
-  fresh hosts before normal provisioning.
-- Platform root modules are named `linux`, `macos`, or `windows`. Normal plans use the active platform module first,
-  then non-platform root modules alphabetically.
+- `_` is the first normal provisioning module. Use it only for small shared declarations that do not deserve a focused
+  module.
+- Run `.agents/skills/provision/bin/bootstrap` explicitly on fresh hosts before normal provisioning when base tools are
+  missing.
+- Platform root modules are named `linux`, `macos`, or `windows`. Dash variants such as `linux-` are ordinary variant
+  modules and run immediately after the active platform module. Normal plans use `_` first, the active platform module
+  next, the active platform dash variant next, then other root modules alphabetically.
 - Root modules may be platform-gated by defining only the relevant platform key, for example `linux:` in a module
   README.
 - Use `links` for symlink placement.
@@ -40,7 +44,7 @@ Run relevant checks after provisioning skill or migrated module changes:
 .agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke --format markdown
 .agents/tests/provision/smoke.sh
 RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck _/bin/bootstrap .agents/skills/provision/bin/lxd-smoke .agents/tests/provision/smoke.sh bin/bin/ramake biome/bin/biome-kludge bundle/bin/bundle-kludge fzf/bin/search todo/actions/edit todo/actions/note todo/actions/projectview todo/actions/revive todo/actions/wtf todo/actions/xp
+shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/lxd-smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake bundle/bin/bundle-kludge javascript/bin/biome-kludge
 ```
 
 Use container smoke tests when container runtimes are available. See

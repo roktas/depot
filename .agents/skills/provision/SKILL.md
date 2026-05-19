@@ -58,12 +58,12 @@ Use `--allow-dirty` only while developing or reviewing the skill. Real provision
 For Docker and LXD setup, smoke-test commands, read-only repository mounts, and LXD Ubuntu container notes, read
 `references/test-environments.md`.
 
-## Support Bootstrap
+## Bootstrap
 
-Use `_/bin/bootstrap` when a fresh target host does not yet have the minimum tools needed for provisioning. Support
-helpers under `_` are explicit, state-free prelude steps: they are not normal modules, are never discovered by
-`bin/plan`, and must be idempotent. Bootstrap must be Bash and must not require Ruby. It installs the platform package
-manager baseline, Homebrew, and the `curl`, `git`, and `ruby` tools needed by the rest of this repository.
+Use `bin/bootstrap` from this skill when a fresh target host does not yet have the minimum tools needed for
+provisioning. Bootstrap is an explicit, state-free prelude step and is not a repository module. It must be idempotent,
+must be Bash, and must not require Ruby. It installs the platform package-manager baseline, Homebrew, and the `curl`,
+`git`, and `ruby` tools needed by the rest of this repository.
 
 ## Modes
 
@@ -79,10 +79,13 @@ manager baseline, Homebrew, and the `curl`, `git`, and `ruby` tools needed by th
 
 - README frontmatter may be omitted when a module has no explicit provisioning config; missing `all` and platform keys
   are treated as empty maps by `bin/plan`.
-- `_` is reserved for state-free support helpers. Never treat `_` as a provisioning module, never include it in state,
-  and do not put normal managed modules under it.
-- Plan platform work in this order: active platform root module (`linux`, `macos`, or `windows`) first when present,
-  then non-platform root modules alphabetically. Exclude inactive platform root modules.
+- `_` is a normal provisioning module for small shared declarations that do not deserve a focused module. Keep it small;
+  if an item grows configuration, platform-specific behavior, or a clear identity, move it to a focused module.
+- Plan module work in this order: `_` first when present, active platform root module (`linux`, `macos`, or `windows`)
+  next when present, the active platform dash variant (`linux-`, `macos-`, or `windows-`) after that when present, then
+  other root modules alphabetically. Exclude inactive platform root modules and inactive platform variants.
+- Dash-suffixed module names such as `linux-` are ordinary modules. The suffix has no global meaning; each pair defines
+  its own local variant semantics in README text.
 - Root modules that define platform keys but do not define `all` are selected only when the active platform key exists.
   This gates both frontmatter actions and special README sections. A platform key may use YAML null (`macos: ~`) to
   select that platform without adding platform-specific actions.

@@ -1,5 +1,6 @@
 ---
 all:
+  level: minimal
   packages:
     - mc
   links:

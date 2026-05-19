@@ -55,7 +55,7 @@ sessions, or terminals may still need to be restarted. Use `lxc info` to verify 
 ```
 
 Use `--keep` to keep the container for manual inspection. Use `--name NAME` to choose a stable instance name.
-Use `--boot` to test the Linux boot bootstrap instead of the normal provision smoke script.
+Use `--boot` to test the Linux bootstrap helper instead of the normal provision smoke script.
 
 Use `security.nesting=true` for Ubuntu 26.04 LXD containers. Without it, `systemd-networkd` and `systemd-resolved` can
 fail during credential mount namespacing with `status=226/NAMESPACE`, leaving the container without working DHCP/DNS.

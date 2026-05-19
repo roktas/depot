@@ -1,7 +1,7 @@
 ---
 all:
   packages:
-    - codex
+    - cask:codex
   links:
     ../agents/skills/: ~/.codex/skills
 ---

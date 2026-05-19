@@ -1,21 +1,37 @@
-# Support
+---
+all:
+  packages:
+    - bat
+    - fastfetch
+    - fd
+    - fzf
+    - gnu-units
+    - htop
+    - imagemagick
+    - libqalculate
+    - moreutils
+    - ncdu
+    - optipng
+    - rclone
+    - ripgrep
+    - slides
+    - socat
+    - telnet
+    - tree
+    - ttyd
+    - yazi
+    - zip
+    - zoxide
+  links:
+    bat/config: ~/.config/bat/config
+    bin/search: ~/.local/bin/search
+    todo/actions/: ~/.config/todo/actions
+    todo/config: ~/.config/todo/config
+---
 
-This directory is reserved for state-free provisioning support helpers.
+# General
 
-It is not a provisioning module, is never discovered by normal plans, and is never recorded in provisioning state.
-Helpers in this directory must be idempotent because they run before state-managed provisioning can begin.
+This is a normal provisioning module for small shared tools and config sets that do not deserve a focused module.
 
-## Bootstrap
-
-Run `bin/bootstrap` explicitly on fresh hosts before normal provisioning:
-
-```bash
-_/bin/bootstrap
-```
-
-Pass a platform only when autodetection is not appropriate:
-
-```bash
-_/bin/bootstrap linux
-_/bin/bootstrap macos
-```
+Keep this module small. If an item grows platform-specific behavior, multi-step instructions, or a clear standalone
+identity, move it to a focused module.

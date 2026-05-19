@@ -1,5 +1,6 @@
 ---
 all:
+  level: extra
   packages:
     - cask:visual-studio-code
   links:

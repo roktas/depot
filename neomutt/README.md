@@ -1,5 +1,6 @@
 ---
 all:
+  level: extra
   packages:
     - neomutt
   links:

@@ -34,11 +34,15 @@ main() {
 		abort "wrong mode" unless plan.fetch("mode") == "apply"
 		abort "wrong level" unless plan.fetch("level") == "normal"
 		abort "wrong platform" unless plan.fetch("platform") == "linux"
-		abort "support modules should not be in normal plan" if plan.fetch("modules").any? { |mod| mod.fetch("name").start_with?("_") }
+		general = plan.fetch("modules").find { |mod| mod.fetch("name") == "_" }
+		abort "missing general module" unless general
+		abort "general module should be first" unless plan.fetch("modules").first.fetch("name") == "_"
+		abort "general module should install shared tools" unless general.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:zoxide" }
 		linux = plan.fetch("modules").find { |mod| mod.fetch("name") == "linux" }
 		abort "missing linux platform module" unless linux
-		abort "linux platform module should be first" unless plan.fetch("modules").first.fetch("name") == "linux"
+		abort "linux platform module should be second" unless plan.fetch("modules")[1].fetch("name") == "linux"
 		abort "missing linux install section" unless linux.fetch("special_sections").key?("Install")
+		abort "linux dash variant should not be planned at normal level" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "linux-" }
 		agents = plan.fetch("modules").find { |mod| mod.fetch("name") == "agents" }
 		abort "missing agents module" unless agents
 		abort "agents should default to normal level" unless agents.fetch("level") == "normal"
@@ -73,6 +77,9 @@ EOF
 		normal_plan = JSON.parse(File.read("/tmp/normal-plan.json"))
 		extra_plan = JSON.parse(File.read("/tmp/extra-plan.json"))
 		abort "extra module should not be planned at normal level" if normal_plan.fetch("modules").any? { |mod| mod.fetch("name") == "zz-level-extra-smoke" }
+		linux_dash = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "linux-" }
+		abort "missing linux dash variant at extra level" unless linux_dash
+		abort "linux dash variant should follow linux" unless extra_plan.fetch("modules")[2].fetch("name") == "linux-"
 		extra = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "zz-level-extra-smoke" }
 		abort "missing extra module at extra level" unless extra
 		abort "wrong extra module level" unless extra.fetch("level") == "extra"

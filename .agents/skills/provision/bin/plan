@@ -169,7 +169,7 @@ class ProvisionPlan
 
     def ignored_root_dir?(path)
       name = path.basename.to_s
-      name.start_with?(".") || name == "_" || DEFAULT_PACKAGE_TYPE.key?(name)
+      name.start_with?(".") || DEFAULT_PACKAGE_TYPE.key?(name)
     end
 
     def normalize_copies(config, dir)
@@ -287,10 +287,14 @@ class ProvisionPlan
     end
 
     def planned_modules
+      common_dir = @repo.join("_")
       platform_dir = @repo.join(@platform)
+      platform_variant_dir = @repo.join("#{@platform}-")
       dirs = []
+      dirs << common_dir if common_dir.join("README.md").file?
       dirs << platform_dir if platform_dir.join("README.md").file?
-      dirs.concat(module_dirs)
+      dirs << platform_variant_dir if platform_variant_dir.join("README.md").file?
+      dirs.concat(module_dirs.reject { |dir| [common_dir, platform_dir, platform_variant_dir].include?(dir) })
 
       dirs.filter_map { |dir| planned_module(dir) }
     end
