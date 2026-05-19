@@ -5,6 +5,8 @@ all:
 
 # Linux
 
+Minimal Linux platform baseline for apt policy, locale, timezone, desktop packages, Flatpak, and GNOME settings.
+
 ## Install
 
 ### APT Policy

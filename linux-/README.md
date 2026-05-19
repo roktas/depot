@@ -5,6 +5,8 @@ all:
 
 # Linux Variant
 
+Extra Linux system provisioning for optional, guarded host capabilities.
+
 ## Install
 
 ### Firewall

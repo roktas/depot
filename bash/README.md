@@ -9,3 +9,5 @@ all:
 ---
 
 # Bash
+
+Minimal Bash shell setup, including the interactive startup file and shell linting.

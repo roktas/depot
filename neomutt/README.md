@@ -8,3 +8,5 @@ all:
 ---
 
 # Neomutt
+
+Extra mail client module with user configuration.

@@ -7,3 +7,5 @@ all:
 ---
 
 # Opencode
+
+Opencode package and shared agent skill links.

@@ -5,6 +5,8 @@ linux:
 
 # SSH
 
+Minimal Linux SSH and sudo environment tuning.
+
 ## Install
 
 Apply conservative SSH and sudo environment tweaks.

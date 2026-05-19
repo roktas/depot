@@ -9,3 +9,5 @@ all:
 ---
 
 # Markdown
+
+Markdown linting and formatting setup using Markdownlint and Prettier.

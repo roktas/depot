@@ -6,3 +6,5 @@ linux:
 ---
 
 # GIMP
+
+Extra Linux image editor module installed through Flatpak.

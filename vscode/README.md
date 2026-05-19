@@ -9,6 +9,8 @@ all:
 
 # Visual Studio Code
 
+Extra Visual Studio Code module with user settings and extension installation.
+
 ## Postinstall
 
 ```bash

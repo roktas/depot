@@ -8,3 +8,5 @@ all:
 ---
 
 # Direnv
+
+Minimal Direnv setup for project-local environment loading.

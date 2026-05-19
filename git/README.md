@@ -15,3 +15,5 @@ all:
 ---
 
 # Git
+
+Minimal Git and GitHub CLI setup with user config, hooks, and helper commands.

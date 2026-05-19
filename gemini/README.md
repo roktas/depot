@@ -7,3 +7,5 @@ all:
 ---
 
 # Gemini
+
+Gemini CLI package and shared agent skill links.

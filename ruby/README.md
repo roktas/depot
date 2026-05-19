@@ -10,3 +10,5 @@ all:
 ---
 
 # Ruby
+
+Minimal Ruby setup with IRB and RuboCop user configuration.

@@ -14,3 +14,5 @@ all:
 ---
 
 # JavaScript
+
+JavaScript runtime and formatter configuration, including Bun, Node, Yarn, npm, ESLint config, and Biome.

@@ -6,3 +6,5 @@ all:
 ---
 
 # Bin
+
+Minimal user command wrappers installed into `~/.local/bin`.

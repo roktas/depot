@@ -6,6 +6,8 @@ linux:
 
 # Inkscape
 
+Linux vector graphics editor module installed through Flatpak.
+
 ## Install
 
 Configure Inkscape as the default SVG handler when desktop MIME tools are available.

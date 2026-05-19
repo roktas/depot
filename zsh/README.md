@@ -7,3 +7,5 @@ all:
 ---
 
 # Zsh
+
+Zsh shell package and startup configuration.

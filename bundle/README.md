@@ -7,6 +7,8 @@ all:
 
 # Bundle
 
+Bundler user configuration and helper command setup.
+
 ## Postinstall
 
 ```bash

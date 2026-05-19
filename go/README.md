@@ -7,3 +7,5 @@ all:
 ---
 
 # Go
+
+Extra Go toolchain module with formatting support.

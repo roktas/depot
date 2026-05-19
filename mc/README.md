@@ -12,3 +12,5 @@ all:
 ---
 
 # Midnight Commander
+
+Minimal Midnight Commander setup with keymap, menu, and copied mutable configuration.

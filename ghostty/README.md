@@ -5,3 +5,5 @@ all:
 ---
 
 # Ghostty
+
+Ghostty terminal package placeholder for future configuration.

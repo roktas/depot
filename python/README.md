@@ -9,3 +9,5 @@ all:
 ---
 
 # Python
+
+Python runtime and user linting setup based on Homebrew Python, uv, and Pylint.

@@ -10,3 +10,5 @@ linux:
 ---
 
 # Fonts
+
+Linux font packages used across terminal and desktop workflows.

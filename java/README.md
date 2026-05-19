@@ -6,3 +6,5 @@ all:
 ---
 
 # Java
+
+Extra Java toolchain module based on OpenJDK.

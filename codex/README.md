@@ -7,3 +7,5 @@ all:
 ---
 
 # Codex
+
+Codex package and shared agent skill links.

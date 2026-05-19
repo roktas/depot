@@ -12,6 +12,8 @@ all:
 
 # Neovim
 
+Minimal Neovim and `vi` setup with LazyVim-oriented user configuration.
+
 ## Postinstall
 
 ```bash

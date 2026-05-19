@@ -10,6 +10,8 @@ all:
 
 # Fish
 
+Minimal Fish shell setup with shared functions and plugin installation.
+
 ## Postinstall
 
 ```bash

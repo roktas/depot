@@ -7,3 +7,5 @@ all:
 ---
 
 # TeX
+
+Extra TeX publishing toolchain with TeX Live and Pandoc.

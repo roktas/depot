@@ -7,3 +7,5 @@ all:
 ---
 
 # Alacritty
+
+Terminal emulator package and user configuration.

@@ -9,3 +9,5 @@ all:
 ---
 
 # Tmux
+
+Minimal tmux configuration and terminal editor/viewer helpers.

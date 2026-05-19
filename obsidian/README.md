@@ -5,3 +5,5 @@ linux:
 ---
 
 # Obsidian
+
+Linux knowledge base application module installed through Flatpak.
