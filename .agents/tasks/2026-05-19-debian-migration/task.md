@@ -146,11 +146,11 @@ support.
 
 - `terminal/git.sh`
   - Target module: `git`.
-  - Packages: `git`, `gh`, `tig`, `lazygit`; possible `libsecret`.
+  - Packages: `git`, `gh`, `tig`, `lazygit`.
   - Instructions:
     - `git` owns GitHub CLI config and package declaration.
     - Prefer Homebrew `lazygit` and `tig` over GitHub release or apt install.
-    - Review `git-cc`; candidate `github:SKalt/git-cc` if still wanted.
+    - Do not migrate `git-cc`.
     - Reconsider system credential helper build; prefer user Git config and package-provided helpers.
 
 - `terminal/fish.sh`
@@ -181,10 +181,10 @@ support.
     - Skip GitHub `.deb` release installer.
 
 - `terminal/crush.sh`
-  - Target module: `_` or future `crush`.
-  - Packages: candidate `crush` or `github:charmbracelet/crush`.
+  - Target module: none.
+  - Packages: none.
   - Instructions:
-    - Verify whether Homebrew formula exists; avoid custom `.deb` installer if possible.
+    - Do not migrate `crush` for now.
 
 - `terminal/direnv.sh`
   - Target module: `direnv`.
@@ -247,9 +247,10 @@ support.
 
 - `terminal/neomutt.sh`
   - Target module: `neomutt`.
-  - Packages: `neomutt`; review `mailcap` and `urlview` as Linux-only extras.
+  - Packages: `neomutt`.
   - Instructions:
-    - Existing module declares `neomutt`; add extras only if config needs them.
+    - Existing module declares `neomutt`.
+    - Do not migrate `mailcap` or `urlview` extras for now.
 
 - `terminal/yazi.sh`
   - Target module: `_`.
@@ -271,11 +272,10 @@ support.
     - Existing module already declares `zsh`.
 
 - `terminal/caddy.sh`
-  - Target module: `_` or future `caddy`.
-  - Packages: `xcaddy` or `caddy` depending on actual need.
+  - Target module: none.
+  - Packages: none.
   - Instructions:
-    - Skip apt repository setup if Homebrew formula covers the use case.
-    - Decide whether `xcaddy` is still needed or only historical.
+    - Do not migrate `caddy` or `xcaddy` for now.
 
 - `terminal/fastfetch.sh`
   - Target module: `_`.
@@ -458,23 +458,23 @@ support.
 
 - `development/c.sh`
   - Target module: `c`.
-  - Packages: `clang`, `clang-format`, `clang-tidy`, `cmake`.
+  - Packages: `llvm`, `clang-format`, `cmake`.
   - Instructions:
-    - Prefer Homebrew packages.
-    - Keep as `level: extra` if migrated; do not use a `development` meta module.
+    - Prefer Homebrew packages; use `llvm` for Clang and clang-tidy.
+    - Migrated as `level: extra`; do not use a `development` meta module.
 
 ### Desktop
 
 - `desktop/desktop.sh`
   - Target module: focused modules, `_`, and `linux`.
   - Packages: existing `alacritty` and `ghostty` modules own their terminal packages; Linux candidates include
-    `flameshot`, `flatpak`, `remmina`, `wl-clipboard`, `xournalpp`, and
-    `flatpak:com.github.PintaProject.Pinta`; review `regexxer`, `ulauncher`, and `avahi` packages.
+    `flameshot`, `flatpak`, `remmina`, `wl-clipboard`, `xournalpp`, and `flatpak:com.github.PintaProject.Pinta`.
   - Instructions:
     - Existing `alacritty` module owns Alacritty config and package; do not duplicate in `desktop`.
     - `ghostty` is a focused module and should not be duplicated in `linux`.
     - Flatpak update maps to `refresh`, not normal apply.
-    - Avahi/mdns setup is Linux system work; keep guarded and conditional.
+    - Avahi/mdns setup moved to the normal Linux desktop package baseline.
+    - Do not migrate `regexxer` or `ulauncher` for now.
 
 - `desktop/chrome.sh`
   - Target module: `linux`.
@@ -490,17 +490,17 @@ support.
     - Do not auto-authorize account linking.
 
 - `desktop/dropignore.sh`
-  - Target module: `_`.
-  - Packages: `github:mweirauch/dropignore` unless Homebrew has a formula.
+  - Target module: `linux-`.
+  - Packages: `github:mweirauch/dropignore`.
   - Instructions:
-    - Install to `~/.local/bin` if kept.
+    - Install to `~/.local/bin` through the `github:` package flow.
 
 - `desktop/fonts.sh`
   - Target module: `linux`.
-  - Packages: likely font casks or Linux `deb:` font packages; exact package source needs review.
+  - Packages: `deb:fonts-spleen` for the Linux baseline; other font packages remain in the `fonts` module for now.
   - Instructions:
-    - Prefer user font installation if files are vendored or downloaded.
-    - Avoid Debian-only font package names in cross-platform frontmatter.
+    - Install `fonts-spleen` from a Linux system section.
+    - Prefer user font installation later if font files are vendored or downloaded.
 
 - `desktop/graphics.sh`
   - Target module: `linux`.
@@ -555,10 +555,10 @@ support.
     - Keep `libxcb-cursor0` only if GitHub tarball installer remains necessary.
 
 - `desktop/calibre.sh`
-  - Target module: `linux`.
-  - Packages: `calibre` or `flatpak:com.calibre_ebook.calibre`.
+  - Target module: `linux-`.
+  - Packages: none in frontmatter; install `flatpak:com.calibre_ebook.calibre` from a guarded section.
   - Instructions:
-    - Prefer package declaration.
+    - Install through Flatpak only on graphical Linux hosts.
     - Skip upstream shell installer on update and likely on apply unless no package option fits.
 
 ### Virtualization
@@ -583,29 +583,26 @@ support.
     - User group addition to `lxd` requires confirmation and session restart/newgrp note.
 
 - `virtualization/kvm.sh`
-  - Target module: `linux`.
+  - Target module: none.
   - Packages: none for now.
   - Instructions:
-    - Defer migration for now.
-    - If revived, keep as explicit extra/manual Linux system provisioning.
-    - Group additions to `libvirt`, `libvirt-qemu`, and `kvm` require confirmation.
+    - Do not migrate KVM for now.
 
 - `virtualization/hashicorp.sh`
-  - Target module: `linux`.
+  - Target module: none.
   - Packages: none for now.
   - Instructions:
-    - Defer migration for now.
-    - Prefer Homebrew `vagrant` if it works on target Linux; otherwise keep HashiCorp apt repo as Linux instruction.
+    - Do not migrate HashiCorp/Vagrant tooling for now.
     - Do not preserve arbitrary `hashicorp_packages` env expansion in frontmatter.
 
 - `virtualization/virtualbox.sh`
-  - Target module: `linux`.
+  - Target module: `virtualbox`.
   - Packages: none for now.
   - Instructions:
-    - Defer migration for now.
-    - Keep guarded by `systemd-detect-virt`.
-    - Physical-host install and extension pack require explicit confirmation.
-    - Oracle guest additions path is legacy/VM-specific; likely skip unless still needed.
+    - Migrated as `level: extra`.
+    - Keep host installation guarded by `systemd-detect-virt` and `PROVISION_VIRTUALBOX_HOST=1`.
+    - Keep extension pack installation separate behind `PROVISION_VIRTUALBOX_EXTPACK=1`.
+    - Oracle Guest Additions path is skipped; add a separate guarded section later only if still needed.
 
 ## Decisions
 
@@ -627,7 +624,7 @@ support.
 11. Bootstrap is a provision skill helper, not a repository module. `_` is now available as the first normal module for
     small shared declarations that do not deserve a focused module.
 12. Do not create a `virtualization` root module. Keep Docker and LXD as explicit extra/manual Linux system sections in
-    `linux-`; defer KVM, VirtualBox, and HashiCorp migration.
+    `linux-`; keep VirtualBox as its own guarded `level: extra` module; defer KVM and HashiCorp migration.
 13. Do not create `terminal` or `desktop` root meta modules. Use `_` for small shared user tools, `linux` for Linux GUI
     and system integration, and focused modules whenever an item has clear identity or configuration.
 14. Use dash-suffixed module variants case-by-case. `linux` is the minimal platform baseline; `linux-` is the extra
@@ -683,8 +680,8 @@ focused modules, and `linux` are sufficient.
 - Added guarded Linux sections and focused modules for SSH/sudo tweaks, UFW, Docker, LXD, desktop apt packages, user
   Flatpak apps, font packages, laptop tools, printer support, NetworkManager OpenVPN integration, VM cleanup, and GNOME
   settings.
-- Deferred ambiguous packages and tools: `crush`, `dropignore`, `git-cc`, `caddy`/`xcaddy`, Vifm archive helpers,
-  Neomutt extras, KVM, VirtualBox, and HashiCorp.
+- Canceled deferred ambiguous packages and tools for now: `crush`, `git-cc`, `caddy`/`xcaddy`, Vifm archive helpers,
+  Neomutt extras, KVM, HashiCorp, `regexxer`, and `ulauncher`.
 
 Validation:
 

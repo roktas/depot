@@ -35,6 +35,9 @@ Read the spec before changing provisioning behavior.
 - Omit `packages` for virtual modules. Add `packages` only when the module should install explicit packages.
 - Do not migrate old `install.sh` files by default. Prefer README frontmatter and special sections; keep a script only
   when it is an intentional module implementation detail.
+- When searching for literal text that may contain shell metacharacters such as backticks, `$`, `!`, or quotes, do not
+  put the pattern inside a double-quoted shell argument. Prefer `rg -F -e 'literal text'` or another form that prevents
+  shell command substitution.
 
 ## Validation
 

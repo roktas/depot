@@ -1,13 +1,31 @@
 ---
 all:
   level: extra
+  packages:
+    - github:mweirauch/dropignore
 ---
 
 # Linux Variant
 
-Extra Linux system provisioning for optional, guarded host capabilities.
+Extra Linux system provisioning for optional, guarded host capabilities and Linux-only desktop tools.
 
 ## Install
+
+### Calibre
+
+Install Calibre through Flatpak only on graphical Linux hosts.
+
+```bash
+if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+	exit 0
+fi
+
+if ! command -v flatpak >/dev/null; then
+	exit 0
+fi
+
+flatpak install -y --user flathub com.calibre_ebook.calibre
+```
 
 ### Firewall
 

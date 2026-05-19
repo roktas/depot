@@ -14,4 +14,4 @@
 - [x] Migrate first `_` shared-tool additions.
 - [x] Migrate first Linux system sections.
 - [ ] Review first migration pass.
-- [ ] Decide which deferred ambiguous packages should migrate.
+- [x] Decide which deferred ambiguous packages should migrate: canceled for now.

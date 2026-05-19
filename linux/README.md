@@ -5,7 +5,7 @@ all:
 
 # Linux
 
-Minimal Linux platform baseline for apt policy, locale, timezone, desktop packages, Flatpak, and GNOME settings.
+Minimal Linux platform baseline for apt policy, locale, timezone, desktop packages, fonts, Flatpak, and GNOME settings.
 
 ## Install
 
@@ -94,10 +94,24 @@ fi
 
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
+	avahi-daemon \
 	flatpak \
 	remmina \
 	remmina-plugin-rdp \
 	wl-clipboard
+```
+
+### Font Packages
+
+Install baseline Linux font packages.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends fonts-spleen
 ```
 
 ### Flatpak
