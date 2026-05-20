@@ -47,21 +47,15 @@ Run relevant checks after provisioning skill or migrated module changes:
 .agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke --format markdown
 .agents/tests/provision/smoke.sh
 RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/lxd-smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here
+shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here
 ```
 
-Use container smoke tests when container runtimes are available. See
-`.agents/skills/provision/references/test-environments.md` for Docker and LXD setup details.
+Use Lima for end-to-end smoke tests. See `.agents/skills/provision/references/test-environments.md`.
 
-Docker:
-
-```bash
-docker run --rm -v /home/roktas/Dropbox/src/home:/repo:ro home-provision-smoke
-```
-
-LXD Ubuntu smoke:
+Lima:
 
 ```bash
-.agents/skills/provision/bin/lxd-smoke
-.agents/skills/provision/bin/lxd-smoke --boot
+.agents/skills/provision/bin/smoke
+.agents/skills/provision/bin/smoke boot
+.agents/skills/provision/bin/smoke stop
 ```

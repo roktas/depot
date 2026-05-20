@@ -1,86 +1,55 @@
 # Test Environments
 
-Use this reference when setting up container runtimes for provisioning smoke tests.
+Use Lima for end-to-end provisioning tests.
 
-## Docker
+## Lima
 
-Use Docker for fast smoke checks. Bind mount the repository read-only; do not copy this repository into Docker images.
+The `lima` module provides `lima/bin/here`, a project-local instance helper. It mounts the current directory writable at
+`/here`, uses Ubuntu by default, and names instances from the selected image plus the current directory path hash.
 
-```bash
-docker run --rm -v /home/roktas/Dropbox/src/home:/repo:ro home-provision-smoke
-```
-
-### Debian Setup
-
-Install Docker Engine from Docker's official apt repository, not Debian's `docker.io` package.
+Run the normal provision smoke script inside the Lima instance:
 
 ```bash
-sudo apt update
-sudo apt install -y ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo adduser "$USER" docker
-newgrp docker
-docker info
+.agents/skills/provision/bin/smoke
 ```
 
-Existing long-running processes, agents, tmux sessions, or terminals may need to be restarted before they see the new
-`docker` group membership.
-
-## LXD
-
-Use LXD when a system-container host simulation is useful, especially for SSH, apt, sudo, systemd, or user-home behavior.
-
-### Debian Setup
+Run the bootstrap helper inside the Lima instance:
 
 ```bash
-sudo apt install --install-recommends lxd
-sudo adduser "$USER" lxd
-newgrp lxd
-lxc info
-sudo lxd init
+.agents/skills/provision/bin/smoke boot
 ```
 
-Use `newgrp lxd` to refresh group membership in the current shell. Existing long-running processes, agents, tmux
-sessions, or terminals may still need to be restarted. Use `lxc info` to verify non-root access.
-
-### Ubuntu Smoke Container
+For fast repeated tests, stop the instance instead of destroying it:
 
 ```bash
-.agents/skills/provision/bin/lxd-smoke
+.agents/skills/provision/bin/smoke stop
 ```
 
-Use `--keep` to keep the container for manual inspection. Use `--name NAME` to choose a stable instance name.
-Use `--boot` to test the Linux bootstrap helper instead of the normal provision smoke script.
-
-Use `security.nesting=true` for Ubuntu 26.04 LXD containers. Without it, `systemd-networkd` and `systemd-resolved` can
-fail during credential mount namespacing with `status=226/NAMESPACE`, leaving the container without working DHCP/DNS.
-
-The smoke helper restarts the container after setting `security.nesting=true`; if you reproduce the steps manually, do
-the same before diagnosing network failures. Treat active `systemd-networkd` and `systemd-resolved` as necessary but not
-sufficient: LXD image downloads use the host network, while apt runs from inside the container and depends on bridge
-NAT/firewall forwarding. A cached image can therefore exist even when container outbound HTTP is broken.
-
-When apt mirror access is flaky or IPv6 is broken, use retrying apt commands, force IPv4, and make `apt-get update`
-fail on unreachable indexes instead of silently reusing stale lists:
+For a fresh-host test, destroy the instance explicitly:
 
 ```bash
-apt-get -o Acquire::Retries=3 -o Acquire::ForceIPv4=true -o APT::Update::Error-Mode=any update
-apt-get -o Acquire::Retries=3 -o Acquire::ForceIPv4=true install -y --no-install-recommends ruby
+.agents/skills/provision/bin/smoke destroy
 ```
 
-If apt still times out, verify outbound HTTP from inside the container before changing package commands:
+Clean Lima's image cache only when explicitly requested:
 
 ```bash
-lxc exec INSTANCE -- bash -lc 'timeout 5 bash -lc "</dev/tcp/1.1.1.1/80"'
-lxc exec INSTANCE -- bash -lc 'ip -4 addr show dev eth0; ip route; resolvectl dns eth0 || true'
+.agents/skills/provision/bin/smoke prune
 ```
 
-If the route and DNS look valid but outbound HTTP times out, inspect host-side LXD bridge NAT, firewall, and forwarding
-rules before rerunning the smoke test.
+## Direct Helper
 
-Delete LXD smoke instances after the test run unless the user explicitly asks to keep them for manual inspection.
+Use the helper directly when a test needs a custom command:
+
+```bash
+lima/bin/here run bash -lc 'cd /here && .agents/tests/provision/smoke.sh'
+```
+
+`lima/bin/here` supports:
+
+- `auto`: create/start the project instance and enter a shell under `/here`.
+- `start`: start an existing instance and enter a shell under `/here`.
+- `run COMMAND [ARG...]`: create/start the instance and run the command with `/here` as working directory.
+- `stop`: stop the instance while preserving its disk.
+- `destroy`: delete the instance while preserving Lima's image cache.
+- `prune`: explicitly prune Lima's cache.

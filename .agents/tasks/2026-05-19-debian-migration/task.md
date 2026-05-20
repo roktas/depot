@@ -56,22 +56,7 @@ support.
 
 ## Validation Notes
 
-### LXD Ubuntu 26.04 Minimal Install
-
-Ran a real install test in LXD instance `home-install-ubuntu-2604`.
-
-- LXD bridge NAT could not reach outbound TCP from the container in this host setup. Switching the instance NIC to
-  macvlan on `enp0s31f6` gave the container LAN address `192.168.1.242` and restored outbound connectivity.
-- `bin/bootstrap` completed on the fresh Ubuntu user: apt baseline, Homebrew, `curl`, `git`, and `ruby` installed.
-- GitHub HTTPS clone could not authenticate in the container, so the install test used a clean local clone from the
-  mounted `/repo` checkout. The target clone was at `172f80a`.
-- Minimal packages installed successfully through Homebrew and RubyGems: Bash, ShellCheck, Direnv, Fish, Git/GH,
-  LazyGit, Tig, Midnight Commander, Neovim, Ruby/RuboCop, and Tmux.
-- Link and copy actions were applied successfully for the checked minimal modules, including Bash, Git, Fish, Neovim,
-  Midnight Commander, and the `vi` wrapper.
-- Linux special sections completed for apt policy, locales, timezone, Flatpak, desktop utility packages, Spleen fonts,
-  and GNOME no-op guarding.
-- Fish postinstall installed the configured Fundle plugins.
+Fresh-host validation now uses the Lima-based smoke helper from the provision skill.
 - Neovim postinstall did not complete cleanly. `nvim --headless +qall!` triggered Lazy.nvim plugin work and reached an
   interactive prompt related to Codeium auth, so the process was terminated and `neovim` was marked `notok` in state.
 - SSH install instructions were applied manually after the Neovim stop, and `/etc/ssh/sshd_config` plus
@@ -141,7 +126,6 @@ Ran a real install test in LXD instance `home-install-ubuntu-2604`.
   - Packages: `deb:ufw`.
   - Instructions:
     - Keep as optional system firewall section.
-    - Preserve LXC IPv6 workaround only if still reproduced.
     - Do not enable the firewall automatically without confirmation.
 
 - `foundation/dropbox.sh`
@@ -598,15 +582,6 @@ Ran a real install test in LXD instance `home-install-ubuntu-2604`.
     - Treat as extra/manual system provisioning, not normal package declaration.
     - User group addition to `docker` requires confirmation and session restart/newgrp note.
 
-- `virtualization/lxd.sh`
-  - Target module: `linux`.
-  - Packages: none in frontmatter; install `lxd` inside an explicit LXD section.
-  - Instructions:
-    - Existing provision docs already contain LXD Debian setup; reconcile.
-    - Keep `--install-recommends` requirement.
-    - Treat as extra/manual system provisioning, not normal package declaration.
-    - User group addition to `lxd` requires confirmation and session restart/newgrp note.
-
 - `virtualization/kvm.sh`
   - Target module: none.
   - Packages: none for now.
@@ -648,7 +623,7 @@ Ran a real install test in LXD instance `home-install-ubuntu-2604`.
 10. Ignore Debian packaging and broad Debian development provisioning scripts for now.
 11. Bootstrap is a provision skill helper, not a repository module. `_` is now available as the first normal module for
     small shared declarations that do not deserve a focused module.
-12. Do not create a `virtualization` root module. Keep Docker and LXD as explicit extra/manual Linux system sections in
+12. Do not create a `virtualization` root module. Keep Docker as an explicit extra/manual Linux system section in
     `linux-`; keep VirtualBox as its own guarded `level: extra` module; defer KVM and HashiCorp migration.
 13. Do not create `terminal` or `desktop` root meta modules. Use `_` for small shared user tools, `linux` for Linux GUI
     and system integration, and focused modules whenever an item has clear identity or configuration.
@@ -704,7 +679,7 @@ large or too hard to review.
 - Added normal language modules: `javascript`, `python`, and `ruby`.
 - Added extra language module: `go`, including `gofumpt`.
 - Added guarded `linux` sections for apt policy, locale, and timezone.
-- Added guarded Linux sections and focused modules for SSH/sudo tweaks, UFW, Docker, LXD, desktop apt packages, user
+- Added guarded Linux sections and focused modules for SSH/sudo tweaks, UFW, Docker, desktop apt packages, user
   Flatpak apps, font packages, laptop tools, printer support, NetworkManager OpenVPN integration, VM cleanup, and GNOME
   settings.
 - Canceled deferred ambiguous packages and tools for now: `crush`, `git-cc`, `caddy`/`xcaddy`, Vifm archive helpers,
@@ -715,7 +690,7 @@ Validation:
 
 - `.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke --format markdown`
 - `.agents/tests/provision/smoke.sh`
-- `shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/lxd-smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge`
+- `shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here`
 - `RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan`
 - `git diff --check`
 

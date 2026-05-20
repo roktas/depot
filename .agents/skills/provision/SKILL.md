@@ -55,7 +55,7 @@ Use `--allow-dirty` only while developing or reviewing the skill. Real provision
 
 ## Development And Test Environments
 
-For Docker and LXD setup, smoke-test commands, read-only repository mounts, and LXD Ubuntu container notes, read
+For Lima setup, smoke-test commands, `/here` repository mounts, and cache/stop/destroy guidance, read
 `references/test-environments.md`.
 
 ## Bootstrap

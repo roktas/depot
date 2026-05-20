@@ -13,8 +13,7 @@ frontmatter-driven modules with `links`, `copies`, `packages`, platform filters,
 - Moved the original root `SPEC.md` into `.agents/specs/home/spec.md` and iteratively refined the design.
 - Created repo-local skill `provision`.
 - Added Ruby plan helper at `.agents/skills/provision/bin/plan`.
-- Added Ubuntu Docker smoke test under `.agents/tests/provision/`.
-- Confirmed Docker root dir is `/var/lib/docker`; image/layer cache is not under Dropbox.
+- Added the repo-local smoke test under `.agents/tests/provision/`.
 - Migrated link/copy-oriented modules from `../dotfiles` into this repo, excluding `dropbox`.
 - Moved the old `gnome` instructions into the root `linux` platform module and removed the standalone `gnome` module.
 - Added `.gitignore` to unignore `_/**` because the user's global Git ignore ignores `_ /`.
@@ -48,9 +47,9 @@ The following checks passed after the latest changes:
 ```bash
 ruby -c .agents/skills/provision/bin/plan
 rubocop --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck .agents/tests/provision/smoke.sh bin/bin/ramake biome/bin/biome-kludge fzf/bin/search todo/actions/edit todo/actions/note todo/actions/projectview todo/actions/revive todo/actions/wtf todo/actions/xp
+shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here
 .agents/tests/provision/smoke.sh
-docker run --rm -v /home/roktas/Dropbox/src/home:/repo:ro home-provision-smoke
+.agents/skills/provision/bin/smoke
 python3 /home/roktas/Dropbox/src/dotfiles/agents/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/provision
 ```
 
@@ -64,8 +63,7 @@ python3 /home/roktas/Dropbox/src/dotfiles/agents/skills/.system/skill-creator/sc
 - `neovim/` explicitly installs `brew:neovim`.
 - `dropbox/` was removed from this repo after initial migration.
 - GNOME desktop settings are Linux-only and live under the `linux/README.md` `Install` section as a guarded subsection.
-- `_` is now a state-free support area, not a platform namespace or normal module. Fresh-host bootstrap lives at
-  `_/bin/bootstrap` and is run explicitly before normal provisioning.
+- Fresh-host bootstrap lives in the provision skill and is run explicitly before normal provisioning.
 - `mc.ini` and `skins/` use `copies`, not `links`, because Midnight Commander overwrites `ini`.
 - `git/bin/git-renew` now matches `../dotfiles/git/bin/git-renew`.
 - Modules without `packages` are intentionally virtual and install no packages.

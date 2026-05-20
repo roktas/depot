@@ -43,10 +43,6 @@ fi
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends ufw
 
-if [[ $(systemd-detect-virt 2>/dev/null || true) =~ lxc ]] && [[ -f /etc/default/ufw ]]; then
-	sudo sed -i 's/IPV6=yes/IPV6=no/' /etc/default/ufw
-fi
-
 firewall_allow=${PROVISION_FIREWALL_ALLOW:-ssh http https}
 
 for service in $firewall_allow; do
@@ -93,24 +89,6 @@ sudo apt-get install -y --no-install-recommends \
 	docker-compose-plugin
 
 sudo adduser "$USER" docker || true
-```
-
-### LXD
-
-Install LXD with recommended packages. This is extra/manual Linux system provisioning.
-
-```bash
-if [[ ${PROVISION_LINUX_LXD:-} != 1 ]]; then
-	exit 0
-fi
-
-if ! command -v apt-get >/dev/null; then
-	exit 0
-fi
-
-sudo apt-get update
-sudo apt-get install -y --install-recommends lxd
-sudo adduser "$USER" lxd || true
 ```
 
 ### Laptop

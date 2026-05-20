@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+repo_root() {
+	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
+}
+
+usage() {
+	cat <<-EOF
+	Usage:
+	  smoke [plan|boot|stop|destroy|prune]
+	EOF
+}
+
+warn() {
+	printf '%s\n' "$*" >&2
+}
+
+main() {
+	local command=${1:-plan}
+	local repo
+
+	repo=$(repo_root)
+	cd "$repo"
+
+	case $command in
+	plan)
+		lima/bin/here run .agents/tests/provision/smoke.sh
+	;;
+	boot)
+		lima/bin/here run .agents/skills/provision/bin/bootstrap
+		lima/bin/here run bash -lc 'ruby --version; git --version; curl --version | head -n 1'
+	;;
+	stop)
+		lima/bin/here stop
+	;;
+	destroy)
+		lima/bin/here destroy
+	;;
+	prune)
+		lima/bin/here prune
+	;;
+	-h|--help|help)
+		usage
+	;;
+	*)
+		usage
+		exit 2
+	;;
+	esac
+}
+
+main "$@"
