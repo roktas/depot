@@ -1,0 +1,19 @@
+minimumLimaVersion: 2.0.0
+
+images:
+  # Ubuntu 26.04 LTS (Resolute Raccoon) - x86_64 (Intel/AMD)
+  - location: "https://cloud-images.ubuntu.com/resolute/current/resolute-server-cloudimg-amd64.img"
+    arch: "x86_64"
+    digest: "sha256:8ed228c9f08a50122fa72307623d9f88d9209ba26e7e849edd584fa675e34863"
+
+  # Ubuntu 26.04 LTS (Resolute Raccoon) - aarch64 (Apple Silicon M series / ARM)
+  - location: "https://cloud-images.ubuntu.com/resolute/current/resolute-server-cloudimg-arm64.img"
+    arch: "aarch64"
+    digest: "sha256:9daa955c3d4cafc5a0c1c3fff51672b79a6bb36b5074b21eecddb696c5710dcb"
+
+mounts:
+  - location: "~"
+    writable: true
+
+firmware:
+  legacyBIOS: true
