@@ -47,7 +47,7 @@ The following checks passed after the latest changes:
 ```bash
 ruby -c .agents/skills/provision/bin/plan
 rubocop --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here
+shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge
 .agents/tests/provision/smoke.sh
 .agents/skills/provision/bin/smoke
 python3 /home/roktas/Dropbox/src/dotfiles/agents/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/provision

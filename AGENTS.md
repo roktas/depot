@@ -47,10 +47,15 @@ Run relevant checks after provisioning skill or migrated module changes:
 .agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke --format markdown
 .agents/tests/provision/smoke.sh
 RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/provision/bin/plan
-shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge lima/bin/here
+shellcheck .agents/skills/provision/bin/bootstrap .agents/skills/provision/bin/smoke .agents/tests/provision/smoke.sh _/bin/search _/todo/actions/edit _/todo/actions/note _/todo/actions/projectview _/todo/actions/revive _/todo/actions/wtf _/todo/actions/xp bin/bin/ramake javascript/bin/biome-kludge
 ```
 
-Use Lima for end-to-end smoke tests. See `.agents/skills/provision/references/test-environments.md`.
+Use Lima with the external `"there"` helper for end-to-end smoke tests. See
+`.agents/skills/provision/references/testing.md`.
+
+This repository's `.envrc` may put a neighboring Liman checkout ahead of the packaged `"there"` command. In
+non-interactive tool shells, direnv may not be loaded automatically; use `direnv exec . COMMAND` when validating
+commands that depend on `.envrc`.
 
 Lima:
 

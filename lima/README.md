@@ -3,9 +3,9 @@ all:
   level: extra
   packages:
     - lima
+    - liman
   links:
     default.yml: ~/.lima/default.yml
-    bin/: ~/.local/bin
 ---
 
 # Lima
@@ -14,27 +14,9 @@ Lima launches Linux virtual machines with automatic file sharing and port forwar
 
 ## Usage
 
-### Helper
+### Project Helper
 
-Start or enter the project-local Ubuntu instance. The current directory is mounted writable as `/here`.
-
-```bash
-here
-```
-
-Run a command inside the instance with `/here` as the working directory.
-
-```bash
-here run pwd
-```
-
-Stop, destroy, or prune Lima state explicitly.
-
-```bash
-here stop
-here destroy
-here prune
-```
+Use the external `"there"` helper from Liman for project-local test instances.
 
 ### By Default Config
 

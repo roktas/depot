@@ -18,6 +18,14 @@ usage() {
 	EOF
 }
 
+there() {
+	if ! type -P there >/dev/null; then
+		abort "\"there\" is not in PATH; install Liman or activate an environment that provides it"
+	fi
+
+	command there "$@"
+}
+
 warn() {
 	printf '%s\n' "$*" >&2
 }
@@ -31,20 +39,20 @@ main() {
 
 	case $command in
 	plan)
-		lima/bin/here run .agents/tests/provision/smoke.sh
+		there run .agents/tests/provision/smoke.sh
 	;;
 	boot)
-		lima/bin/here run .agents/skills/provision/bin/bootstrap
-		lima/bin/here run bash -lc 'ruby --version; git --version; curl --version | head -n 1'
+		there run .agents/skills/provision/bin/bootstrap
+		there run bash -lc 'ruby --version; git --version; curl --version | head -n 1'
 	;;
 	stop)
-		lima/bin/here stop
+		there stop
 	;;
 	destroy)
-		lima/bin/here destroy
+		there destroy
 	;;
 	prune)
-		lima/bin/here prune
+		there prune
 	;;
 	-h|--help|help)
 		usage

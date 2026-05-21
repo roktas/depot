@@ -55,8 +55,11 @@ Use `--allow-dirty` only while developing or reviewing the skill. Real provision
 
 ## Development And Test Environments
 
-For Lima setup, smoke-test commands, `/here` repository mounts, and cache/stop/destroy guidance, read
-`references/test-environments.md`.
+For Lima/Liman setup and smoke-test commands, read `references/testing.md`.
+
+`bin/smoke` uses the external Liman `"there"` command when running end-to-end tests. Keep this dependency loose:
+`"there"` must be discoverable through `PATH`, but this skill must not assume how it was installed or provided. Use
+Liman's own documentation for detailed `"there"` usage.
 
 ## Bootstrap
 
