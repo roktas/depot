@@ -3,7 +3,6 @@ all:
   packages:
     - brew:oven-sh/bun/bun
     - node
-    - yarn
     - npm:@biomejs/biome
   links:
     bunfig.toml: ~/.config/.bunfig.toml
@@ -15,4 +14,4 @@ all:
 
 # JavaScript
 
-JavaScript runtime and formatter configuration, including Bun, Node, Yarn, npm, ESLint config, and Biome.
+JavaScript runtime and formatter configuration, including Bun, Node, npm, ESLint config, and Biome.
