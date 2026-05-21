@@ -12,9 +12,16 @@ messages, and documentation in English.
 - Plan helper: `.agents/skills/provision/bin/plan`
 - Bootstrap helper: `.agents/skills/provision/bin/bootstrap`
 - Provisioning state: `.agents/state/hosts/HOST/home.md`
+- Agent resume checkpoint: `.agents/state/agent/checkpoint.md`
 - Migration task notes: `.agents/tasks/2026-05-15-dotfiles-migration/`
 
 Read the spec before changing provisioning behavior.
+
+## Session Drift
+
+At session start, compare `.agents/state/agent/checkpoint.md` with the current branch, `HEAD`, and worktree state when
+the checkpoint exists. If `HEAD` or dirty state changed since the checkpoint, inspect the drift and summarize it before
+editing. At session closeout, refresh the checkpoint after any requested commits or pushes when practical.
 
 ## Conventions
 

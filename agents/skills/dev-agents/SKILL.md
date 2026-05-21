@@ -1,6 +1,6 @@
 ---
 name: dev-agents
-description: Use when creating, placing, or updating agent-facing repository files under `.agents/`, including skills, specs, task notes, todos, tests, logs, scratch files, checkpoints, runtime state, or `todo`/`todo!` prompt shortcuts.
+description: Use when creating, placing, or updating agent-facing repository files under `.agents/`, including skills, specs, task notes, tests, logs, scratch files, checkpoints, or runtime state.
 ---
 
 # Agent Workspace
@@ -161,6 +161,40 @@ follow-up work, reflect that in `.agents/tasks/<task>/todo.md`.
 State is not a substitute for task narrative. If state is meant to be durable, portable, or part of the project's
 behavioral contract, define that explicitly in a spec.
 
+## Session Checkpoints
+
+Use `.agents/state/agent/checkpoint.md` as the default local checkpoint when a repository benefits from resume-aware
+agent sessions. The checkpoint is runtime state, not project truth, and should normally remain untracked.
+
+At the start of a resumed or fresh session, compare the checkpoint to the current repository state before making edits:
+
+- Read `.agents/state/agent/checkpoint.md` if it exists.
+- Run `git status --short --branch`.
+- Compare the recorded branch and `HEAD` with the current branch and `HEAD`.
+- If `HEAD` changed, inspect the commits since the checkpoint when possible and summarize the drift before editing.
+- If the worktree is dirty, inspect the relevant status or diff before editing.
+- If the checkpoint is missing or the history was rewritten so the old `HEAD` is not reachable, fall back to the recent
+  local log and explain that the checkpoint could not be compared directly.
+
+When the user signals session closeout and it is practical, refresh the checkpoint after any requested commits or
+pushes. Keep it small and factual:
+
+```yaml
+---
+repo: name
+branch: main
+head: HEAD_SHA
+dirty: false
+timestamp: 2026-05-21T21:30:00+03:00
+---
+
+Last assistant checkpoint.
+```
+
+If the worktree is dirty at closeout, record `dirty: true` and include a short status summary below the frontmatter.
+Do not use the checkpoint to hide unresolved task state; promote durable handoff notes to tracked task files when they
+matter to future humans.
+
 ## Human And Agent TODO
 
 Use `.agents/state/human/todo.md` for user-owned, untracked project notes that may later be shown to an agent. Use
@@ -168,28 +202,7 @@ Use `.agents/state/human/todo.md` for user-owned, untracked project notes that m
 truth; promote useful items into `.agents/tasks/<task>/todo.md` or `.agents/specs/` only when they become tracked work
 or durable behavior.
 
-Use this skill's helper, resolved relative to the directory that contains this `SKILL.md`, to append checklist items,
-print paths, or open these files. Run these commands from the skill directory, or otherwise resolve `bin/todo` relative
-to the skill directory. Do not look for `bin/todo` in the target repository root.
-
-```bash
-./bin/todo human "Revisit Linux package baseline"
-./bin/todo agent "Re-run smoke test after changing plan helper"
-./bin/todo human --edit
-./bin/todo agent --path
-```
-
-Prompt shortcuts:
-
-- `todo TEXT`: append `TEXT` to `.agents/state/human/todo.md`.
-- `todo! TEXT`: append `TEXT` to `.agents/state/agent/todo.md`.
-- `todo edit` or `todo --edit`: open the human TODO in the default editor.
-- `todo! edit` or `todo! --edit`: open the agent TODO in the default editor.
-- `todo path` or `todo --path`: print the human TODO path.
-- `todo! path` or `todo! --path`: print the agent TODO path.
-
-Only treat messages that start with `todo ` or `todo! ` as shortcuts. Incidental mentions of `todo` inside normal
-sentences are not commands.
+Prompt shortcuts such as `todo TEXT` and `todo! TEXT` are handled by the focused `dev-todo` skill.
 
 ## Repository Instructions
 
@@ -222,6 +235,7 @@ later", do a lightweight closeout before the final response when practical:
 - Check whether `.agents/specs/`, `.agents/tasks/`, `.agents/skills/`, `.agents/tests/`, or `.agents/state/` need
   updates, summaries, or cleanup for a future resumed session.
 - Record durable decisions in specs, bounded work progress in task notes, and runtime residue in state.
+- Refresh `.agents/state/agent/checkpoint.md` when resume drift detection would help future sessions.
 - Refresh handoff notes and todos so a later resume can continue without reconstructing context from the chat.
 - Mention any closeout updates in the final response, or explicitly say no closeout updates were needed.
 
