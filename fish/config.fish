@@ -12,6 +12,10 @@ end
 fish_add_path "$HOME"/.local/bin
 fish_add_path "$HOME"/Dropbox/bin
 
+if status --is-interactive; and isatty stdout; and not set -q TMUX; and not set -q NO_TMUX; and type -q tmux
+    exec tmux new-session -A -s main
+end
+
 set -U XDG_CACHE_HOME ~/.cache
 set -U XDG_CONFIG_HOME ~/.config
 set -U XDG_DATA_HOME ~/.local/share
