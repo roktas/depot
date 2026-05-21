@@ -1,6 +1,6 @@
 #!/bin/sh
 
-preferred_shell=/usr/bin/fish
+preferred_shell=$(command -v fish || printf '%s\n' "${SHELL:-/bin/sh}")
 current_window=$(tmux display-message -p '#I')
 
 if [ "$current_window" = "0" ]; then
