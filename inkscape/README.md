@@ -1,16 +1,31 @@
 ---
-linux:
-  packages:
-    - flatpak:org.inkscape.Inkscape
+linux: ~
 ---
 
 # Inkscape
 
 Linux vector graphics editor module installed through Flatpak.
 
-## Install
+## Linux
+
+### Install
+
+Install Inkscape only on graphical Linux hosts.
+
+```bash
+if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+	exit 0
+fi
+
+if ! command -v flatpak >/dev/null; then
+	exit 0
+fi
+
+flatpak install -y --user flathub org.inkscape.Inkscape
+```
 
 Configure Inkscape as the default SVG handler when desktop MIME tools are available.
+
 
 ```bash
 if ! command -v xdg-mime >/dev/null; then

@@ -2,6 +2,13 @@
 #  Init
 # ----------------------------------------------------------------------------------------------------------------------
 
+for prefix in /home/linuxbrew/.linuxbrew /opt/homebrew /usr/local
+    if test -x "$prefix"/bin/brew
+        eval ("$prefix"/bin/brew shellenv)
+        break
+    end
+end
+
 fish_add_path "$HOME"/.local/bin
 fish_add_path "$HOME"/Dropbox/bin
 

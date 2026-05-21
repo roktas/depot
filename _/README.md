@@ -8,7 +8,6 @@ all:
     - gnu-units
     - htop
     - imagemagick
-    - libqalculate
     - moreutils
     - ncdu
     - optipng
@@ -16,7 +15,6 @@ all:
     - ripgrep
     - slides
     - socat
-    - telnet
     - tree
     - ttyd
     - yazi

@@ -5,7 +5,7 @@ function mc --wraps=mc
 	if set -q t[1]
 		set -l f "$t/dir"
 
-		env SHELL=/bin/bash COLORTERM=truecolor /usr/bin/mc -P "$f" $argv
+		env SHELL=/bin/bash COLORTERM=truecolor mc -P "$f" $argv
 
 		if test -r "$f"
 			set -l d (cat "$f")
