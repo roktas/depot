@@ -12,6 +12,8 @@ metadata:
 
 - Follow the conversation language, but keep code comments, variables, and file names in English.
 - Skip basics unless asked; prefer simple C over clever C.
+- Prefer short contextual file and command names. Do not include backend or implementation details in names unless they
+  disambiguate real siblings or are part of an established interface.
 
 ## Style
 

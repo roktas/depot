@@ -33,6 +33,8 @@ Read the spec before changing provisioning behavior.
 - Omit `level` for normal modules. Use `level: minimal` for the smallest useful base and `level: extra` for optional
   additions.
 - Omit `packages` for virtual modules. Add `packages` only when the module should install explicit packages.
+- Prefer short contextual file, directory, and helper names. Avoid encoding implementation details in names unless
+  they disambiguate real siblings or are part of an established external interface.
 - Do not migrate old `install.sh` files by default. Prefer README frontmatter and special sections; keep a script only
   when it is an intentional module implementation detail.
 - When searching for literal text that may contain shell metacharacters such as backticks, `$`, `!`, or quotes, do not

@@ -25,6 +25,8 @@ Load detailed guidance based on context:
 
 - Follow the conversation language, but keep code comments, variables, and file names in English.
 - Skip basics unless asked; prefer simple Ruby over clever Ruby.
+- Prefer short contextual file and command names. Do not include backend or implementation details in names unless they
+  disambiguate real siblings or are part of an established interface.
 - **Ruby Version** - **Always** use modern Ruby syntax/version if Ruby version is unspecified. **Do not** write code in legacy syntax.
 
 ## Style

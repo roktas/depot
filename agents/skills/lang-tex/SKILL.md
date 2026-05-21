@@ -12,6 +12,8 @@ metadata:
 
 - Follow the conversation language, but keep TeX comments, macros, labels, and file names in English.
 - Skip basics unless asked; prefer publication-quality source with simple structure.
+- Prefer short contextual file names. Do not include backend or implementation details in names unless they
+  disambiguate real siblings or are part of an established interface.
 - **Engine** - Assume LuaTeX or XeTeX unless specified otherwise.
 
 ## Style

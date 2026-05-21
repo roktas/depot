@@ -38,6 +38,20 @@ When unsure:
 4. If it verifies agent-facing behavior and should be reviewed or reused, use `tests/`.
 5. If it is raw, local, temporary, machine-generated, or not worth reviewing, use `state/`.
 
+## Naming
+
+Start with the shortest clear name that the local context can support. Do not encode implementation details,
+technology choices, or category prefixes into file, directory, or helper names unless they disambiguate real neighbors
+or form an established convention.
+
+Prefer simple contextual names such as `smoke`, `testing.md`, `plan`, or `state/hosts/` when the parent directory or
+section already supplies the missing meaning. Use hyphenated or underscored multiword names only when a single word
+would be ambiguous, when several sibling artifacts need the same prefix, or when an external ecosystem requires that
+style.
+
+Avoid names that would need to change only because an internal implementation changed. For example, a smoke-test helper
+should not include the container or VM backend in its name unless multiple backend-specific helpers coexist.
+
 ## Specs
 
 Use `.agents/specs/<feature>/spec.md` for durable project or feature requirements: behavior, invariants, interfaces,

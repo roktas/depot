@@ -12,6 +12,8 @@ metadata:
 
 - Follow the conversation language, but keep code comments, variables, and file names in English.
 - Skip basics unless asked; prefer simple Bash over clever Bash.
+- Prefer short contextual command and file names. Do not include backend or implementation details in names unless they
+  disambiguate real siblings or are part of an established interface.
 
 ## Style
 
