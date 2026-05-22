@@ -2,6 +2,7 @@
 
 set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
 
+cleanup_dirty_guard_module=
 cleanup_level_extra_module=
 cleanup_link_target_list_module=
 cleanup_platform_null_module=
@@ -12,7 +13,7 @@ cleanup_repair_repo=
 # ------------------------------------------------------------------------------------------------------------------------
 
 cleanup() {
-	rm -rf "$cleanup_level_extra_module" "$cleanup_link_target_list_module" "$cleanup_platform_null_module"
+	rm -rf "$cleanup_dirty_guard_module" "$cleanup_level_extra_module" "$cleanup_link_target_list_module" "$cleanup_platform_null_module"
 	[[ -z $cleanup_repair_repo ]] || rm -rf "$cleanup_repair_repo"
 }
 
@@ -21,6 +22,7 @@ cleanup() {
 # ------------------------------------------------------------------------------------------------------------------------
 
 main() {
+	local dirty_guard_module
 	local head
 	local level_extra_module
 	local link_target_list_module
@@ -31,9 +33,11 @@ main() {
 
 	script_dir=$(cd -- "${BASH_SOURCE[0]%/*}" >/dev/null && pwd)
 	repo=${REPO_ROOT:-$(cd -- "$script_dir/../../.." >/dev/null && pwd)}
+	dirty_guard_module=$repo/zz-dirty-guard-smoke
 	level_extra_module=$repo/zz-level-extra-smoke
 	link_target_list_module=$repo/zz-link-target-list-smoke
 	platform_null_module=$repo/zz-platform-null-smoke
+	cleanup_dirty_guard_module=$dirty_guard_module
 	cleanup_level_extra_module=$level_extra_module
 	cleanup_link_target_list_module=$link_target_list_module
 	cleanup_platform_null_module=$platform_null_module
@@ -47,12 +51,19 @@ main() {
 
 	ruby -c .agents/skills/provision/bin/plan
 
+	rm -rf "$dirty_guard_module"
+	mkdir -p "$dirty_guard_module"
+	cat >"$dirty_guard_module/README.md" <<'EOF'
+# Dirty Guard Smoke
+EOF
+
 	if .agents/skills/provision/bin/plan >/tmp/plan.json 2>/tmp/plan.err; then
 		echo "expected dirty worktree guard to fail" >&2
 		exit 1
 	fi
 
 	grep -q "Dirty worktree" /tmp/plan.err
+	rm -rf "$dirty_guard_module"
 
 	.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/plan.json
 
