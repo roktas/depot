@@ -167,6 +167,10 @@ class ProvisionPlan
       level
     end
 
+    def validate_module_level(module_name, level)
+      raise "misc- must use level: extra" if module_name == "misc-" && level != "extra"
+    end
+
     def module_dirs
       @repo.children
         .select(&:directory?)
@@ -177,7 +181,11 @@ class ProvisionPlan
 
     def ignored_root_dir?(path)
       name = path.basename.to_s
-      name.start_with?(".") || DEFAULT_PACKAGE_TYPE.key?(name)
+      name.start_with?(".") || DEFAULT_PACKAGE_TYPE.key?(name) || platform_variant?(name)
+    end
+
+    def platform_variant?(name)
+      DEFAULT_PACKAGE_TYPE.keys.any? { |platform| name == "#{platform}-" }
     end
 
     def normalize_copies(config, dir)
@@ -289,11 +297,12 @@ class ProvisionPlan
 
       config = active_config(frontmatter)
       level = module_level(config)
+      module_name = dir.relative_path_from(@repo).to_s
 
+      validate_module_level(module_name, level)
       return nil unless level_allowed?(level)
       return nil unless host_allowed?(config)
 
-      module_name = dir.relative_path_from(@repo).to_s
       skipped, skip_reason = skip_status(module_name)
       actions_skipped = actions_skipped?(skipped)
       packages = normalize_packages(config)
@@ -315,14 +324,12 @@ class ProvisionPlan
     end
 
     def planned_modules
-      common_dir = @repo.join("_")
       platform_dir = @repo.join(@platform)
       platform_variant_dir = @repo.join("#{@platform}-")
       dirs = []
-      dirs << common_dir if common_dir.join("README.md").file?
       dirs << platform_dir if platform_dir.join("README.md").file?
       dirs << platform_variant_dir if platform_variant_dir.join("README.md").file?
-      dirs.concat(module_dirs.reject { |dir| [common_dir, platform_dir, platform_variant_dir].include?(dir) })
+      dirs.concat(module_dirs.reject { |dir| [platform_dir, platform_variant_dir].include?(dir) })
 
       dirs.filter_map { |dir| planned_module(dir) }
     end

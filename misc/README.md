@@ -27,9 +27,10 @@ all:
     todo/config: ~/.config/todo/config
 ---
 
-# General
+# Misc
 
 This is a normal provisioning module for small shared tools and config sets that do not deserve a focused module.
 
 Keep this module small. If an item grows platform-specific behavior, multi-step instructions, or a clear standalone
-identity, move it to a focused module.
+identity, move it to a focused module. GUI- or desktop-session-dependent installs belong in guarded special-section
+commands, not in frontmatter packages.

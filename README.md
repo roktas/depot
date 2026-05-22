@@ -17,6 +17,6 @@ Preview the provisioning plan:
 .agents/skills/provision/bin/plan --format markdown
 ```
 
-`_` is the first normal provisioning module and is intended for small shared declarations without a focused module.
-Platform modules such as `linux` run after `_`; platform dash variants such as `linux-` run immediately after their
-base platform module.
+`misc` is a normal provisioning module for small shared declarations without a focused module. Platform modules such as
+`linux` run first; platform dash variants such as `linux-` run immediately after their base platform module. Other root
+modules, including `misc`, then run alphabetically.

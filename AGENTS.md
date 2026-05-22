@@ -26,13 +26,13 @@ editing. At session closeout, refresh the checkpoint after any requested commits
 ## Conventions
 
 - Root modules must have `README.md`; YAML frontmatter is optional when a module has no explicit provisioning config.
-- `_` is the first normal provisioning module. Use it only for small shared declarations that do not deserve a focused
-  module.
+- `misc` is a normal provisioning module for small shared declarations that do not deserve a focused module. It has no
+  special ordering and runs alphabetically with other non-platform root modules. If `misc-` exists, it must be `extra`.
 - Run `.agents/skills/provision/bin/bootstrap` explicitly on fresh hosts before normal provisioning when base tools are
   missing.
 - Platform root modules are named `linux`, `macos`, or `windows`. Dash variants such as `linux-` are ordinary variant
-  modules and run immediately after the active platform module. Normal plans use `_` first, the active platform module
-  next, the active platform dash variant next, then other root modules alphabetically.
+  modules and run immediately after the active platform module. Normal plans use the active platform module first, the
+  active platform dash variant next, then other root modules alphabetically.
 - Root modules may be platform-gated by defining only the relevant platform key, for example `linux:` in a module
   README.
 - Use `links` for symlink placement.
@@ -40,6 +40,8 @@ editing. At session closeout, refresh the checkpoint after any requested commits
 - Omit `level` for normal modules. Use `level: minimal` for the smallest useful base and `level: extra` for optional
   additions.
 - Omit `packages` for virtual modules. Add `packages` only when the module should install explicit packages.
+- Keep GUI- or desktop-session-dependent package installs out of frontmatter `packages`; use guarded special-section
+  commands instead.
 - Prefer short contextual file, directory, and helper names. Avoid encoding implementation details in names unless
   they disambiguate real siblings or are part of an established external interface.
 - Do not migrate old `install.sh` files by default. Prefer README frontmatter and special sections; keep a script only

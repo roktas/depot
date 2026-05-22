@@ -83,9 +83,9 @@ fi
 sudo timedatectl set-timezone "$timezone"
 ```
 
-### Desktop Packages
+### Desktop Integration Packages
 
-Install baseline Linux desktop packages.
+Install baseline Linux desktop integration packages.
 
 ```bash
 if ! command -v apt-get >/dev/null; then
@@ -95,7 +95,24 @@ fi
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
 	avahi-daemon \
-	flatpak \
+	flatpak
+```
+
+### GUI Packages
+
+Install GUI-session-dependent Linux packages only on graphical hosts.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
+	exit 0
+fi
+
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
 	remmina \
 	remmina-plugin-rdp \
 	wl-clipboard

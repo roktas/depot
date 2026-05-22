@@ -7,8 +7,8 @@ provizyonlamayı hedefler.
 
 - **Modül**: Repo kökündeki her uygulama veya provizyonlama birimi dizini. Önceki taslakta "görev" olarak geçen kavram
   budur. "Modül" terimi `.agents/tasks/` ile kavramsal çakışmayı azaltır.
-- **Genel modül**: `_` dizinindeki normal provisioning modülü. Focused modülü hak etmeyen küçük ortak tanımlar için
-  kullanılır. State dışı bootstrap davranışı içermez.
+- **Misc modülü**: `misc` dizinindeki normal provisioning modülü. Focused modülü hak etmeyen küçük ortak tanımlar için
+  kullanılır. State dışı bootstrap davranışı içermez. `misc-` varyantı kullanılacaksa `extra` level olmalıdır.
 - **Platform modülü**: Repo kökündeki `linux/README.md`, `macos/README.md` veya `windows/README.md` dosyasıyla
   tanımlanan jenerik platform modülü. Platformun kendi davranışını hazırlar; örneğin apt policy, Homebrew policy veya
   platform defaults.
@@ -33,10 +33,10 @@ provizyonlamayı hedefler.
 - Provizyonlama kararı state yüklendikten sonra verilir.
 - Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa provision skill bootstrap helper'ı explicit olarak
   çalıştırılır. Bu helper state dışıdır ve idempotent olmalıdır.
-- Normal provizyonlama yapılacaksa önce `_` modülü varsa uygulanır, sonra aktif platformun kök platform modülü (`linux`,
-  `macos` veya `windows`) varsa uygulanır, sonra aktif platformun `-` varyantı (`linux-`, `macos-` veya `windows-`)
-  varsa uygulanır, sonra diğer kök modüller alfabetik sırayla uygulanır. Aktif olmayan platform kök modülleri ve aktif
-  olmayan platform varyantları plan dışıdır.
+- Normal provizyonlama yapılacaksa önce aktif platformun kök platform modülü (`linux`, `macos` veya `windows`) varsa
+  uygulanır, sonra aktif platformun `-` varyantı (`linux-`, `macos-` veya `windows-`) varsa uygulanır, sonra diğer kök
+  modüller alfabetik sırayla uygulanır. `misc` bu diğer kök modüllerden biridir ve özel sıra önceliği yoktur. Aktif
+  olmayan platform kök modülleri ve aktif olmayan platform varyantları plan dışıdır.
 - Kök modüller platform anahtarlarıyla da süzülebilir. Örneğin bir kök modül yalnızca `linux:` anahtarı içeriyorsa
   modül Linux dışında planlanmaz.
 - Her modül uygulanırken önce modül dizinine geçilir, `README.md` okunur, frontmatter verisi ve gövde talimatları
@@ -48,7 +48,7 @@ provizyonlamayı hedefler.
 
 ```text
 .
-  _/
+  misc/
     README.md
   linux/
     README.md
@@ -199,6 +199,8 @@ Paket kaldırma ancak kullanıcı agent'a açıkça bu yönde talimat verirse ay
 `packages` yalnızca plan-time deklarasyondur. Harness runtime koşul değerlendirmez. Paket kurulumu runtime koşula
 bağlıysa paket `packages` altında yer almamalı; `Install` veya `Preinstall` gibi özel README bölümlerinde guarded komut
 olarak yazılmalıdır. Bu durumda koşul sağlanmıyorsa komut `exit 0` ile başarılı no-op olabilir.
+GUI veya desktop oturumu gerektiren kurulumlar da bu kapsamdadır: paket `packages` altında yer almamalı, ilgili özel
+README bölümünde GUI/session guard'ı olan komutla kurulmalıdır.
 
 **`level`**: Modülün provizyonlama kapsam seviyesi.
 
@@ -312,7 +314,8 @@ Provizyonlamada bu reponun makinede bulunduğu yer hakkında bir kabul yapılmaz
 bulunduğu yer çalışma zamanında çözülerek gerçekleştirilir. Provizyonlama yerelde (bu dizin içinde) veya uzaktan
 yapılabilir. Repo hedef makinede Dropbox gibi bir senkronizasyonla zaten bulunuyorsa bu çalışma kopyası kullanılabilir.
 SSH yoluyla uzaktan provizyonlama yapılacaksa agent yerelde çalışabilir, fakat uygulama hedef makinedeki repo kopyası
-üzerinden yapılır. Uzak makineye sadece bu reponun klonlandığı durumlarda `~/.home` lokasyonu varsayılır.
+üzerinden yapılır. Uzak makineye sadece bu reponun klonlandığı durumlarda varsayılan konum `~/.local/src/<repo-adı>`
+altıdır; dizin adı sabit `home` değil, klonlanan reponun kendi adıdır.
 
 ### Platform Bootstrapping
 
@@ -334,9 +337,9 @@ araçlarını brew üzerinden sağlar.
 
 Üç uzak mod vardır:
 
-- `remote-git`: Varsayılan ve deterministik mod. Repo hedef makineye `git clone` ile genellikle `~/.home` olarak
-  alınır. Aksi açıkça belirtilmedikçe `main` branch ve son push edilmiş commit kullanılır. Yerel worktree clean olmalı,
-  ilgili commit remote'a push edilmiş olmalıdır.
+- `remote-git`: Varsayılan ve deterministik mod. Repo hedef makineye `git clone` ile genellikle
+  `~/.local/src/<repo-adı>` altına alınır. Aksi açıkça belirtilmedikçe `main` branch ve son push edilmiş commit
+  kullanılır. Yerel worktree clean olmalı, ilgili commit remote'a push edilmiş olmalıdır.
 - `remote-dropbox`: Hedef makinede repo Dropbox altında zaten vardır. Bu repo kopyası kullanılır; Git HEAD eşitliği
   zorunlu değildir. State Dropbox ile senkronize olacağı için provisioning sonunda ayrıca state kopyalama gerekmez.
 - `remote-any`: Hedefteki repo path'i ne durumdaysa o kullanılır. Git HEAD, branch ve dirty worktree eşitliği
@@ -376,9 +379,9 @@ atlanmazlar.
 
 ### Traverse
 
-- Daima önce `_` modülünden başla.
-- Sonra geçerli platform modülünü işle.
+- Önce geçerli platform modülünü işle.
 - Sonra varsa geçerli platformun `-` varyantını işle.
+- Sonra aktif diğer kök modülleri alfabetik sırayla işle.
 
 - Modül dizinine girerek `README.md` dosyasını oku ve provizyonlama sözlüğünü yükle. Bu yüklemede `all` ve varsa platforma
   ait sözlükler birleştirilir.
@@ -396,10 +399,10 @@ atlanmazlar.
 
 ### Sıralama
 
-- `_` modülü varsa her zaman önce uygulanır.
-- Geçerli platform modülü ikinci sırada uygulanır.
+- Geçerli platform modülü ilk sırada uygulanır.
 - Geçerli platformun `-` varyantı varsa platform modülünün hemen ardından uygulanır.
-- Diğer kök modüller dizin adına göre alfabetik sırayla uygulanır.
+- Diğer kök modüller dizin adına göre alfabetik sırayla uygulanır. `misc` özel değildir; alfabetik konumu neresiyse
+  orada uygulanır.
 - Gelecekte modül frontmatter'ına `order` anahtarı eklenebilir. Bu durumda `order` sayısal weight gibi yorumlanır;
   `order` belirtilmeyen modüller varsayılan weight değeriyle sıralanır. Weight eşitliğinde alfabetik sıra korunur.
 

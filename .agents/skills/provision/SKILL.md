@@ -20,8 +20,9 @@ Use this repo-local skill for provisioning this `home` repository. Treat `.agent
 
 ## Remote Modes
 
-- `remote-git`: default remote mode. Prepare the target repo with `git clone` or fetch/checkout, usually at `~/.home`.
-  Use `main` and the latest pushed commit unless instructed otherwise. Require a clean local worktree and pushed commit.
+- `remote-git`: default remote mode. Prepare the target repo with `git clone` or fetch/checkout, usually under
+  `~/.local/src/<repo-name>`. Use the cloned repository's own name; do not force the directory name to `home`. Use
+  `main` and the latest pushed commit unless instructed otherwise. Require a clean local worktree and pushed commit.
 - `remote-dropbox`: use the target repo already present under Dropbox. Do not require local and remote Git HEADs to
   match. State is expected to sync through Dropbox, so no explicit state copy-back is needed.
 - `remote-any`: use the target repo path as-is. This mode is intentionally less deterministic; call out dirty worktree,
@@ -82,11 +83,13 @@ must be Bash, and must not require Ruby. It installs the platform package-manage
 
 - README frontmatter may be omitted when a module has no explicit provisioning config; missing `all` and platform keys
   are treated as empty maps by `bin/plan`.
-- `_` is a normal provisioning module for small shared declarations that do not deserve a focused module. Keep it small;
-  if an item grows configuration, platform-specific behavior, or a clear identity, move it to a focused module.
-- Plan module work in this order: `_` first when present, active platform root module (`linux`, `macos`, or `windows`)
-  next when present, the active platform dash variant (`linux-`, `macos-`, or `windows-`) after that when present, then
-  other root modules alphabetically. Exclude inactive platform root modules and inactive platform variants.
+- `misc` is a normal provisioning module for small shared declarations that do not deserve a focused module. Keep it
+  small; if an item grows configuration, platform-specific behavior, or a clear identity, move it to a focused module.
+  `misc` has no special ordering and runs alphabetically with other non-platform root modules. If `misc-` exists, treat
+  it as an `extra` variant.
+- Plan module work in this order: active platform root module (`linux`, `macos`, or `windows`) first when present, the
+  active platform dash variant (`linux-`, `macos-`, or `windows-`) after that when present, then other root modules
+  alphabetically. Exclude inactive platform root modules and inactive platform variants.
 - Dash-suffixed module names such as `linux-` are ordinary modules. The suffix has no global meaning; each pair defines
   its own local variant semantics in README text.
 - Root modules that define platform keys but do not define `all` are selected only when the active platform key exists.
@@ -104,6 +107,8 @@ must be Bash, and must not require Ruby. It installs the platform package-manage
   keys; use `gemini-cli` or `brew:gemini-cli`, not `brew: [gemini-cli]`.
 - Treat `packages` as plan-time declarations. If package installation depends on runtime state such as GUI/session
   availability, keep it out of `packages` and put a guarded command in a special README section instead.
+- Install GUI- or desktop-session-dependent packages only through guarded special-section commands, not through
+  frontmatter `packages`.
 - Missing `packages` means the module is virtual and installs no packages. Add package names explicitly for modules that
   should install packages.
 - Do not remove packages unless the user explicitly asks for package removal.

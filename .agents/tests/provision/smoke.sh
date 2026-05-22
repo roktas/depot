@@ -61,14 +61,14 @@ main() {
 		abort "wrong mode" unless plan.fetch("mode") == "apply"
 		abort "wrong level" unless plan.fetch("level") == "normal"
 		abort "wrong platform" unless plan.fetch("platform") == "linux"
-		general = plan.fetch("modules").find { |mod| mod.fetch("name") == "_" }
-		abort "missing general module" unless general
-		abort "general module should be first" unless plan.fetch("modules").first.fetch("name") == "_"
-		abort "general module should install shared tools" unless general.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:zoxide" }
 		linux = plan.fetch("modules").find { |mod| mod.fetch("name") == "linux" }
 		abort "missing linux platform module" unless linux
-		abort "linux platform module should be second" unless plan.fetch("modules")[1].fetch("name") == "linux"
+		abort "linux platform module should be first" unless plan.fetch("modules").first.fetch("name") == "linux"
 		abort "missing linux install section" unless linux.fetch("special_sections").key?("Install")
+		misc = plan.fetch("modules").find { |mod| mod.fetch("name") == "misc" }
+		abort "missing misc module" unless misc
+		abort "misc module should run alphabetically" unless plan.fetch("modules").map { |mod| mod.fetch("name") }.index("misc") > plan.fetch("modules").map { |mod| mod.fetch("name") }.index("markdown")
+		abort "misc module should install shared tools" unless misc.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:zoxide" }
 		chrome = plan.fetch("modules").find { |mod| mod.fetch("name") == "chrome" }
 		abort "missing chrome module" unless chrome
 		abort "missing chrome linux install section" unless chrome.fetch("special_sections").dig("Install", "body").include?("google-chrome-beta")
@@ -144,7 +144,7 @@ EOF
 		abort "extra module should not be planned at normal level" if normal_plan.fetch("modules").any? { |mod| mod.fetch("name") == "zz-level-extra-smoke" }
 		linux_dash = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "linux-" }
 		abort "missing linux dash variant at extra level" unless linux_dash
-		abort "linux dash variant should follow linux" unless extra_plan.fetch("modules")[2].fetch("name") == "linux-"
+		abort "linux dash variant should follow linux" unless extra_plan.fetch("modules")[1].fetch("name") == "linux-"
 		abort "missing linux dash dropignore package" unless linux_dash.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "github:mweirauch/dropignore" }
 		abort "calibre should be a guarded install section" unless linux_dash.fetch("special_sections").dig("Install", "body").include?("com.calibre_ebook.calibre")
 		extra = extra_plan.fetch("modules").find { |mod| mod.fetch("name") == "zz-level-extra-smoke" }
