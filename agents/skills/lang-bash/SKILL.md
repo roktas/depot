@@ -1,6 +1,6 @@
 ---
 name: lang-bash
-description: Use when working on Bash or POSIX shell scripts, shell-based automation, CLI wrappers, dotfiles, CI scripts, or projects where Bash style, safety, portability tradeoffs, or shell testing matter.
+description: Use when editing, writing, or debugging Bash or POSIX shell scripts, shell-based automation, CLI wrappers, dotfiles, CI scripts, or when Bash style, safety, portability, or shell testing matter. Use when writing Bash code inside Markdown fenced code blocks. Always load this skill before writing or modifying any Bash code, even if the task seems straightforward — the skill catches subtle pitfalls that are easy to overlook.
 metadata:
   author: https://github.com/roktas
   version: "1.0.0"
@@ -119,3 +119,4 @@ metadata:
 
 - **Local** - `local x=$(...)` swallows exit codes. Define `local x` first, then assign.
 - **Unbound** - With `set -u`, use `${var:-}` to avoid errors on unbound vars.
+- **SSH/carriage return** - Shell output captured over SSH (e.g. via `limactl shell`) may contain `\r\n` line endings. Command substitution `$(...)` strips `\n` but **not** `\r`. Pipe through `tr -d '\r'` before using the result as a command argument, file path, or comparison value.

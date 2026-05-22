@@ -1,6 +1,6 @@
 ---
 name: dev-commits
-description: Use when creating, editing, reviewing, or explaining git commit messages, commit scopes, changelog-friendly history, semantic-release compatibility, or Conventional Commits formatting.
+description: Use when creating, editing, reviewing, or explaining git commit messages, commit scopes, changelog-friendly history, semantic-release compatibility, or Conventional Commits formatting. Always load this skill before preparing a commit message — even if only suggesting one — to ensure Conventional Commits formatting and correct type/scope selection.
 license: MIT
 metadata:
   author: github.com/bastos
