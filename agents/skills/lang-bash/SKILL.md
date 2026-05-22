@@ -19,6 +19,8 @@ metadata:
 
 - **Indent** - 1 tab (8 spaces). Do NOT convert tabs to spaces.
 - **Scope** - Use `local` for local vars, `readonly` for globals.
+- **Local order** - In functions, declare locals assigned from positional arguments first, in positional order. Then leave
+  one blank line and declare the function's other local variables alphabetically.
 - **Conditions** - Always use `[[ ... ]]`. Use `&&`/`||` instead of `-a`/`-o`.
 - **Quotes** - Quote only necessary elements (e.g., `"$HOME"/path/to/file`).
 - **Ops** - Use `$(...)` for capture, `=` for string equality.
@@ -30,12 +32,36 @@ metadata:
   a)
   	# body
   	...
-  ;;
+  	;;
   esac
   ```
 
 
 - **Alphabetize** arrays, dicts, assignments, and functions if order is irrelevant.
+- **Script layout** - In standalone scripts, group content in this order:
+  1. Prelude
+  2. Helpers
+  3. Commands
+  4. Main
+
+  Do not add a heading for the prelude. The prelude contains only the shebang, the standard `set` line, global
+  variables if any, and then core functions such as `abort` and `warn`, alphabetized.
+
+  Add the other section headings in this exact shape, with 120 hyphens:
+
+  ```bash
+  # ------------------------------------------------------------------------------------------------------------------------
+  # Helpers
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  ```
+
+  Keep functions alphabetized inside each section.
+- **Command functions** - In scripts that expose top-level commands, name command entrypoint functions with the
+  `command.` prefix, such as `command.start()` or `command.doctor()`.
+- **Main section** - Put non-command functions used directly by `main`, such as `usage`, `dispatch`, or `help`, in the
+  `Main` section alphabetically. The `main` function itself is always the last function in the `Main` section regardless
+  of alphabetical order.
 - **Comments** - Code should be self-documenting. If you need a comment to explain WHAT the code does, consider
   refactoring to make it clearer. Unacceptable comments:
   - Comments that repeat what code does
