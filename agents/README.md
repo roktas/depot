@@ -4,6 +4,7 @@ all:
     - cask:codex
     - opencode
     - gemini-cli
+    - aicommits
   links:
     skills/: ~/.agents/skills
 ---
