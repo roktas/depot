@@ -3,7 +3,6 @@ all:
   packages:
     - cask:codex
     - opencode
-    - gemini-cli
     - aicommits
   links:
     skills/: ~/.agents/skills
@@ -11,4 +10,4 @@ all:
 
 # Agents
 
-Shared agent assets used by Codex, Gemini, and Opencode.
+Shared agent assets used.

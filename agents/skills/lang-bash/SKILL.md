@@ -119,4 +119,3 @@ metadata:
 
 - **Local** - `local x=$(...)` swallows exit codes. Define `local x` first, then assign.
 - **Unbound** - With `set -u`, use `${var:-}` to avoid errors on unbound vars.
-- **SSH/carriage return** - Shell output captured over SSH (e.g. via `limactl shell`) may contain `\r\n` line endings. Command substitution `$(...)` strips `\n` but **not** `\r`. Pipe through `tr -d '\r'` before using the result as a command argument, file path, or comparison value.
