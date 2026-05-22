@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 
-abort()   { printf '\e[1m\e[38;5;9m✗\e[0m   \e[1m%s\e[0m\n'  "$*" >&2; exit 1;     }
-warn()    { printf '\e[1m\e[38;5;11m!\e[0m   \e[1m%s\e[0m\n' "$*" >&2;             }
-succeed() { printf '\e[1m\e[38;5;10m✓\e[0m   \e[1m%s\e[0m\n' "$*" >&2;             }
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	printf '\e[1m\e[38;5;9m✗\e[0m   \e[1m%s\e[0m\n' "$*" >&2
+	exit 1
+}
+
+succeed() {
+	printf '\e[1m\e[38;5;10m✓\e[0m   \e[1m%s\e[0m\n' "$*" >&2
+}
+
+warn() {
+	printf '\e[1m\e[38;5;11m!\e[0m   \e[1m%s\e[0m\n' "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
 
 verify() {
 	local message=$1
@@ -20,17 +35,23 @@ verify() {
 nitpick() {
 	local message=$1
 
-	if ! echo "$message" | sed -E 's/^[^:]+: +(.*)$/\1/g' | grep -Eq '^([a-zığüşöç]|[A-ZİĞÜŞÖÇ]{2,})'; then
+	if ! sed -E 's/^[^:]+: +(.*)$/\1/g' <<<"$message" | grep -Eq '^([a-zığüşöç]|[A-ZİĞÜŞÖÇ]{2,})'; then
 		abort 'Description must start with lowercase'
 	fi
 
-	if echo "$message" | grep -Eq '^refact(:|\()'; then
+	if grep -Eq '^refact(:|\()' <<<"$message"; then
 		abort 'Do not abbreviate "refactor"'
 	fi
 }
 
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
 main() {
-	local commit_message_file=$1 message
+	local commit_message_file=$1
+
+	local message
 
 	if [[ $(git config hooks.conventional-commits 2>/dev/null || true) != true ]]; then
 		exit 0

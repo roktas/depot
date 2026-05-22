@@ -1,24 +1,33 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail; shopt -s nullglob; unset CDPATH; IFS=$' \t\n'; [[ -z ${TRACE:-} ]] || set -x
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
 export LC_ALL=C.UTF-8 LANG=C.UTF-8
 
-KLUDGE_CONFIG_PATH=${XGD_CONFIG_HOME:-$HOME/.config}/biome
-KLUDGE_CONFIG_FILE=biome.json
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Functions
-# ----------------------------------------------------------------------------------------------------------------------
+readonly KLUDGE_CONFIG_FILE=biome.json
+readonly KLUDGE_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/biome
 
 abort() {
 	warn "$@"
 	exit 1
 }
 
-locate() {
-	local cwd=${1?${FUNCNAME[0]}: missing argument}; shift
+warn() {
+	echo "kludge: $*" >&2
+}
 
-	local err=0; local root; root=$(
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+locate() {
+	local cwd=$1
+	shift
+
+	local err=0
+	local root
+
+	root=$(
 		[[ -z $cwd ]] || cd "$cwd" || exit
 
 		while :; do
@@ -50,13 +59,9 @@ locate() {
 	return 1
 }
 
-warn() {
-	echo "kludge: $*" >&2
-}
-
-# ----------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------
 # Main
-# ----------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------------------
 
 main() {
 	command -v biome &>/dev/null || abort "Biome required"

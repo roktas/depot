@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 
-die() {
-	echo >&2 "$*"
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	warn "E: $*"
 	exit 1
 }
 
+warn() {
+	echo -e "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
 climb() {
-	local cwd=${1?${FUNCNAME[0]}: missing argument}; shift
+	local cwd=$1
+	shift
 
 	cd "$cwd" || exit
 
@@ -30,8 +41,12 @@ climb() {
 	return 1
 }
 
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
 main() {
-	climb . Rakefile Makefile make || die "No [MR]akefile found"
+	climb . Rakefile Makefile make || abort "No [MR]akefile found"
 
 	local -a args
 
@@ -42,7 +57,7 @@ main() {
 			args=(rake)
 		fi
 	elif [[ -f make ]]; then
-		[[ -x make ]] || die "Unexecutable make"
+		[[ -x make ]] || abort "Unexecutable make"
 		args=(./make)
 	else
 		args=(make)

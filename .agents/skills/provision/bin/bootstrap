@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \t\n'
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
 
 abort() {
 	warn "E: $*"
 	exit 1
 }
+
+warn() {
+	printf '%s\n' "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
 
 brew_prefix_linux() {
 	if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
@@ -49,6 +57,10 @@ detect_platform() {
 	esac
 }
 
+# ------------------------------------------------------------------------------------------------------------------------
+# Commands
+# ------------------------------------------------------------------------------------------------------------------------
+
 ensure_command_line_tools() {
 	if xcode-select -p >/dev/null 2>&1; then
 		return
@@ -66,6 +78,8 @@ install_apt_base() {
 }
 
 install_homebrew() {
+	local platform=$1
+
 	if command -v brew >/dev/null || "brew_prefix_$platform" >/dev/null; then
 		return
 	fi
@@ -74,6 +88,8 @@ install_homebrew() {
 }
 
 load_homebrew() {
+	local platform=$1
+
 	local prefix
 
 	prefix=$("brew_prefix_$platform") || abort "Homebrew installation was not found"
@@ -81,6 +97,8 @@ load_homebrew() {
 }
 
 persist_homebrew() {
+	local platform=$1
+
 	local line
 	local profile
 
@@ -104,22 +122,28 @@ persist_homebrew() {
 	fi
 }
 
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
 usage() {
 	cat <<-EOF
 	Usage: bootstrap [linux|macos]
 	EOF
 }
 
-warn() {
-	printf '%s\n' "$*" >&2
-}
-
 main() {
-	platform=${1:-$(detect_platform)}
-
 	if (($# > 1)); then
 		usage
 		exit 2
+	fi
+
+	local platform
+
+	if (($# == 0)); then
+		platform=$(detect_platform)
+	else
+		platform=$1
 	fi
 
 	case $platform in
@@ -134,9 +158,9 @@ main() {
 	;;
 	esac
 
-	install_homebrew
-	load_homebrew
-	persist_homebrew
+	install_homebrew "$platform"
+	load_homebrew "$platform"
+	persist_homebrew "$platform"
 
 	brew update
 	brew install curl git ruby

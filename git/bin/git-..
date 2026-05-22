@@ -1,3 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-git commit -a -m . && exec git push "$@"
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+main() {
+	git commit -a -m .
+	exec git push "$@"
+}
+
+main "$@"

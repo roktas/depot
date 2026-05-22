@@ -1,4 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Direnv doesn't properly work under some programs, e.g. tmux + midnight commander combo.
-exec direnv exec . "$(command -v bat)" --paging=always "$@"
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+main() {
+	exec direnv exec . "$(command -v bat)" --paging=always "$@"
+}
+
+main "$@"

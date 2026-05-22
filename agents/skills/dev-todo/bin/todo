@@ -7,12 +7,23 @@ abort() {
 	exit 1
 }
 
+warn() {
+	echo -e "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
 editor() {
+	local todo_file=$1
+
 	${VISUAL:-${EDITOR:-vi}} "$todo_file"
 }
 
 ensure_file() {
 	local owner=$1
+	local todo_file=$2
 
 	mkdir -p "${todo_file%/*}"
 	if [[ -e $todo_file ]]; then
@@ -31,6 +42,10 @@ repo_root() {
 	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
 }
 
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
 usage() {
 	cat <<-EOF
 	Usage:
@@ -39,10 +54,6 @@ usage() {
 	  todo human --edit
 	  todo agent --path
 	EOF
-}
-
-warn() {
-	echo -e "$*" >&2
 }
 
 main() {
@@ -54,6 +65,9 @@ main() {
 	local owner=$1
 	shift
 
+	local root
+	local todo_file
+
 	case $owner in
 	human|agent)
 	;;
@@ -62,19 +76,18 @@ main() {
 	;;
 	esac
 
-	local root
 	root=$(repo_root)
 	todo_file=$root/.agents/state/$owner/todo.md
-	ensure_file "$owner"
+	ensure_file "$owner" "$todo_file"
 
 	if (($# == 0)); then
-		editor
+		editor "$todo_file"
 		return
 	fi
 
 	case $1 in
 	--edit|edit)
-		editor
+		editor "$todo_file"
 	;;
 	--path|path)
 		printf '%s\n' "$todo_file"

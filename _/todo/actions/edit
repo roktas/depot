@@ -1,16 +1,40 @@
-#!/bin/bash
-case $1 in
-"usage")
-  echo "$(basename "$0") [BASENAME]"
-  echo "  Open \$TODO_DIR/BASENAME.txt in \$EDITOR."
-  echo "  If BASENAME is not given, defaults to 'todo'."
-  ;;
-*)
-  FILE=${2:-todo}.txt
-  if [ -n "$EDITOR" ]; then
-    "$EDITOR" "$TODO_DIR/$FILE"
-  else
-    echo "Error: The EDITOR environment variable is not set"
-  fi
-  ;;
-esac
+#!/usr/bin/env bash
+
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+warn() {
+	echo -e "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+usage() {
+	cat <<-EOF
+	${0##*/} [BASENAME]
+	  Open \$TODO_DIR/BASENAME.txt in \$EDITOR.
+	  If BASENAME is not given, defaults to 'todo'.
+	EOF
+}
+
+main() {
+	case ${1:-} in
+	usage)
+		usage
+	;;
+	*)
+		local file=${2:-todo}.txt
+
+		[[ -n ${EDITOR:-} ]] || abort "EDITOR is not set"
+		"$EDITOR" "$TODO_DIR/$file"
+	;;
+	esac
+}
+
+main "$@"

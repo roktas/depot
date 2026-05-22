@@ -1,83 +1,108 @@
 #!/usr/bin/env bash
-# 2009-2011 Paul Mansfield
-# License: GPL, http://www.gnu.org/copyleft/gpl.html
 
-# Stop Verbose lines, thanks to Mark Harrison
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
 export TODOTXT_VERBOSE=0
-# Allow control of wrapping if using as simplepv action
-NOWRAP=0
 
-# Check how we are being run
-HOWRUN=$(basename "$0")
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
 
-# move arguments one to left, therefore eating action name
-action=$1
-shift
+apply_final_filter() {
+	local content=$1
 
-# If being run as simplepv then turn off all colours and
-# wrap at 40 characters
-# Useful for display outside of terminal
-if [ "$HOWRUN" = "simplepv" ] ; then
-    export TODOTXT_PLAIN=1
-    export PRI_X=$NONE
-    export PRI_A=$NONE
-    export PRI_B=$NONE
-    export PRI_C=$NONE
-    export DEFAULT=$NONE
-    export COLOR_DONE=$NONE
-    # Check if we want to wrap text or not
-    if [ "$1" = "--nowrap" ]; then
-        NOWRAP=1
-        shift
-    fi
-    # If we have fmt then use it to wrap long lines
-    file /usr/bin/fmt > /dev/null 2>&1
-    FMT=$?
-    # Set final filter
-    if [ "$NOWRAP" -eq 1 ] ; then
-        TODOTXT_FINAL_FILTER="$TODOTXT_FINAL_FILTER "
-    elif [ $FMT -eq 0 ] ; then
-        TODOTXT_FINAL_FILTER="$TODOTXT_FINAL_FILTER | fmt -t -w 40"
-    fi
-fi
+	local filter=${TODOTXT_FINAL_FILTER:-cat}
 
-# Stop filter now and run in a controlled manner after the _list function is run
-export TODOTXT_DISABLE_FILTER=1
-
-[ "$action" = "useage" ] && {
-    echo "    $(basename "$0") [TERM...]"
-    echo "      Show todo items containing TERM, grouped by project, and displayed in"
-    echo "      priority order. If no TERM provided, displays entire todo.txt."
-    echo ""
-    exit
+	# shellcheck disable=SC2086
+	echo "$content" | eval $filter
 }
 
-# Show projects in alphabetical order and todo items in priority order
-echo "=====  Projects  ====="
-echo ""
+configure_simplepv() {
+	export TODOTXT_PLAIN=1
+	export PRI_X=${NONE:-}
+	export PRI_A=${NONE:-}
+	export PRI_B=${NONE:-}
+	export PRI_C=${NONE:-}
+	export DEFAULT=${NONE:-}
+	export COLOR_DONE=${NONE:-}
 
-# Find all projects and sort
-PROJECTS=$(grep -o '[^ ]*+[^ ]\+' "$TODO_FILE" | grep '^+' | sort -u | sed 's/^+//g' )
+	if [[ $NOWRAP -eq 1 ]]; then
+		TODOTXT_FINAL_FILTER=${TODOTXT_FINAL_FILTER:-cat}
+	elif command -v fmt &>/dev/null; then
+		TODOTXT_FINAL_FILTER="${TODOTXT_FINAL_FILTER:-cat} | fmt -t -w 40"
+	fi
+}
 
-# For each project show header and the list of todo items
-for project in $PROJECTS ; do 
-    # Use core _list function, does numbering and colouring for us
-    PROJECT_LIST=$(_list "$TODO_FILE" "+$project\b" "$@" | sed 's/\ *+[a-zA-Z0-9._\-]*\ */ /g')
-    if [[ -n "${PROJECT_LIST}" ]]; then
-	    echo  "---  $project  ---"
-	    # shellcheck disable=SC2086
-	    echo  "${PROJECT_LIST}" | eval $TODOTXT_FINAL_FILTER
-	    # If run as simplepv don't add newlines
-	    if [ "$HOWRUN" != "simplepv" ] ; then
-            echo  ""
-        fi
-    fi
-done
+emit_project() {
+	local project=$1
+	shift
 
-# Show todo items not associated to a project
-PROJECT_LIST=$(_list "$TODO_FILE" "$@" | grep -v "+[[:alnum:]]*" )
-if [[ -n "${PROJECT_LIST}" ]]; then
-    echo "--- Not in projects ---"
-    # shellcheck disable=SC2086
-    echo "${PROJECT_LIST}" | eval $TODOTXT_FINAL_FILTER
-fi
+	local project_list
+
+	project_list=$(_list "$TODO_FILE" "+$project\b" "$@" | sed 's/\ *+[a-zA-Z0-9._\-]*\ */ /g')
+	[[ -n $project_list ]] || return
+
+	echo "---  $project  ---"
+	apply_final_filter "$project_list"
+	[[ ${HOWRUN:-} == simplepv ]] || echo ""
+}
+
+list_projects() {
+	mapfile -t PROJECTS < <(grep -o '[^ ]*+[^ ]\+' "$TODO_FILE" | grep '^+' | sort -u | sed 's/^+//g')
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+usage() {
+	cat <<-EOF
+	${0##*/} [TERM...]
+	  Show todo items containing TERM, grouped by project, and displayed in
+	  priority order. If no TERM provided, displays entire todo.txt.
+	EOF
+}
+
+main() {
+	local action=${1:-}
+	shift || true
+
+	local project
+	local project_list
+
+	declare -a PROJECTS=()
+	HOWRUN=${0##*/}
+	NOWRAP=0
+
+	if [[ $HOWRUN == simplepv ]]; then
+		if [[ ${1:-} == --nowrap ]]; then
+			NOWRAP=1
+			shift
+		fi
+
+		configure_simplepv
+	fi
+
+	export TODOTXT_DISABLE_FILTER=1
+
+	if [[ $action == useage || $action == usage ]]; then
+		usage
+		exit
+	fi
+
+	echo "=====  Projects  ====="
+	echo ""
+
+	list_projects
+	for project in "${PROJECTS[@]}"; do
+		emit_project "$project" "$@"
+	done
+
+	project_list=$(_list "$TODO_FILE" "$@" | grep -v "+[[:alnum:]]*" || true)
+	if [[ -n $project_list ]]; then
+		echo "--- Not in projects ---"
+		apply_final_filter "$project_list"
+	fi
+}
+
+main "$@"

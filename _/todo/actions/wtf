@@ -1,5 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-! command -v bat &>/dev/null || PAGER=bat
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
 
-[[ -f "$TODO_DIR"/README.md ]] && "${PAGER:-cat}" "$TODO_DIR"/README.md
+main() {
+	local pager=${PAGER:-cat}
+
+	if command -v bat &>/dev/null; then
+		pager=bat
+	fi
+
+	[[ ! -f "$TODO_DIR"/README.md ]] || "$pager" "$TODO_DIR"/README.md
+}
+
+main "$@"

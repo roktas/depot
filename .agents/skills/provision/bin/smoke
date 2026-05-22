@@ -7,15 +7,16 @@ abort() {
 	exit 1
 }
 
-repo_root() {
-	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
+warn() {
+	printf '%s\n' "$*" >&2
 }
 
-usage() {
-	cat <<-EOF
-	Usage:
-	  smoke [plan|boot|stop|destroy|prune]
-	EOF
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+repo_root() {
+	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
 }
 
 there() {
@@ -26,8 +27,15 @@ there() {
 	command there "$@"
 }
 
-warn() {
-	printf '%s\n' "$*" >&2
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+usage() {
+	cat <<-EOF
+	Usage:
+	  smoke [plan|boot|stop|destroy|prune]
+	EOF
 }
 
 main() {

@@ -1,3 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-"${EDITOR:-nvim}" "$TODO_DIR"/0000.md
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+main() {
+	"${EDITOR:-nvim}" "$TODO_DIR"/0000.md
+}
+
+main "$@"

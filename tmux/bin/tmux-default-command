@@ -1,10 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-preferred_shell=$(command -v fish || printf '%s\n' "${SHELL:-/bin/sh}")
-current_window=$(tmux display-message -p '#I')
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
 
-if [ "$current_window" = "0" ]; then
-	tmux rename-window "Hello" && exec "$preferred_shell" -l
-else
+main() {
+	local current_window
+	local preferred_shell
+
+	preferred_shell=$(command -v fish || printf '%s\n' "${SHELL:-/bin/sh}")
+	current_window=$(tmux display-message -p '#I')
+
+	if [[ $current_window == 0 ]]; then
+		tmux rename-window "Hello"
+		exec "$preferred_shell" -l
+	fi
+
 	exec "$preferred_shell"
-fi
+}
+
+main "$@"

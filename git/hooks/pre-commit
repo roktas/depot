@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
-# Avoid doing commit in environment branches.
 
-declare -gr forbidden_branches='^(master|main|release)$'
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+readonly FORBIDDEN_BRANCHES='^(master|main|release)$'
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
 
 check() {
-	local branch; branch=$(git rev-parse --abbrev-ref HEAD)
+	local branch
 
-	if [[ $branch =~ $forbidden_branches ]]; then
+	branch=$(git rev-parse --abbrev-ref HEAD)
+
+	if [[ $branch =~ $FORBIDDEN_BRANCHES ]]; then
 		cat >&2 <<-EOF
 			You should not commit directly into $branch branch.
 			Please create a new branch from '$branch' and try again.
@@ -15,6 +22,10 @@ check() {
 		exit 1
 	fi
 }
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
 
 main() {
 	if [[ $(git for-each-ref --format='%(refname)' refs/heads/ | wc -l) -le 1 ]]; then

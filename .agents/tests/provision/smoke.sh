@@ -1,19 +1,44 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \t\n'
+set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+
+cleanup_level_extra_module=
+cleanup_link_target_list_module=
+cleanup_platform_null_module=
+cleanup_repair_repo=
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+cleanup() {
+	rm -rf "$cleanup_level_extra_module" "$cleanup_link_target_list_module" "$cleanup_platform_null_module"
+	[[ -z $cleanup_repair_repo ]] || rm -rf "$cleanup_repair_repo"
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
 
 main() {
+	local head
+	local level_extra_module
+	local link_target_list_module
+	local platform_null_module
+	local repair_repo=
 	local repo
 	local script_dir
 
 	script_dir=$(cd -- "${BASH_SOURCE[0]%/*}" >/dev/null && pwd)
 	repo=${REPO_ROOT:-$(cd -- "$script_dir/../../.." >/dev/null && pwd)}
-	LEVEL_EXTRA_MODULE=$repo/zz-level-extra-smoke
-	LINK_TARGET_LIST_MODULE=$repo/zz-link-target-list-smoke
-	PLATFORM_NULL_MODULE=$repo/zz-platform-null-smoke
-	REPAIR_REPO=
+	level_extra_module=$repo/zz-level-extra-smoke
+	link_target_list_module=$repo/zz-link-target-list-smoke
+	platform_null_module=$repo/zz-platform-null-smoke
+	cleanup_level_extra_module=$level_extra_module
+	cleanup_link_target_list_module=$link_target_list_module
+	cleanup_platform_null_module=$platform_null_module
 
-	trap 'rm -rf "$LEVEL_EXTRA_MODULE" "$LINK_TARGET_LIST_MODULE" "$PLATFORM_NULL_MODULE"; [[ -z ${REPAIR_REPO:-} ]] || rm -rf "$REPAIR_REPO"' EXIT HUP INT QUIT TERM
+	trap cleanup EXIT HUP INT QUIT TERM
 
 	export GIT_CONFIG_GLOBAL=${GIT_CONFIG_GLOBAL:-/tmp/provision-smoke-gitconfig}
 
@@ -68,10 +93,10 @@ main() {
 		abort "gnome module should not be planned" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "gnome" }
 	'
 
-	rm -rf "$LINK_TARGET_LIST_MODULE"
-	mkdir -p "$LINK_TARGET_LIST_MODULE/bin"
-	touch "$LINK_TARGET_LIST_MODULE/config" "$LINK_TARGET_LIST_MODULE/bin/tool"
-	cat >"$LINK_TARGET_LIST_MODULE/README.md" <<'EOF'
+	rm -rf "$link_target_list_module"
+	mkdir -p "$link_target_list_module/bin"
+	touch "$link_target_list_module/config" "$link_target_list_module/bin/tool"
+	cat >"$link_target_list_module/README.md" <<'EOF'
 ---
 all:
   links:
@@ -99,9 +124,9 @@ EOF
 		abort "missing second fan-in list target" unless links.any? { |link| link.fetch("source") == "bin/tool" && link.fetch("target") == "~/.local/sbin/tool" && link.fetch("fan_in") == true }
 	'
 
-	rm -rf "$LEVEL_EXTRA_MODULE"
-	mkdir -p "$LEVEL_EXTRA_MODULE"
-	cat >"$LEVEL_EXTRA_MODULE/README.md" <<'EOF'
+	rm -rf "$level_extra_module"
+	mkdir -p "$level_extra_module"
+	cat >"$level_extra_module/README.md" <<'EOF'
 ---
 all:
   level: extra
@@ -142,9 +167,9 @@ EOF
 		abort "vscode linux plan should not install cask" if vscode.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:visual-studio-code" }
 	'
 
-	rm -rf "$PLATFORM_NULL_MODULE"
-	mkdir -p "$PLATFORM_NULL_MODULE"
-	cat >"$PLATFORM_NULL_MODULE/README.md" <<'EOF'
+	rm -rf "$platform_null_module"
+	mkdir -p "$platform_null_module"
+	cat >"$platform_null_module/README.md" <<'EOF'
 ---
 macos: ~
 ---
@@ -189,9 +214,9 @@ EOF
 		abort "platform scoped sections should preserve document order" unless body.index("echo all") < body.index("echo macos")
 	'
 
-	rm -rf "$PLATFORM_NULL_MODULE"
-	mkdir -p "$PLATFORM_NULL_MODULE"
-	cat >"$PLATFORM_NULL_MODULE/README.md" <<'EOF'
+	rm -rf "$platform_null_module"
+	mkdir -p "$platform_null_module"
+	cat >"$platform_null_module/README.md" <<'EOF'
 ---
 all:
   packages:
@@ -208,7 +233,7 @@ EOF
 
 	grep -q "Package name must not be empty" /tmp/invalid-package-plan.err
 
-	rm -rf "$PLATFORM_NULL_MODULE"
+	rm -rf "$platform_null_module"
 
 	.agents/skills/provision/bin/plan --mode refresh --platform linux --host smoke >/tmp/refresh-plan.json
 
@@ -243,11 +268,12 @@ EOF
 		end
 	'
 
-	REPAIR_REPO=$(mktemp -d "${TMPDIR:-/tmp}/provision-repair-repo.XXXXXX")
-	cp -a "$repo/." "$REPAIR_REPO"
-	mkdir -p "$REPAIR_REPO/.agents/state/hosts/smoke-repair"
-	head=$(git -C "$REPAIR_REPO" rev-parse HEAD)
-	cat >"$REPAIR_REPO/.agents/state/hosts/smoke-repair/home.md" <<EOF
+	repair_repo=$(mktemp -d "${TMPDIR:-/tmp}/provision-repair-repo.XXXXXX")
+	cleanup_repair_repo=$repair_repo
+	cp -a "$repo/." "$repair_repo"
+	mkdir -p "$repair_repo/.agents/state/hosts/smoke-repair"
+	head=$(git -C "$repair_repo" rev-parse HEAD)
+	cat >"$repair_repo/.agents/state/hosts/smoke-repair/home.md" <<EOF
 ---
 head: $head
 done:
@@ -256,7 +282,7 @@ done:
 ---
 EOF
 
-	"$REPAIR_REPO/.agents/skills/provision/bin/plan" --repo "$REPAIR_REPO" --allow-dirty --mode repair --platform linux --host smoke-repair >/tmp/repair-plan.json
+	"$repair_repo/.agents/skills/provision/bin/plan" --repo "$repair_repo" --allow-dirty --mode repair --platform linux --host smoke-repair >/tmp/repair-plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/repair-plan.json"))
