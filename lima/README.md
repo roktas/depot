@@ -3,7 +3,7 @@ all:
   level: extra
   packages:
     - lima
-    - liman
+    - there
   links:
     default.yml: ~/.lima/default.yml
 ---
@@ -16,7 +16,7 @@ Lima launches Linux virtual machines with automatic file sharing and port forwar
 
 ### Project Helper
 
-Use the external `"there"` helper from Liman for project-local test instances.
+Use the external `"there"` helper from the neighboring `there` repository for project-local test instances.
 
 ### By Default Config
 

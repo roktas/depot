@@ -2,16 +2,16 @@
 
 ## Scope
 
-This repository is a Home-style dotfiles provisioning repo. Keep repository-facing code, comments, file names, commit
+This repository is a Depot-style dotfiles provisioning repo. Keep repository-facing code, comments, file names, commit
 messages, and documentation in English.
 
 ## Canonical Design
 
-- Durable provisioning spec: `.agents/specs/home/spec.md`
+- Durable provisioning spec: `.agents/specs/depot/spec.md`
 - Repo-local provisioning skill: `.agents/skills/provision/SKILL.md`
 - Plan helper: `.agents/skills/provision/bin/plan`
 - Bootstrap helper: `.agents/skills/provision/bin/bootstrap`
-- Provisioning state: `.agents/state/hosts/HOST/home.md`
+- Provisioning state: `.agents/state/hosts/HOST/depot.md`
 - Agent resume checkpoint: `.agents/state/agent/checkpoint.md`
 - Migration task notes: `.agents/tasks/2026-05-15-dotfiles-migration/`
 
@@ -66,7 +66,7 @@ shellcheck "${shell_files[@]}"
 Use Lima with the external `"there"` helper for end-to-end smoke tests. See
 `.agents/skills/provision/references/testing.md`.
 
-This repository's `.envrc` may put a neighboring Liman checkout ahead of the packaged `"there"` command. In
+This repository's `.envrc` may put a neighboring `there` checkout ahead of the packaged `"there"` command. In
 non-interactive tool shells, direnv may not be loaded automatically; use `direnv exec . COMMAND` when validating
 commands that depend on `.envrc`.
 

@@ -1,4 +1,6 @@
 .agents/state/
+!agents/skills/_/
+!agents/skills/_/**
 __pycache__/
 *.pyc
 agents/skills/.system/

@@ -1,8 +1,8 @@
-# Home
+# Depot
 
-Home-style dotfiles and provisioning repository.
+Dotfiles and provisioning repository.
 
-The durable design lives in `.agents/specs/home/spec.md`. The repo-local provisioning skill lives in
+The durable design lives in `.agents/specs/depot/spec.md`. The repo-local provisioning skill lives in
 `.agents/skills/provision/`, and the plan helper is `.agents/skills/provision/bin/plan`.
 
 Fresh hosts may need the bootstrap helper before normal provisioning:
