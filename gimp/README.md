@@ -14,7 +14,7 @@ Extra Linux image editor module installed through Flatpak.
 Install GIMP only on graphical Linux hosts.
 
 ```bash
-if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+if [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
 	exit 0
 fi
 

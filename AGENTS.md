@@ -40,8 +40,9 @@ editing. At session closeout, refresh the checkpoint after any requested commits
 - Omit `level` for normal modules. Use `level: minimal` for the smallest useful base and `level: extra` for optional
   additions.
 - Omit `packages` for virtual modules. Add `packages` only when the module should install explicit packages.
-- Keep GUI- or desktop-session-dependent package installs out of frontmatter `packages`; use guarded special-section
-  commands instead.
+- Keep GUI- or desktop-host-dependent package installs out of frontmatter `packages`; use guarded special-section
+  commands instead. For Linux package installs, prefer a desktop-host guard such as `systemctl get-default` equals
+  `graphical.target`; reserve `DISPLAY`/`WAYLAND_DISPLAY` checks for active GUI session commands.
 - Prefer short contextual file, directory, and helper names. Avoid encoding implementation details in names unless
   they disambiguate real siblings or are part of an established external interface.
 - Do not migrate old `install.sh` files by default. Prefer README frontmatter and special sections; keep a script only

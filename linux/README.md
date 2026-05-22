@@ -107,7 +107,7 @@ if ! command -v apt-get >/dev/null; then
 	exit 0
 fi
 
-if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]] && [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
+if [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
 	exit 0
 fi
 

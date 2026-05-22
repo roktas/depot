@@ -199,8 +199,12 @@ Paket kaldırma ancak kullanıcı agent'a açıkça bu yönde talimat verirse ay
 `packages` yalnızca plan-time deklarasyondur. Harness runtime koşul değerlendirmez. Paket kurulumu runtime koşula
 bağlıysa paket `packages` altında yer almamalı; `Install` veya `Preinstall` gibi özel README bölümlerinde guarded komut
 olarak yazılmalıdır. Bu durumda koşul sağlanmıyorsa komut `exit 0` ile başarılı no-op olabilir.
-GUI veya desktop oturumu gerektiren kurulumlar da bu kapsamdadır: paket `packages` altında yer almamalı, ilgili özel
-README bölümünde GUI/session guard'ı olan komutla kurulmalıdır.
+
+GUI veya desktop host gerektiren kurulumlar da bu kapsamdadır: paket `packages` altında yer almamalı, ilgili özel README
+bölümünde guard'lı komutla kurulmalıdır. SSH üzerinden provizyonlama desteklendiği için GUI paket kurulum guard'ı
+`DISPLAY` veya `WAYLAND_DISPLAY` varlığına dayanmamalı; host'un desktop profiline bakmalıdır. Linux'ta önerilen sinyal
+`systemctl get-default` çıktısının `graphical.target` olmasıdır. Buna karşılık `gsettings`, `xdg-mime` veya GUI
+uygulaması çalıştırma gibi aktif oturum gerektiren işlemler ayrıca session guard'ı kullanmalıdır.
 
 **`level`**: Modülün provizyonlama kapsam seviyesi.
 

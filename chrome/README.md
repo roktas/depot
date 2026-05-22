@@ -15,7 +15,7 @@ Google Chrome Beta browser package and Linux apt repository setup.
 Install Google Chrome Beta from Google's apt repository on Debian-family Linux hosts.
 
 ```bash
-if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
+if [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
 	exit 0
 fi
 

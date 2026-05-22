@@ -105,10 +105,13 @@ must be Bash, and must not require Ruby. It installs the platform package-manage
   directory with the same basename, rather than linking the source directory itself.
 - `packages` must be a flat YAML list of `[package-type:]package-name` strings. Do not nest package types as mapping
   keys; use `gemini-cli` or `brew:gemini-cli`, not `brew: [gemini-cli]`.
-- Treat `packages` as plan-time declarations. If package installation depends on runtime state such as GUI/session
-  availability, keep it out of `packages` and put a guarded command in a special README section instead.
-- Install GUI- or desktop-session-dependent packages only through guarded special-section commands, not through
-  frontmatter `packages`.
+- Treat `packages` as plan-time declarations. If package installation depends on runtime state such as GUI or desktop
+  host availability, keep it out of `packages` and put a guarded command in a special README section instead.
+- Install GUI- or desktop-host-dependent packages only through guarded special-section commands, not through frontmatter
+  `packages`. Do not use `DISPLAY` or `WAYLAND_DISPLAY` as the package-install guard because SSH provisioning can target
+  a desktop host without exporting a GUI session. On Linux, prefer `systemctl get-default == graphical.target` for
+  package installs. Keep `DISPLAY`, `WAYLAND_DISPLAY`, `XDG_CURRENT_DESKTOP`, or similar session checks for commands
+  that truly need an active GUI session, such as `gsettings`, MIME association, or launching GUI programs.
 - Missing `packages` means the module is virtual and installs no packages. Add package names explicitly for modules that
   should install packages.
 - Do not remove packages unless the user explicitly asks for package removal.
