@@ -21,6 +21,25 @@ editor() {
 	${VISUAL:-${EDITOR:-vi}} "$todo_file"
 }
 
+emit_todo() {
+	local todo_file=$1
+
+	local index=0
+	local line
+
+	while IFS= read -r line; do
+		case $line in
+		"- [ ] "*|"- [x] "*)
+			((index += 1))
+			printf '%2d  %s\n' "$index" "$line"
+		;;
+		*)
+			printf '%s\n' "$line"
+		;;
+		esac
+	done <"$todo_file"
+}
+
 ensure_file() {
 	local owner=$1
 	local todo_file=$2
@@ -38,6 +57,55 @@ ensure_file() {
 	EOF
 }
 
+mark_done() {
+	local todo_file=$1
+	local item=$2
+
+	local current=0
+	local found=
+	local line
+	local tempfile
+
+	[[ $item =~ ^[0-9]+$ ]] || abort "todo item must be a number: $item"
+
+	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
+
+	while IFS= read -r line; do
+		case $line in
+		"- [ ] "*|"- [x] "*)
+			((current += 1))
+			if ((current == item)); then
+				found=true
+				if [[ $line == "- [ ] "* ]]; then
+					line="- [x] ${line#"- [ ] "}"
+				fi
+			fi
+		;;
+		esac
+
+		printf '%s\n' "$line" >>"$tempfile"
+	done <"$todo_file"
+
+	if [[ -z $found ]]; then
+		rm -f "$tempfile"
+		abort "todo item not found: $item"
+	fi
+
+	mv "$tempfile" "$todo_file"
+}
+
+prompt_done_item() {
+	local todo_file=$1
+
+	local item
+
+	emit_todo "$todo_file"
+	printf 'Done item: ' >&2
+	read -r item
+	[[ -n $item ]] || abort "todo item is empty"
+	printf '%s\n' "$item"
+}
+
 repo_root() {
 	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
 }
@@ -51,6 +119,8 @@ usage() {
 	Usage:
 	  todo human TEXT
 	  todo agent TEXT
+	  todo human
+	  todo human --done [NUMBER]
 	  todo human --edit
 	  todo agent --path
 	EOF
@@ -65,6 +135,7 @@ main() {
 	local owner=$1
 	shift
 
+	local item
 	local root
 	local todo_file
 
@@ -81,11 +152,23 @@ main() {
 	ensure_file "$owner" "$todo_file"
 
 	if (($# == 0)); then
-		editor "$todo_file"
+		emit_todo "$todo_file"
 		return
 	fi
 
 	case $1 in
+	--done|done)
+		shift
+
+		item=${1:-}
+
+		if [[ -z $item ]]; then
+			item=$(prompt_done_item "$todo_file")
+		fi
+
+		mark_done "$todo_file" "$item"
+		printf '%s\n' "$todo_file"
+	;;
 	--edit|edit)
 		editor "$todo_file"
 	;;

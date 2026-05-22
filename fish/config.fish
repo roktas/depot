@@ -125,6 +125,8 @@ end
 
 function co --wraps=codex --description 'alias co codex'
     if test (count $argv) -eq 0
+        codex -a never -s workspace-write resume --last
+    else if test (count $argv) -eq 1; and test "$argv[1]" = -
         codex -a never -s workspace-write resume
     else
         codex -a never -s workspace-write $argv
