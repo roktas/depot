@@ -1,4 +1,4 @@
-# Home Specification
+# Depot Specification
 
 Bu proje, dotfiles benzeri bir repoyu agent yardımıyla yerel olarak veya SSH üzerinden uzak bir makinede
 provizyonlamayı hedefler.
@@ -41,7 +41,7 @@ provizyonlamayı hedefler.
   modül Linux dışında planlanmaz.
 - Her modül uygulanırken önce modül dizinine geçilir, `README.md` okunur, frontmatter verisi ve gövde talimatları
   değerlendirilir.
-- İlgili host için provizyonlama state'i işlem yapılan repo kökündeki `.agents/state/hosts/HOST/home.md` dosyasına
+- İlgili host için provizyonlama state'i işlem yapılan repo kökündeki `.agents/state/hosts/HOST/depot.md` dosyasına
   yazılır.
 
 ## Repo Yerleşimi
@@ -64,12 +64,12 @@ provizyonlamayı hedefler.
     bin/
   .agents/
     specs/
-      home/
+      depot/
         spec.md
     state/
       hosts/
         HOST/
-          home.md
+          depot.md
 ```
 
 `.agents/state/` çalışma zamanı state'idir. Git'e alınıp alınmaması repo sahibinin kararıdır; bu spec bunu zorunlu
@@ -248,7 +248,7 @@ Kullanıcı provizyonlama başlangıcında açıkça toplu onay verirse bu akı�
 
 ## Format: State Log
 
-Log dosyası kaynak repo içindeki `.agents/state/hosts/HOST/home.md` lokasyonunda, YAML frontmatter'lı bir Markdown
+Log dosyası kaynak repo içindeki `.agents/state/hosts/HOST/depot.md` lokasyonunda, YAML frontmatter'lı bir Markdown
 dosyadır. HOST
 `hostname -f` çıktısında sonda `.*` varsa çıkarılarak belirlenir (ör. `kant.local` için `kant`). YAML frontmatter
 aşağıdaki anahtarların yer aldığı bir sözlüktür:
@@ -261,7 +261,7 @@ aşağıdaki anahtarların yer aldığı bir sözlüktür:
   anahtar 3 değerden birini alabilir. `ok`: provizyonlama başarılı, `notok`: provizyonlama başarısız, `ignored`:
   provizyonlama yapılmadı/yapılmayacak.
 
-`kant` konağında örnek log: `.agents/state/hosts/kant/home.md`
+`kant` konağında örnek log: `.agents/state/hosts/kant/depot.md`
 
         ---
         head: a10a8ae3db88c91f792b54b76db93dc30e09341e
@@ -286,7 +286,7 @@ detaylar varsa kaydedilir.
 - State önce işlemin yürütüldüğü repo kopyasına yazılır. Yerel provizyonlamada bu yerel repo, SSH ile uzak
   provizyonlamada hedef makinedeki repo kopyasıdır.
 - Yerel repo pratik state arşividir. Uzak provizyonlama sonunda hedef repo Dropbox ile yerel makineye senkronize
-  olmuyorsa, ilgili host state dosyası hedef makineden yerel repo `.agents/state/hosts/HOST/home.md` yoluna geri
+  olmuyorsa, ilgili host state dosyası hedef makineden yerel repo `.agents/state/hosts/HOST/depot.md` yoluna geri
   kopyalanır.
 - Hedef repo Dropbox altında ise state için ayrıca kopyalama gerekmez; Dropbox senkronizasyonu state'i de taşır.
 - Hedef repo Git klonuysa ve `.agents/state` Git ignore nedeniyle taşınmıyorsa bu normaldir. State hedefte üretilir ve

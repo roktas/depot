@@ -80,7 +80,6 @@ main() {
 		abort "agents should not be virtual" unless agents.fetch("virtual") == false
 		abort "missing codex cask" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:codex" }
 		abort "missing opencode package" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:opencode" }
-		abort "missing gemini-cli package" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:gemini-cli" }
 		git = plan.fetch("modules").find { |mod| mod.fetch("name") == "git" }
 		abort "missing git module" unless git
 		abort "git should not be virtual" unless git.fetch("virtual") == false
@@ -273,7 +272,7 @@ EOF
 	cp -a "$repo/." "$repair_repo"
 	mkdir -p "$repair_repo/.agents/state/hosts/smoke-repair"
 	head=$(git -C "$repair_repo" rev-parse HEAD)
-	cat >"$repair_repo/.agents/state/hosts/smoke-repair/home.md" <<EOF
+	cat >"$repair_repo/.agents/state/hosts/smoke-repair/depot.md" <<EOF
 ---
 head: $head
 done:

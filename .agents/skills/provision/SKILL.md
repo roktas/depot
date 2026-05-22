@@ -1,21 +1,21 @@
 ---
 name: provision
-description: Use in this repository to plan and perform Home-style dotfiles provisioning from `.agents/specs/home/spec.md`, including module discovery, README frontmatter interpretation, host/platform filtering, state-aware planning, package/link/copy actions, and confirmation-gated application.
+description: Use in this repository to plan and perform Depot-style dotfiles provisioning from `.agents/specs/depot/spec.md`, including module discovery, README frontmatter interpretation, host/platform filtering, state-aware planning, package/link/copy actions, and confirmation-gated application.
 ---
 
 # Provision
 
-Use this repo-local skill for provisioning this `home` repository. Treat `.agents/specs/home/spec.md` as the canonical behavior specification.
+Use this repo-local skill for provisioning this `depot` repository. Treat `.agents/specs/depot/spec.md` as the canonical behavior specification.
 
 ## Workflow
 
-1. Read `.agents/specs/home/spec.md` when the user asks to provision, change provisioning behavior, or inspect the design.
+1. Read `.agents/specs/depot/spec.md` when the user asks to provision, change provisioning behavior, or inspect the design.
 2. Ensure the worktree is clean before real local or `remote-git` provisioning. For `remote-git`, ensure the target
    commit is pushed.
 3. Generate a non-destructive plan with `bin/plan`.
 4. Present the plan and ask for confirmation unless the user already gave bulk approval for this provisioning run.
 5. Apply the confirmed actions manually with normal tools. The helper does not apply changes.
-6. Update `.agents/state/hosts/HOST/home.md` in the repo copy where actions were applied. For remote provisioning
+6. Update `.agents/state/hosts/HOST/depot.md` in the repo copy where actions were applied. For remote provisioning
    without Dropbox sync, copy that host state back into the local repo state archive before finishing.
 
 ## Remote Modes
@@ -30,7 +30,7 @@ Use this repo-local skill for provisioning this `home` repository. Treat `.agent
 
 In all remote modes, resolve links and copies against the target machine's repo copy, not the local orchestrating repo.
 Write state on the target first. If the target is not Dropbox-synced, fetch the resulting
-`.agents/state/hosts/HOST/home.md` back into the local repo at the end.
+`.agents/state/hosts/HOST/depot.md` back into the local repo at the end.
 
 ## Helper
 
@@ -56,11 +56,11 @@ Use `--allow-dirty` only while developing or reviewing the skill. Real provision
 
 ## Development And Test Environments
 
-For Lima/Liman setup and smoke-test commands, read `references/testing.md`.
+For Lima and the `there` helper setup and smoke-test commands, read `references/testing.md`.
 
-`bin/smoke` uses the external Liman `"there"` command when running end-to-end tests. Keep this dependency loose:
+`bin/smoke` uses the external `"there"` command when running end-to-end tests. Keep this dependency loose:
 `"there"` must be discoverable through `PATH`, but this skill must not assume how it was installed or provided. Use
-Liman's own documentation for detailed `"there"` usage.
+the `there` documentation for detailed `"there"` usage.
 
 ## Bootstrap
 

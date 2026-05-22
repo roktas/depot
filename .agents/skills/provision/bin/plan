@@ -515,7 +515,7 @@ class ProvisionPlan
     end
 
     def state_path
-      @repo.join(".agents", "state", "hosts", @host, "home.md")
+      @repo.join(".agents", "state", "hosts", @host, "depot.md")
     end
 
     def validate_platform!
@@ -537,7 +537,7 @@ class ProvisionPlan
     end
 
     def validate_repo!
-      spec = @repo.join(".agents", "specs", "home", "spec.md")
+      spec = @repo.join(".agents", "specs", "depot", "spec.md")
       raise "Not a directory: #{@repo}" unless @repo.directory?
       raise "Missing spec: #{spec}" unless spec.file?
     end

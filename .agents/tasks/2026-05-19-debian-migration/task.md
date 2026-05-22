@@ -2,7 +2,7 @@
 
 ## Brief
 
-Plan the migration of `../debian` provisioning scripts into this Home-style dotfiles repository.
+Plan the migration of `../debian` provisioning scripts into this Depot-style dotfiles repository.
 
 The planning pass is complete and the migration has started. Keep migrating in small reviewable groups.
 

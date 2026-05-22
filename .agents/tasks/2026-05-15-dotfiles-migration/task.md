@@ -2,15 +2,15 @@
 
 ## Context
 
-This repository is being reshaped into a Home-style dotfiles provisioning repo. The durable spec lives at
-`.agents/specs/home/spec.md`. The repo-local provisioning skill lives at `.agents/skills/provision/`.
+This repository is being reshaped into a Depot-style dotfiles provisioning repo. The durable spec lives at
+`.agents/specs/depot/spec.md`. The repo-local provisioning skill lives at `.agents/skills/provision/`.
 
 The old implementation is at `../dotfiles`. It was Debian/Linux-oriented and module-based. This repo now uses
 frontmatter-driven modules with `links`, `copies`, `packages`, platform filters, and state under `.agents/state`.
 
 ## Completed
 
-- Moved the original root `SPEC.md` into `.agents/specs/home/spec.md` and iteratively refined the design.
+- Moved the original root `SPEC.md` into `.agents/specs/depot/spec.md` and iteratively refined the design.
 - Created repo-local skill `provision`.
 - Added Ruby plan helper at `.agents/skills/provision/bin/plan`.
 - Added the repo-local smoke test under `.agents/tests/provision/`.

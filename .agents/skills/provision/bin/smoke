@@ -21,7 +21,7 @@ repo_root() {
 
 there() {
 	if ! type -P there >/dev/null; then
-		abort "\"there\" is not in PATH; install Liman or activate an environment that provides it"
+		abort "\"there\" is not in PATH; install there or activate an environment that provides it"
 	fi
 
 	command there "$@"

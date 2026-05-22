@@ -1,13 +1,13 @@
 # Testing
 
-Use Lima with the external Liman `"there"` helper for end-to-end provisioning tests.
+Use Lima with the external `"there"` helper for end-to-end provisioning tests.
 
 ## Lima
 
-The provision smoke wrapper expects `"there"` to be available in `PATH`. Install the `liman` package, or activate an
+The provision smoke wrapper expects `"there"` to be available in `PATH`. Install the `there` package, or activate an
 environment that provides a compatible `"there"` command.
 
-This skill intentionally does not encode how `"there"` is installed. See the Liman documentation for command behavior
+This skill intentionally does not encode how `"there"` is installed. See the `there` documentation for command behavior
 and detailed usage.
 
 Run the normal provision smoke script inside the Lima instance:
