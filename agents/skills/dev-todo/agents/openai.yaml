@@ -1,4 +1,0 @@
----
-name: dev-todo
-description: Use when the user message starts with `todo ` or `todo! ` to append, edit, or print human/agent TODO files under `.agents/state/`.
----
