@@ -41,8 +41,7 @@ emit_todo() {
 }
 
 ensure_file() {
-	local owner=$1
-	local todo_file=$2
+	local todo_file=$1
 
 	mkdir -p "${todo_file%/*}"
 	if [[ -e $todo_file ]]; then
@@ -50,14 +49,14 @@ ensure_file() {
 	fi
 
 	cat >"$todo_file" <<-EOF
-	# ${owner^} TODO
+	# TODO
 
 	## Inbox
 
 	EOF
 }
 
-mark_done() {
+mark_ok() {
 	local todo_file=$1
 	local item=$2
 
@@ -94,13 +93,13 @@ mark_done() {
 	mv "$tempfile" "$todo_file"
 }
 
-prompt_done_item() {
+prompt_ok_item() {
 	local todo_file=$1
 
 	local item
 
 	emit_todo "$todo_file"
-	printf 'Done item: ' >&2
+	printf 'OK item: ' >&2
 	read -r item
 	[[ -n $item ]] || abort "todo item is empty"
 	printf '%s\n' "$item"
@@ -110,6 +109,20 @@ repo_root() {
 	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
 }
 
+todo_path() {
+	local owner=$1
+	local root=$2
+
+	case $owner in
+	shared|human|agent)
+		printf '%s\n' "$root/.agents/notes/todo.md"
+	;;
+	*)
+		abort "owner must be shared, human, or agent"
+	;;
+	esac
+}
+
 # ------------------------------------------------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------------------------------------------------
@@ -117,12 +130,15 @@ repo_root() {
 usage() {
 	cat <<-EOF
 	Usage:
-	  todo human TEXT
-	  todo agent TEXT
-	  todo human
-	  todo human --done [NUMBER]
-	  todo human --edit
-	  todo agent --path
+	  todo shared TEXT
+	  todo shared
+	  todo shared --ok [NUMBER]
+	  todo shared --edit
+	  todo shared --path
+
+	Compatibility aliases:
+	  todo human ...
+	  todo agent ...
 	EOF
 }
 
@@ -139,17 +155,9 @@ main() {
 	local root
 	local todo_file
 
-	case $owner in
-	human|agent)
-	;;
-	*)
-		abort "owner must be human or agent"
-	;;
-	esac
-
 	root=$(repo_root)
-	todo_file=$root/.agents/state/$owner/todo.md
-	ensure_file "$owner" "$todo_file"
+	todo_file=$(todo_path "$owner" "$root")
+	ensure_file "$todo_file"
 
 	if (($# == 0)); then
 		emit_todo "$todo_file"
@@ -157,16 +165,16 @@ main() {
 	fi
 
 	case $1 in
-	--done|done)
+	--ok|ok|--done|done)
 		shift
 
 		item=${1:-}
 
 		if [[ -z $item ]]; then
-			item=$(prompt_done_item "$todo_file")
+			item=$(prompt_ok_item "$todo_file")
 		fi
 
-		mark_done "$todo_file" "$item"
+		mark_ok "$todo_file" "$item"
 		printf '%s\n' "$todo_file"
 	;;
 	--edit|edit)

@@ -13,6 +13,7 @@ For concrete directory examples and task templates, load `references/layout.md`.
 
 ```text
 .agents/
+  notes/
   skills/
   specs/
   tasks/
@@ -24,6 +25,7 @@ For concrete directory examples and task templates, load `references/layout.md`.
 
 - `.agents/skills/` - Reusable agent capabilities. Skill file structure is defined by the active skill-authoring
   convention, not by this workspace layout (e.g. Codex `skill-creator` skill).
+- `.agents/notes/` - Versioned shared working notes that are useful before they belong in specs or task directories.
 - `.agents/specs/` - Durable repo-level or feature-level truth.
 - `.agents/tasks/` - Versioned work areas for bounded tasks.
 - `.agents/tests/` - Agent-facing validation harnesses, fixtures, smoke tests, or test configs that support specs,
@@ -33,10 +35,12 @@ For concrete directory examples and task templates, load `references/layout.md`.
 When unsure:
 
 1. If it teaches agents a reusable workflow, use `skills/`.
-2. If it describes what the project or feature must do, use `specs/`.
-3. If it describes how a particular change is being planned, executed, reviewed, or handed off, use `tasks/`.
-4. If it verifies agent-facing behavior and should be reviewed or reused, use `tests/`.
-5. If it is raw, local, temporary, machine-generated, or not worth reviewing, use `state/`.
+2. If it is a shared inbox note, early draft, or cross-task note that should be versioned but is not durable truth yet,
+   use `notes/`.
+3. If it describes what the project or feature must do, use `specs/`.
+4. If it describes how a particular change is being planned, executed, reviewed, or handed off, use `tasks/`.
+5. If it verifies agent-facing behavior and should be reviewed or reused, use `tests/`.
+6. If it is raw, local, temporary, machine-generated, or not worth reviewing, use `state/`.
 
 ## Naming
 
@@ -62,6 +66,22 @@ Do not put temporary task plans, progress tracking, raw logs, or local state in 
 When a task-local decision becomes durable project truth, move or summarize it into `specs/`. Keep only a short note in
 the task narrative saying the spec was updated. If task notes and specs disagree, the spec wins; update stale task
 notes.
+
+## Notes
+
+Use `.agents/notes/` for shared, versioned working material that is useful across sessions but has not earned a more
+specific home yet.
+
+Good fits:
+
+- `.agents/notes/todo.md` - Shared repository TODO inbox. It is not user-owned or agent-owned; both humans and agents
+  may add, edit, complete, or promote items.
+- Early spec drafts before the owning `.agents/specs/<feature>/spec.md` location is clear.
+- Cross-task questions, rough decisions, or coordination notes that are expected to be reviewed later.
+
+Do not put raw logs, local caches, generated output, private machine state, or throwaway scratch in `notes/`; those
+belong under `.agents/state/`. Do not leave durable requirements in `notes/` after they become project truth; promote
+them into `specs/` and keep only a short pointer if useful.
 
 ## Skill Helpers
 
@@ -163,12 +183,12 @@ behavioral contract, define that explicitly in a spec.
 
 ## Session Checkpoints
 
-Use `.agents/state/agent/checkpoint.md` as the default local checkpoint when a repository benefits from resume-aware
+Use `.agents/state/checkpoints/assistant.md` as the default local checkpoint when a repository benefits from resume-aware
 agent sessions. The checkpoint is runtime state, not project truth, and should normally remain untracked.
 
 At the start of a resumed or fresh session, compare the checkpoint to the current repository state before making edits:
 
-- Read `.agents/state/agent/checkpoint.md` if it exists.
+- Read `.agents/state/checkpoints/assistant.md` if it exists.
 - Run `git status --short --branch`.
 - Compare the recorded branch and `HEAD` with the current branch and `HEAD`.
 - If `HEAD` changed, inspect the commits since the checkpoint when possible and summarize the drift before editing.
@@ -195,12 +215,14 @@ If the worktree is dirty at closeout, record `dirty: true` and include a short s
 Do not use the checkpoint to hide unresolved task state; promote durable handoff notes to tracked task files when they
 matter to future humans.
 
-## Human And Agent TODO
+## Shared TODO
 
-Use `.agents/state/human/todo.md` for user-owned, untracked project notes that may later be shown to an agent. Use
-`.agents/state/agent/todo.md` for the assistant's own untracked operational checklist. Neither file is canonical project
-truth; promote useful items into `.agents/tasks/<task>/todo.md` or `.agents/specs/` only when they become tracked work
-or durable behavior.
+Use `.agents/notes/todo.md` as the shared repository TODO inbox. It is tracked, reviewable, and editable by humans and
+agents. It is still an inbox rather than canonical truth; promote useful items into `.agents/tasks/<task>/todo.md` or
+`.agents/specs/` when they become bounded work or durable behavior.
+
+Use `.agents/state/` only for local runtime residue such as checkpoints, logs, cache, or throwaway scratch. Do not use
+`.agents/state/human/` for TODOs.
 
 Prompt shortcuts such as `:todo TEXT`, `:todo! TEXT`, `:commit`, `:push`, `:ship`, `:harness`, and `:close` are handled
 by the focused `dev-colon` skill.
@@ -233,10 +255,10 @@ When the user signals they are ending the session, such as "that's enough for to
 later", do a lightweight closeout before the final response when practical:
 
 - Check whether project-specific root instructions such as `AGENTS.md` need updates.
-- Check whether `.agents/specs/`, `.agents/tasks/`, `.agents/skills/`, `.agents/tests/`, or `.agents/state/` need
+- Check whether `.agents/notes/`, `.agents/specs/`, `.agents/tasks/`, `.agents/skills/`, `.agents/tests/`, or `.agents/state/` need
   updates, summaries, or cleanup for a future resumed session.
 - Record durable decisions in specs, bounded work progress in task notes, and runtime residue in state.
-- Refresh `.agents/state/agent/checkpoint.md` when resume drift detection would help future sessions.
+- Refresh `.agents/state/checkpoints/assistant.md` when resume drift detection would help future sessions.
 - Refresh handoff notes and todos so a later resume can continue without reconstructing context from the chat.
 - Mention any closeout updates in the final response, or explicitly say no closeout updates were needed.
 
@@ -246,6 +268,7 @@ Track:
 
 ```text
 .agents/skills/
+.agents/notes/
 .agents/specs/
 .agents/tasks/
 .agents/tests/

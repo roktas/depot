@@ -5,6 +5,7 @@ Load this reference when examples, templates, or placement edge cases are useful
 ## Directory Semantics
 
 ```text
+.agents/notes/    Shared versioned working notes
 .agents/skills/   Reusable agent capabilities
 .agents/specs/    Durable repo-level or feature-level specifications
 .agents/tasks/    Versioned work areas for bounded tasks
@@ -15,6 +16,7 @@ Load this reference when examples, templates, or placement edge cases are useful
 Mental model:
 
 ```text
+notes/  = shared inboxes and drafts before promotion
 skills/ = reusable agent behavior
 specs/  = what must be true
 tasks/  = how a bounded piece of work is being done
@@ -43,6 +45,31 @@ Examples:
 Use `specs/` when the document answers:
 
 > What should be true for this project, subsystem, or feature?
+
+## Notes
+
+Canonical shared TODO:
+
+```text
+.agents/notes/todo.md
+```
+
+Use `.agents/notes/` for versioned working material that should survive sessions and be reviewable, but is not yet a
+durable spec or bounded task note.
+
+Good fits:
+
+```text
+shared TODO inbox
+early spec drafts
+cross-task questions
+rough decisions waiting for promotion
+coordination notes that should be reviewed later
+```
+
+Promote notes into `.agents/specs/` when they become durable project truth. Promote notes into `.agents/tasks/` when
+they become bounded work with execution history. Keep raw logs, local caches, generated output, and throwaway scratch
+under `.agents/state/`.
 
 ## Tasks
 
@@ -160,19 +187,6 @@ checkpoints
 intermediate outputs
 local caches
 ```
-
-### Human And Agent TODO
-
-Use these untracked checklists for lightweight notes that should not become tracked task work yet:
-
-```text
-.agents/state/human/todo.md
-.agents/state/agent/todo.md
-```
-
-- `human/todo.md` is user-owned inbox material.
-- `agent/todo.md` is assistant-owned operational scratch work.
-- Promote items into `.agents/tasks/<task>/todo.md` when they become tracked work.
 
 ## Avoid Extra Top-Level Directories
 

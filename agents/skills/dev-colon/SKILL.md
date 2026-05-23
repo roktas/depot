@@ -1,6 +1,6 @@
 ---
 name: dev-colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:harness`, `:ha`, `:todo TEXT`, `:to TEXT`, `:todo! TEXT`, `:to! TEXT`, `:done NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
+description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:harness`, `:ha`, `:todo TEXT`, `:to TEXT`, `:todo! TEXT`, `:to! TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
 ---
 
 # Colon Shortcuts
@@ -21,7 +21,8 @@ Every shortcut also accepts its two-character form, using the first two letters 
 - `:harness [TARGET...]`, `:ha [TARGET...]`
 - `:todo [TEXT|edit|path]`, `:to [TEXT|edit|path]`
 - `:todo! [TEXT|edit|path]`, `:to! [TEXT|edit|path]`
-- `:done [TODO_NUMBER]`, `:do [TODO_NUMBER]`
+- `:ok [TODO_NUMBER]`
+- `:do [TODO_NUMBER]`
 - `:learn ERROR_DESCRIPTION`, `:le ERROR_DESCRIPTION`
 - `:close [push|no-push]`, `:cl [push|no-push]`
 
@@ -68,25 +69,41 @@ Treat unknown harness arguments as user intent and choose the closest relevant c
 
 ## TODO
 
-`:todo [TEXT|edit|path]` targets `.agents/state/human/todo.md`.
+`:todo [TEXT|edit|path]` targets the shared `.agents/notes/todo.md` inbox.
 
 - `:todo TEXT`: append `TEXT`.
-- `:todo edit` or `:todo --edit`: open the human TODO in the default editor.
-- `:todo path` or `:todo --path`: print the human TODO path.
-- `:todo` with no argument: print the human TODO contents with numbered checklist items.
+- `:todo edit` or `:todo --edit`: open the shared TODO in the default editor.
+- `:todo path` or `:todo --path`: print the shared TODO path.
+- `:todo` with no argument: print the shared TODO contents with numbered checklist items.
 
-`:todo! [TEXT|edit|path]` has the same argument semantics but targets `.agents/state/agent/todo.md`.
+`:todo! [TEXT|edit|path]` is a compatibility alias for the same shared TODO. Do not create a separate agent-owned TODO
+for ordinary repository work.
 
 When the user refers to a listed TODO number, interpret it as the numbered checklist item from the latest relevant
 `:todo` or `:todo!` listing. If the reference is stale or ambiguous, list the TODO again before acting. Use the target
 file path plus the checklist text, not the transient number, when promoting or editing durable task notes.
 
-## Done
+## OK
 
-`:done [TODO_NUMBER]` marks a human TODO checklist item as done.
+`:ok [TODO_NUMBER]` marks a shared TODO checklist item as done.
 
-- `:done 2`: mark human TODO item 2 as `- [x]`.
-- `:done` with no argument: list human TODO items, ask the user for a number, then mark that item as done.
+- `:ok 2`: mark shared TODO item 2 as `- [x]`.
+- `:ok` with no argument: list shared TODO items, ask the user for a number, then mark that item as done.
+
+## Do
+
+`:do [TODO_NUMBER]` directs the agent to work on the numbered shared TODO item now. It accepts the same number argument
+as `:ok`, but it does not mark the item complete by itself.
+
+- `:do 2`: resolve shared TODO item 2, restate the selected item briefly, then treat that item as the current user task.
+- `:do` with no argument: list shared TODO items and ask the user for a number before starting work.
+- If the number is stale, invalid, or points at an already completed item, list the TODO and ask for a corrected number.
+- Do not write an in-progress state to `.agents/notes/todo.md`; active work lives in the current conversation.
+- After completing the work, mark the item done only when the user explicitly asks for `:ok NUMBER` or otherwise clearly
+  asks to close that item.
+- Trivial one-turn work can stay only in the conversation. If the selected item is broad, risky, multi-file,
+  multi-step, likely to span sessions, or likely to need reviewable decisions, create or update a bounded
+  `.agents/tasks/` task before implementation and use that task for planning, history, validation, and handoff notes.
 
 TODO numbers are transient display numbers from the current file contents. If the user gives a stale or invalid number,
 list the TODO again and ask for a corrected number.
@@ -139,15 +156,11 @@ Defaults:
 - Use `:close push` to push after committing, and to push an already-ahead branch even when no new closeout commit was
   needed.
 
-## TODO Files
+## TODO File
 
-Use untracked state files:
-
-- `.agents/state/human/todo.md` for user-owned inbox notes.
-- `.agents/state/agent/todo.md` for assistant-owned operational notes.
-
-These files are not canonical project truth. Promote useful items into `.agents/tasks/<task>/todo.md` or
-`.agents/specs/` only when they become tracked work or durable behavior.
+Use `.agents/notes/todo.md` for the shared repository TODO inbox. It is tracked and editable by humans and agents, but
+it is still not canonical project truth. Promote useful items into `.agents/tasks/<task>/todo.md` or `.agents/specs/`
+when they become tracked work or durable behavior.
 
 ## TODO Helper
 
@@ -155,9 +168,9 @@ Use this skill's helper, resolved relative to the directory that contains this `
 in the target repository root.
 
 ```bash
-./bin/todo human "Revisit Linux package baseline"
-./bin/todo agent "Re-run smoke test after changing plan helper"
-./bin/todo human --edit
-./bin/todo human --done 2
+./bin/todo shared "Revisit Linux package baseline"
+./bin/todo human "Compatibility alias for the shared TODO"
+./bin/todo shared --edit
+./bin/todo shared --ok 2
 ./bin/todo agent --path
 ```

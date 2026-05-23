@@ -1,4 +1,4 @@
 ---
 name: dev-colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:harness`, `:ha`, `:todo TEXT`, `:to TEXT`, `:todo! TEXT`, `:to! TEXT`, `:done NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
+description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:harness`, `:ha`, `:todo TEXT`, `:to TEXT`, `:todo! TEXT`, `:to! TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
 ---
