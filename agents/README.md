@@ -5,6 +5,8 @@ all:
     - opencode
     - aicommits
   links:
+    codex/hooks/shellcheck: ~/.codex/hooks/shellcheck
+    codex/hooks/shfmt: ~/.codex/hooks/shfmt
     skills/: ~/.agents/skills
 ---
 
@@ -25,6 +27,33 @@ submit = ["ctrl-enter", "alt-enter", "ctrl-m"]
 [tui.keymap.editor]
 insert_newline = ["enter"]
 ```
+
+Format changed shell scripts with `shfmt` after Codex writes files through shell commands or patches.
+
+```toml
+[[hooks.PostToolUse]]
+matcher = "^(Bash|apply_patch)$"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "~/.codex/hooks/shfmt"
+timeout = 30
+statusMessage = "Formatting shell files"
+```
+
+Run `shellcheck` before Codex stops so generated Bash issues are fixed before the final response.
+
+```toml
+[[hooks.Stop]]
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = '/usr/bin/python3 "$HOME"/.codex/hooks/shellcheck'
+timeout = 30
+statusMessage = "Running shellcheck on modified Bash files"
+```
+
+Review and trust the hook from `/hooks` the first time Codex reports a new hook.
 
 ### OpenCode
 
@@ -83,7 +112,7 @@ Make Enter insert a newline and submit with Ctrl/Alt/Cmd+Enter.
 ]
 ```
 
-Apply these bindings to the user-level configuration files.
+Apply these bindings and hook settings to the user-level configuration files.
 
 ```bash
 ruby <<'RUBY'
@@ -93,7 +122,7 @@ require "json"
 home = ENV.fetch("HOME")
 
 codex_config = File.join(home, ".codex", "config.toml")
-codex_block = <<~TOML.strip
+codex_keybinding_block = <<~TOML.strip
   # BEGIN depot agent keybindings
   [tui.keymap.composer]
   submit = ["ctrl-enter", "alt-enter", "ctrl-m"]
@@ -103,11 +132,41 @@ codex_block = <<~TOML.strip
   # END depot agent keybindings
 TOML
 
+codex_hook_block = <<~TOML.strip
+  # BEGIN depot agent hooks
+  [[hooks.PostToolUse]]
+  matcher = "^(Bash|apply_patch)$"
+
+  [[hooks.PostToolUse.hooks]]
+  type = "command"
+  command = "~/.codex/hooks/shfmt"
+  timeout = 30
+  statusMessage = "Formatting shell files"
+  # END depot agent hooks
+TOML
+
+codex_shellcheck_block = <<~TOML.strip
+  # BEGIN depot agent shellcheck hook
+  [[hooks.Stop]]
+
+  [[hooks.Stop.hooks]]
+  type = "command"
+  command = '/usr/bin/python3 "$HOME"/.codex/hooks/shellcheck'
+  timeout = 30
+  statusMessage = "Running shellcheck on modified Bash files"
+  # END depot agent shellcheck hook
+TOML
+
 FileUtils.mkdir_p(File.dirname(codex_config))
 codex_text = File.exist?(codex_config) ? File.read(codex_config) : ""
+codex_legacy_shellcheck = codex_text.include?("# BEGIN codex shellcheck stop hook")
 codex_text = codex_text.gsub(/\n?# BEGIN depot agent keybindings\n.*?\n# END depot agent keybindings\n?/m, "\n")
+codex_text = codex_text.gsub(/\n?# BEGIN depot agent hooks\n.*?\n# END depot agent hooks\n?/m, "\n")
+codex_text = codex_text.gsub(/\n?# BEGIN depot agent shellcheck hook\n.*?\n# END depot agent shellcheck hook\n?/m, "\n")
 codex_text = codex_text.rstrip
-codex_text = [codex_text, codex_block].reject(&:empty?).join("\n\n") + "\n"
+codex_blocks = [codex_text, codex_keybinding_block, codex_hook_block]
+codex_blocks << codex_shellcheck_block unless codex_legacy_shellcheck
+codex_text = codex_blocks.reject(&:empty?).join("\n\n") + "\n"
 File.write(codex_config, codex_text)
 
 opencode_config = File.join(home, ".config", "opencode", "tui.json")

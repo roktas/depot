@@ -44,7 +44,7 @@ metadata:
   3. Commands
   4. Main
 
-  Do not add a heading for the prelude. The prelude contains only the shebang, the standard `set` line, global
+  Do not add a heading for the prelude. The prelude contains only the shebang, the standard prelude, global
   variables if any, and then core functions such as `abort` and `warn`, alphabetized.
 
   Add the other section headings in this exact shape, with 120 hyphens:
@@ -77,7 +77,9 @@ metadata:
   ```bash
   #!/usr/bin/env bash
 
-  set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+  set -euo pipefail
+  [[ -z ${TRACE:-} ]] || set -x
+  unset CDPATH
 
   ```
 
