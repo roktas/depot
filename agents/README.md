@@ -75,13 +75,7 @@ Format and lint supported file types after writes and edits.
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "lsp": {
-    "bash": {},
-    "gopls": {},
-    "ruby-lsp": {},
-    "pyright": {},
-    "yaml-ls": {}
-  },
+  "lsp": true,
   "formatter": {
     "rubyfmt": {
       "command": ["rubyfmt", "--in-place", "$FILE"],
