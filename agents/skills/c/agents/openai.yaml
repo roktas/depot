@@ -1,0 +1,4 @@
+interface:
+  display_name: "C Programming"
+  short_description: "C style, safety, and systems code"
+  default_prompt: "Use $c to write or review maintainable C code."
