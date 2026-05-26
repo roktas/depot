@@ -77,10 +77,26 @@ metadata:
   ```bash
   #!/usr/bin/env bash
 
-  set -euo pipefail
+  set -Eeuo pipefail
   [[ -z ${TRACE:-} ]] || set -x
   unset CDPATH
 
+  ```
+
+- **Nullglob**: When a script uses glob patterns that may match nothing, add `shopt -s nullglob` to
+  the prelude after the standard options:
+
+  ```bash
+  shopt -s nullglob
+  ```
+
+  Without this, an unmatched glob such as `*.txt` produces the literal string `*.txt`:
+
+  ```bash
+  # When no .txt files exist, this iterates over the single string "*.txt"
+  for f in *.txt; do
+  	...
+  done
   ```
 
 - **Error Handling**
@@ -121,3 +137,6 @@ metadata:
 
 - **Local** - `local x=$(...)` swallows exit codes. Define `local x` first, then assign.
 - **Unbound** - With `set -u`, use `${var:-}` to avoid errors on unbound vars.
+- **Locale** - Sorting, character classes (`[a-z]`), and number formatting depend on locale. Add
+  `export LC_ALL=C.UTF-8 LANG=C.UTF-8` to the prelude in locale-dependent scripts for predictable
+  behavior.
