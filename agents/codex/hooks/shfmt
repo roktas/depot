@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Format changed shell scripts before control returns to the caller.
 
-set -euo pipefail
+set -Eeuo pipefail
 [[ -z ${TRACE:-} ]] || set -x
 unset CDPATH
 
