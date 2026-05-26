@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Prefer gofumpt for gofmt-compatible formatting when it is available.
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+same_file() {
+	local left=$1
+	local right=$2
+
+	[[ $(realpath "$left" 2>/dev/null || printf '%s\n' "$left") == "$(realpath "$right" 2>/dev/null || printf '%s\n' "$right")" ]]
+}
+
+main() {
+	if command -v gofumpt >/dev/null; then
+		exec gofumpt "$@"
+	fi
+
+	local dir
+	local fallback
+	local self=$0
+
+	IFS=: read -r -a path_dirs <<<"$PATH"
+	for dir in "${path_dirs[@]}"; do
+		[[ -n $dir ]] || dir=.
+		fallback=$dir/gofmt
+		[[ -x $fallback ]] || continue
+		same_file "$fallback" "$self" && continue
+		# shellcheck disable=SC2093
+		exec "$fallback" "$@"
+	done
+
+	printf 'gofmt: command not found\n' >&2
+	return 127
+}
+
+main "$@"
