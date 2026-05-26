@@ -70,12 +70,18 @@ Make Return insert a newline in the input and submit with Ctrl/Alt/Super+Return.
 }
 ```
 
-Format Ruby files with `rubyfmt` after OpenCode writes or edits them. Go formatting uses OpenCode's built-in `gofmt`
-formatter; the Go module installs a `gofmt` wrapper that prefers `gofumpt` when it is available.
+Format and lint supported file types after writes and edits.
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
+  "lsp": {
+    "bash": {},
+    "gopls": {},
+    "ruby-lsp": {},
+    "pyright": {},
+    "yaml-ls": {}
+  },
   "formatter": {
     "rubyfmt": {
       "command": ["rubyfmt", "--in-place", "$FILE"],
@@ -86,10 +92,16 @@ formatter; the Go module installs a `gofmt` wrapper that prefers `gofumpt` when 
     },
     "standardrb": {
       "disabled": true
-    }
+    },
+    "shfmt": {},
+    "gofmt": {},
+    "ruff": {},
+    "prettier": {}
   }
 }
 ```
+
+Go formatting uses `gofmt` (wrapper at `go/bin/gofmt` prefers `gofumpt` when available).
 
 ### Antigravity
 
