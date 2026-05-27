@@ -6,7 +6,7 @@ provizyonlamayı hedefler.
 ## Terimler
 
 - **Modül**: Repo kökündeki her uygulama veya provizyonlama birimi dizini. Önceki taslakta "görev" olarak geçen kavram
-  budur. "Modül" terimi `.agents/tasks/` ile kavramsal çakışmayı azaltır.
+  budur. "Modül" terimi agent task state kavramıyla kavramsal çakışmayı azaltır.
 - **Misc modülü**: `misc` dizinindeki normal provisioning modülü. Focused modülü hak etmeyen küçük ortak tanımlar için
   kullanılır. State dışı bootstrap davranışı içermez. `misc-` varyantı kullanılacaksa `extra` level olmalıdır.
 - **Platform modülü**: Repo kökündeki `linux/README.md`, `macos/README.md` veya `windows/README.md` dosyasıyla

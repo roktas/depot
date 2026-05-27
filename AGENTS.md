@@ -14,7 +14,7 @@ messages, and documentation in English.
 - Provisioning state: `.agents/state/hosts/HOST/depot.md`
 - Agent resume checkpoint: `.agents/state/checkpoints/assistant.md`
 - Shared notes and TODO inbox: `.agents/notes/todo.md`
-- Migration task notes: `.agents/tasks/2026-05-15-dotfiles-migration/`
+- Local task state: `.agents/state/tasks/`
 
 Read the spec before changing provisioning behavior.
 
@@ -22,7 +22,9 @@ Read the spec before changing provisioning behavior.
 
 At session start, compare `.agents/state/checkpoints/assistant.md` with the current branch, `HEAD`, and worktree state when
 the checkpoint exists. If `HEAD` or dirty state changed since the checkpoint, inspect the drift and summarize it before
-editing. At session closeout, refresh the checkpoint after any requested commits or pushes when practical.
+editing. During this session-start drift check, reread any current canonical skill, spec, or instruction file before
+applying conventions remembered from an earlier session; treat the repository version as authoritative. At session
+closeout, refresh the checkpoint after any requested commits or pushes when practical.
 
 ## Conventions
 

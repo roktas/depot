@@ -81,7 +81,7 @@ for ordinary repository work.
 
 When the user refers to a listed TODO number, interpret it as the numbered checklist item from the latest relevant
 `:todo` or `:todo!` listing. If the reference is stale or ambiguous, list the TODO again before acting. Use the target
-file path plus the checklist text, not the transient number, when promoting or editing durable task notes.
+file path plus the checklist text, not the transient number, when promoting or editing local task state.
 
 ## OK
 
@@ -103,7 +103,7 @@ as `:ok`, but it does not mark the item complete by itself.
   asks to close that item.
 - Trivial one-turn work can stay only in the conversation. If the selected item is broad, risky, multi-file,
   multi-step, likely to span sessions, or likely to need reviewable decisions, create or update a bounded
-  `.agents/tasks/` task before implementation and use that task for planning, history, validation, and handoff notes.
+  `.agents/state/tasks/` task before implementation and use that task for planning, validation, and handoff notes.
 
 TODO numbers are transient display numbers from the current file contents. If the user gives a stale or invalid number,
 list the TODO again and ask for a corrected number.
@@ -133,7 +133,7 @@ Then decide where the prevention belongs:
 - New skill: choose this when the mistake reveals a recurring workflow that is not covered by an existing skill and is
   specific enough to trigger reliably.
 - Repo-wise harness: choose this when the prevention is project-specific and belongs in root instructions, repo-local
-  specs, repo-local skills, tests, or task notes.
+  specs, repo-local skills, tests, or local task state.
 - User-wise harness: choose this when the prevention is broad across repositories and belongs in user-level instructions
   such as the global `AGENTS.md`.
 
@@ -147,7 +147,7 @@ Answer with:
 ## Close
 
 `:close [push|no-push]` performs the `agents` closeout routine: check root instructions and `.agents/` consistency,
-update useful state or task notes, refresh the checkpoint, and commit/push only if closeout produced tracked changes.
+update useful state or notes, refresh the checkpoint, and commit/push only if closeout produced tracked changes.
 
 Defaults:
 
@@ -159,8 +159,8 @@ Defaults:
 ## TODO File
 
 Use `.agents/notes/todo.md` for the shared repository TODO inbox. It is tracked and editable by humans and agents, but
-it is still not canonical project truth. Promote useful items into `.agents/tasks/<task>/todo.md` or `.agents/specs/`
-when they become tracked work or durable behavior.
+it is still not canonical project truth. Promote useful items into `.agents/state/tasks/<task>/todo.md` or
+`.agents/specs/` when they become local bounded work or durable behavior.
 
 ## TODO Helper
 

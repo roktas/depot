@@ -5,6 +5,8 @@ all:
     - opencode
     - aicommits
   links:
+    AGENTS.md: ~/.agents/AGENTS.md
+    codex/hooks/gofmt: ~/.codex/hooks/gofmt
     codex/hooks/rubyfmt: ~/.codex/hooks/rubyfmt
     codex/hooks/shellcheck: ~/.codex/hooks/shellcheck
     codex/hooks/shfmt: ~/.codex/hooks/shfmt
@@ -29,7 +31,7 @@ submit = ["ctrl-enter", "alt-enter", "ctrl-m"]
 insert_newline = ["enter"]
 ```
 
-Format changed shell scripts with `shfmt` after Codex writes files through shell commands or patches.
+Format changed shell and Go files after Codex writes files through shell commands or patches.
 
 ```toml
 [[hooks.PostToolUse]]
@@ -40,6 +42,12 @@ type = "command"
 command = "~/.codex/hooks/shfmt"
 timeout = 30
 statusMessage = "Formatting shell files"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "~/.codex/hooks/gofmt"
+timeout = 30
+statusMessage = "Formatting Go files"
 ```
 
 Run `shellcheck` before Codex stops so generated Bash issues are fixed before the final response.
