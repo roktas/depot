@@ -2,8 +2,7 @@
 
 ## Scope
 
-This repository is a Depot-style dotfiles provisioning repo. Keep repository-facing code, comments, file names, commit
-messages, and documentation in English.
+This repository is a Depot-style dotfiles provisioning repo.
 
 ## Canonical Design
 
