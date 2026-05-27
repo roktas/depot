@@ -116,7 +116,6 @@ Examples:
 
 ```text
 .agents/tests/provision/smoke.sh
-.agents/tests/provision/Dockerfile
 .agents/tests/skill-validation/fixtures/
 .agents/tests/prompt-contracts/golden/
 ```
