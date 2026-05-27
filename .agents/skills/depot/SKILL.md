@@ -1,9 +1,9 @@
 ---
-name: provision
+name: depot
 description: Use in this repository to plan and perform Depot-style dotfiles provisioning from `.agents/specs/depot/spec.md`, including module discovery, README frontmatter interpretation, host/platform filtering, state-aware planning, package/link/copy actions, and confirmation-gated application.
 ---
 
-# Provision
+# Depot
 
 Use this repo-local skill for provisioning this `depot` repository. Treat `.agents/specs/depot/spec.md` as the canonical behavior specification.
 
@@ -37,19 +37,19 @@ Write state on the target first. If the target is not Dropbox-synced, fetch the 
 Run from the repo root:
 
 ```bash
-.agents/skills/provision/bin/plan
+.agents/skills/depot/bin/plan
 ```
 
 Useful options:
 
 ```bash
-.agents/skills/provision/bin/plan --host kant --platform linux
-.agents/skills/provision/bin/plan --level minimal
-.agents/skills/provision/bin/plan --level extra
-.agents/skills/provision/bin/plan --mode refresh
-.agents/skills/provision/bin/plan --mode repair
-.agents/skills/provision/bin/plan --format markdown
-.agents/skills/provision/bin/plan --allow-dirty
+.agents/skills/depot/bin/plan --host kant --platform linux
+.agents/skills/depot/bin/plan --level minimal
+.agents/skills/depot/bin/plan --level extra
+.agents/skills/depot/bin/plan --mode refresh
+.agents/skills/depot/bin/plan --mode repair
+.agents/skills/depot/bin/plan --format markdown
+.agents/skills/depot/bin/plan --allow-dirty
 ```
 
 Use `--allow-dirty` only while developing or reviewing the skill. Real provisioning must use a clean worktree.

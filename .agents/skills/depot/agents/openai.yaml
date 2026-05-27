@@ -1,0 +1,6 @@
+interface:
+  display_name: "Depot"
+  short_description: "Plan and apply this repo's provisioning"
+  default_prompt: "Use $depot to generate a provisioning plan for this depot repository."
+policy:
+  allow_implicit_invocation: true

@@ -1,6 +1,0 @@
-interface:
-  display_name: "Provision"
-  short_description: "Plan and apply this repo's provisioning"
-  default_prompt: "Use $provision to generate a provisioning plan for this home repository."
-policy:
-  allow_implicit_invocation: true

@@ -61,7 +61,7 @@ commands in `AGENTS.md` and the active task/spec context.
 Argument hints:
 
 - No argument: run the normal relevant checks for the current changes.
-- `provision`: run provisioning plan/smoke/RuboCop/shellcheck checks as applicable.
+- `depot`: run the Depot provisioning plan, smoke, RuboCop, and shellcheck checks as applicable.
 - `shell`: run shell syntax and shellcheck checks.
 - `quick`: run the smallest useful check set.
 

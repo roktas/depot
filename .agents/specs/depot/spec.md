@@ -31,7 +31,7 @@ provizyonlamayı hedefler.
 - Modül olarak işlenecek kök dizinlerde `README.md` bulunmalıdır. `README.md` olmayan kök dizinler provizyonlama dışı
   bırakılır.
 - Provizyonlama kararı state yüklendikten sonra verilir.
-- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa provision skill bootstrap helper'ı explicit olarak
+- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa depot skill bootstrap helper'ı explicit olarak
   çalıştırılır. Bu helper state dışıdır ve idempotent olmalıdır.
 - Normal provizyonlama yapılacaksa önce aktif platformun kök platform modülü (`linux`, `macos` veya `windows`) varsa
   uygulanır, sonra aktif platformun `-` varyantı (`linux-`, `macos-` veya `windows-`) varsa uygulanır, sonra diğer kök
@@ -323,7 +323,7 @@ altıdır; dizin adı sabit `home` değil, klonlanan reponun kendi adıdır.
 
 ### Platform Bootstrapping
 
-Platform bootstrap helper'ı `.agents/skills/provision/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın
+Platform bootstrap helper'ı `.agents/skills/depot/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın
 çalışabilmesi için gereken en küçük ön hazırlığı yapar: temel transport araçları, Homebrew ve Ruby. Bootstrap Ruby'ye
 güvenemez; saf Bash olmalıdır.
 

@@ -35,8 +35,8 @@ there() {
 
 usage() {
 	cat <<-EOF
-	Usage:
-	  smoke [plan|boot|stop|destroy|prune]
+		Usage:
+		  smoke [plan|boot|stop|destroy|prune]
 	EOF
 }
 
@@ -50,27 +50,27 @@ main() {
 	case $command in
 	plan)
 		there run .agents/tests/provision/smoke.sh
-	;;
+		;;
 	boot)
-		there run .agents/skills/provision/bin/bootstrap
+		there run .agents/skills/depot/bin/bootstrap
 		there run bash -lc 'ruby --version; git --version; curl --version | head -n 1'
-	;;
+		;;
 	stop)
 		there stop
-	;;
+		;;
 	destroy)
 		there destroy
-	;;
+		;;
 	prune)
 		there prune
-	;;
-	-h|--help|help)
+		;;
+	-h | --help | help)
 		usage
-	;;
+		;;
 	*)
 		usage
 		exit 2
-	;;
+		;;
 	esac
 }
 

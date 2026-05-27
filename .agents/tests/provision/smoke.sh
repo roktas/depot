@@ -51,7 +51,7 @@ main() {
 	cd "$repo"
 	git config --global --add safe.directory "$repo"
 
-	ruby -c .agents/skills/provision/bin/plan
+	ruby -c .agents/skills/depot/bin/plan
 
 	rm -rf "$dirty_guard_module"
 	mkdir -p "$dirty_guard_module"
@@ -59,7 +59,7 @@ main() {
 # Dirty Guard Smoke
 EOF
 
-	if .agents/skills/provision/bin/plan >/tmp/plan.json 2>/tmp/plan.err; then
+	if .agents/skills/depot/bin/plan >/tmp/plan.json 2>/tmp/plan.err; then
 		echo "expected dirty worktree guard to fail" >&2
 		exit 1
 	fi
@@ -67,7 +67,7 @@ EOF
 	grep -q "Dirty worktree" /tmp/plan.err
 	rm -rf "$dirty_guard_module"
 
-	.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/plan.json
+	.agents/skills/depot/bin/plan --allow-dirty --platform linux --host smoke >/tmp/plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/plan.json"))
@@ -123,7 +123,7 @@ all:
 # Link Target List Smoke
 EOF
 
-	.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/link-target-list-plan.json
+	.agents/skills/depot/bin/plan --allow-dirty --platform linux --host smoke >/tmp/link-target-list-plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/link-target-list-plan.json"))
@@ -147,8 +147,8 @@ all:
 # Level Extra Smoke
 EOF
 
-	.agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/normal-plan.json
-	.agents/skills/provision/bin/plan --allow-dirty --level extra --platform linux --host smoke >/tmp/extra-plan.json
+	.agents/skills/depot/bin/plan --allow-dirty --platform linux --host smoke >/tmp/normal-plan.json
+	.agents/skills/depot/bin/plan --allow-dirty --level extra --platform linux --host smoke >/tmp/extra-plan.json
 
 	ruby -rjson -e '
 		normal_plan = JSON.parse(File.read("/tmp/normal-plan.json"))
@@ -205,7 +205,7 @@ echo macos
 ```
 EOF
 
-	.agents/skills/provision/bin/plan --allow-dirty --platform macos --host smoke >/tmp/macos-plan.json
+	.agents/skills/depot/bin/plan --allow-dirty --platform macos --host smoke >/tmp/macos-plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/macos-plan.json"))
@@ -238,7 +238,7 @@ all:
 # Invalid Package Smoke
 EOF
 
-	if .agents/skills/provision/bin/plan --allow-dirty --platform linux --host smoke >/tmp/invalid-package-plan.json 2>/tmp/invalid-package-plan.err; then
+	if .agents/skills/depot/bin/plan --allow-dirty --platform linux --host smoke >/tmp/invalid-package-plan.json 2>/tmp/invalid-package-plan.err; then
 		echo "expected invalid package name guard to fail" >&2
 		exit 1
 	fi
@@ -247,7 +247,7 @@ EOF
 
 	rm -rf "$platform_null_module"
 
-	.agents/skills/provision/bin/plan --mode refresh --platform linux --host smoke >/tmp/refresh-plan.json
+	.agents/skills/depot/bin/plan --mode refresh --platform linux --host smoke >/tmp/refresh-plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/refresh-plan.json"))
@@ -294,7 +294,7 @@ done:
 ---
 EOF
 
-	"$repair_repo/.agents/skills/provision/bin/plan" --repo "$repair_repo" --allow-dirty --mode repair --platform linux --host smoke-repair >/tmp/repair-plan.json
+	"$repair_repo/.agents/skills/depot/bin/plan" --repo "$repair_repo" --allow-dirty --mode repair --platform linux --host smoke-repair >/tmp/repair-plan.json
 
 	ruby -rjson -e '
 		plan = JSON.parse(File.read("/tmp/repair-plan.json"))

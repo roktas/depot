@@ -49,13 +49,13 @@ detect_platform() {
 	case $(uname -s) in
 	Darwin)
 		echo macos
-	;;
+		;;
 	Linux)
 		echo linux
-	;;
+		;;
 	*)
 		abort "unsupported bootstrap platform: $(uname -s)"
-	;;
+		;;
 	esac
 }
 
@@ -107,13 +107,13 @@ persist_homebrew() {
 	case $platform in
 	linux)
 		profile=$HOME/.profile
-	;;
+		;;
 	macos)
 		profile=$HOME/.zprofile
-	;;
+		;;
 	*)
 		abort "unsupported bootstrap platform: $platform"
-	;;
+		;;
 	esac
 
 	line="eval \"\$($(brew --prefix)/bin/brew shellenv)\""
@@ -130,7 +130,7 @@ persist_homebrew() {
 
 usage() {
 	cat <<-EOF
-	Usage: bootstrap [linux|macos]
+		Usage: bootstrap [linux|macos]
 	EOF
 }
 
@@ -151,13 +151,13 @@ main() {
 	case $platform in
 	linux)
 		install_apt_base
-	;;
+		;;
 	macos)
 		ensure_command_line_tools
-	;;
+		;;
 	*)
 		abort "unsupported bootstrap platform: $platform"
-	;;
+		;;
 	esac
 
 	install_homebrew "$platform"
