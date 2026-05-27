@@ -31,9 +31,8 @@ Load detailed guidance based on context:
 
 ## Style
 
-- **Rails Style Guide** - Follow [Rails Style Guide](https://github.com/rubocop/rails-style-guide).
-- **Indent** - 2 spaces. Double quotes (`"`) for strings.
-- **Methods** - Use `def foo = ...` syntax for **single line** methods.
+- **Formatting** - Use `rubyfmt` as the formatting source of truth. Do not hand-align code or fight formatter output.
+- **Methods** - Use `def foo = ...` syntax for simple expression methods when it improves clarity.
 - **Order**
   1. `include`/`extend`
   2. Constants (Alpha)
@@ -42,32 +41,7 @@ Load detailed guidance based on context:
   5. `public` methods (Alpha)
   6. `private` methods (Alpha)
 
-- **Private Indent** - Indent `private` methods **2 levels (4 spaces)**.
-
-  ```ruby
-  class Foo
-    def public_method; end
-
-    private
-
-      # 2 levels deep
-      def private_method; end
-  end
-  ```
-
 - **Alphabetize** arrays, dicts, assignments, and methods if order is irrelevant.
-- **Align** consecutive assignments around the `=` operator.
-  
-  ```ruby
-  # Aligned & Alphabetical
-  bar                = 5
-  i                  = 3
-  long_variable_name = 8
-  
-  # Alphabetical Elements
-  LIST = %i[A B C].freeze
-  ```
-
 - **Comments** - Code should be self-documenting. If you need a comment to explain WHAT the code does, consider
   refactoring to make it clearer. Unacceptable comments:
   - Comments that repeat what code does
