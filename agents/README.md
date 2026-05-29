@@ -1,8 +1,5 @@
 ---
 all:
-  packages:
-    - opencode
-    - aicommits
   links:
     AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
@@ -10,47 +7,6 @@ all:
 
 # Agents
 
-Installation instructions and strict shared assets for low-cost agents.
+Common agent instructions and skills installed through the shared `~/.agents` surface.
 
-## Setup
-
-### OpenCode
-
-Make Return insert a newline in the input and submit with Ctrl/Alt/Super+Return.
-
-```json
-{
-  "$schema": "https://opencode.ai/tui.json",
-  "keybinds": {
-    "input_newline": "return",
-    "input_submit": "ctrl+return,alt+return,super+return"
-  }
-}
-```
-
-Format and lint supported file types after writes and edits.
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "lsp": true,
-  "formatter": {
-    "rubyfmt": {
-      "command": ["rubyfmt", "--in-place", "$FILE"],
-      "extensions": [".rb", ".rake", ".gemspec", ".ru"]
-    },
-    "rubocop": {
-      "disabled": true
-    },
-    "standardrb": {
-      "disabled": true
-    },
-    "shfmt": {},
-    "gofmt": {},
-    "ruff": {},
-    "prettier": {}
-  }
-}
-```
-
-Go formatting uses `gofmt` (wrapper at `go/bin/gofmt` prefers `gofumpt` when available).
+Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.

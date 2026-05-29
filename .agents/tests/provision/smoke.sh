@@ -90,24 +90,30 @@ EOF
 		agents = plan.fetch("modules").find { |mod| mod.fetch("name") == "agents" }
 		abort "missing agents module" unless agents
 		abort "agents should default to normal level" unless agents.fetch("level") == "normal"
-		abort "agents should not be virtual" unless agents.fetch("virtual") == false
-		abort "missing opencode package" unless agents.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:opencode" }
-		abort "agents should keep low-cost skills under ~/.agents" unless agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/skills/commits" }
+		abort "agents should be a virtual shared-asset module" unless agents.fetch("virtual") == true
+		abort "agents should not install agent-specific packages" unless agents.fetch("packages_to_install").empty?
+		abort "agents should link shared instructions under ~/.agents" unless agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/AGENTS.md" }
+		abort "agents should keep common skills under ~/.agents" unless agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/skills/colon" }
+		abort "agents should not expose codex-only commits globally" if agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/skills/commits" }
+		abort "agents should not expose system skills globally" if agents.fetch("links_to_create").any? { |link| link.fetch("target").include?("/.system") }
 		abort "agents colon skill should be the common source" if File.symlink?("agents/skills/colon")
-		abort "agents frontier colon skill should be a shared symlink" unless File.symlink?("agents-/skills/colon")
-		abort "agents frontier colon symlink target changed" unless File.readlink("agents-/skills/colon") == "../../agents/skills/colon"
-		abort "agents frontier bash skill should be a shared symlink" unless File.symlink?("agents-/skills/bash")
-		abort "agents frontier bash symlink target changed" unless File.readlink("agents-/skills/bash") == "../../agents/skills/bash"
-		abort "agents frontier ruby skill should be a shared symlink" unless File.symlink?("agents-/skills/ruby")
-		abort "agents frontier ruby symlink target changed" unless File.readlink("agents-/skills/ruby") == "../../agents/skills/ruby"
-		agents_frontier = plan.fetch("modules").find { |mod| mod.fetch("name") == "agents-" }
-		abort "missing agents frontier module" unless agents_frontier
-		abort "missing codex cask" unless agents_frontier.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:codex" }
-		abort "agents frontier should link codex skills" unless agents_frontier.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.codex/skills/commits" }
-		abort "agents frontier should link shared bash skill" unless agents_frontier.fetch("links_to_create").any? { |link| link.fetch("source") == "skills/bash" && link.fetch("target") == "~/.codex/skills/bash" }
-		abort "agents should not directly link frontier bash skill" if agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.codex/skills/bash" }
-		abort "agents frontier should link codex hooks by directory" unless agents_frontier.fetch("links_to_create").any? { |link| link.fetch("source") == "codex/hooks/shellcheck" && link.fetch("target") == "~/.codex/hooks/shellcheck" && link.fetch("fan_in") == true }
-		abort "agents frontier should not link system skills" if agents_frontier.fetch("links_to_create").any? { |link| link.fetch("target").include?("/.system") }
+		abort "agents- module should be removed" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "agents-" }
+		codex = plan.fetch("modules").find { |mod| mod.fetch("name") == "codex" }
+		abort "missing codex module" unless codex
+		abort "missing codex cask" unless codex.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "cask:codex" }
+		abort "codex should link codex-only skills" unless codex.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.codex/skills/commits" }
+		abort "codex should not duplicate common bash skill" if codex.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.codex/skills/bash" }
+		abort "codex should link hooks by directory" unless codex.fetch("links_to_create").any? { |link| link.fetch("source") == "hooks/shellcheck" && link.fetch("target") == "~/.codex/hooks/shellcheck" && link.fetch("fan_in") == true }
+		abort "codex should not link system skills" if codex.fetch("links_to_create").any? { |link| link.fetch("target").include?("/.system") }
+		opencode = plan.fetch("modules").find { |mod| mod.fetch("name") == "opencode" }
+		abort "missing opencode module" unless opencode
+		abort "missing opencode package" unless opencode.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:opencode" }
+		abort "missing aicommits package" unless opencode.fetch("packages_to_install").any? { |pkg| pkg.fetch("value") == "brew:aicommits" }
+		abort "opencode should link heavy commits skill under opencode config" unless opencode.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.config/opencode/skills/commits" }
+		abort "opencode should link system skills under opencode config" unless opencode.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.config/opencode/skills/.system" }
+		abort "opencode should not link heavy skills through ~/.agents" if opencode.fetch("links_to_create").any? { |link| link.fetch("target").start_with?("~/.agents/") }
+		abort "opencode should keep heavy commits skill" unless File.exist?("opencode/skills/commits/SKILL.md")
+		abort "opencode should keep system skills out of shared agents" unless File.exist?("opencode/skills/.system/.codex-system-skills.marker")
 		git = plan.fetch("modules").find { |mod| mod.fetch("name") == "git" }
 		abort "missing git module" unless git
 		abort "git should not be virtual" unless git.fetch("virtual") == false
