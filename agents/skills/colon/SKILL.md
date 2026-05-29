@@ -1,176 +1,64 @@
 ---
 name: colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:harness`, `:ha`, `:todo TEXT`, `:to TEXT`, `:todo! TEXT`, `:to! TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
+description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
+metadata:
+  author: https://github.com/roktas
+  version: "1.0.0"
 ---
 
 # Colon Shortcuts
 
-Use this skill only for explicit prompt shortcuts at the beginning of a user message. The first token selects the
-shortcut; the rest of the message is shortcut input.
+Use this skill only when the user message starts with `:`. The first token selects the shortcut; the remaining text is
+the shortcut input. Do not treat incidental `:` characters inside normal prose as shortcuts.
 
-Do not treat incidental `:` characters inside normal prose as shortcuts.
+When a shortcut matches, behave as if the user had written the corresponding prompt below.
 
-## Shortcuts
+## Prompt Expansions
 
-Every shortcut also accepts its two-character form, using the first two letters after `:`. The only exception is
-`:todo!`, whose short form is `:to!`.
+### `:commit [MESSAGE_HINT]`, `:co [MESSAGE_HINT]`
 
-- `:commit [MESSAGE_HINT]`, `:co [MESSAGE_HINT]`
-- `:push [REMOTE] [BRANCH]`, `:pu [REMOTE] [BRANCH]`
-- `:ship [MESSAGE_HINT]`, `:sh [MESSAGE_HINT]`
-- `:harness [TARGET...]`, `:ha [TARGET...]`
-- `:todo [TEXT|edit|path]`, `:to [TEXT|edit|path]`
-- `:todo! [TEXT|edit|path]`, `:to! [TEXT|edit|path]`
-- `:ok [TODO_NUMBER]`
-- `:do [TODO_NUMBER]`
-- `:learn ERROR_DESCRIPTION`, `:le ERROR_DESCRIPTION`
-- `:close [push|no-push]`, `:cl [push|no-push]`
+Inspect the current git status and diff. Load `commits`. Stage only the changes that belong to this work, prepare an
+accurate Conventional Commit message using `MESSAGE_HINT` only as guidance, create the commit, and do not push.
 
-## Commit
+### `:push [REMOTE] [BRANCH]`, `:pu [REMOTE] [BRANCH]`
 
-`:commit [MESSAGE_HINT]` stages relevant current changes and creates a Conventional Commit using the `commits`
-rules. Do not push.
+Inspect the current branch and upstream. Push the current branch, using `REMOTE` and `BRANCH` if provided. Do not create
+a commit first. If history diverged, do not force push unless the user explicitly requested it or the conversation
+already established that local history is authoritative.
 
-If `MESSAGE_HINT` is present, treat it as user guidance for the commit message, not as a mandatory literal message.
-Inspect the diff first and keep the final commit message accurate.
+### `:ship [MESSAGE_HINT]`, `:sh [MESSAGE_HINT]`
 
-## Push
+Inspect the repository, commit the current work using the `:commit` behavior, then push using the `:push` behavior. If
+there is nothing to commit, skip the commit step and only push when the branch is ahead of its upstream.
 
-`:push [REMOTE] [BRANCH]` pushes the current branch. Do not create a commit unless explicitly requested.
+### `:todo [TEXT|edit|path]`, `:to [TEXT|edit|path]`
 
-Defaults:
+Use the shared repository TODO inbox at `.agents/notes/todo.md`. With text, append it as a shared TODO. With no input,
+print the TODO contents with numbered checklist items. With `edit`/`--edit`, open the file in the default editor. With
+`path`/`--path`, print the file path. Use this skill's `bin/todo` helper when available, resolved relative to this
+`SKILL.md`, not from the target repository root.
 
-- `REMOTE`: use the configured upstream remote.
-- `BRANCH`: use the current branch.
+### `:ok [TODO_NUMBER]`
 
-If push fails because local and remote history diverged, do not force push unless the user explicitly asked for it or the
-conversation has already established that the local branch is authoritative.
+Mark the numbered shared TODO checklist item as done. If no number is provided, list the TODO items and ask for a number
+before editing. TODO numbers are transient display numbers; if the number is stale, invalid, ambiguous, or already
+completed, list the TODO again before acting.
 
-## Ship
+### `:do [TODO_NUMBER]`
 
-`:ship [MESSAGE_HINT]` runs `:commit [MESSAGE_HINT]` and then `:push`.
+Work on the numbered shared TODO item now. Restate the selected item briefly, treat it as the current task, and do not
+mark it done unless the user explicitly asks for `:ok NUMBER` or otherwise clearly asks to close it. If the selected
+work is broad, risky, multi-file, multi-step, likely to span sessions, or needs reviewable decisions, create or update a
+bounded `.agents/state/tasks/` task before implementation and promote durable conclusions into `.agents/specs/`.
 
-If there are no tracked or untracked changes to commit, skip the commit step and only push when the branch is ahead of
-its upstream.
+### `:learn [ERROR_DESCRIPTION]`, `:le [ERROR_DESCRIPTION]`
 
-## Harness
+Analyze the mistake or recurring pattern and propose a harness improvement without editing files immediately. Decide
+whether the prevention belongs in an existing skill, a new skill, repo-local instructions/specs/tests/state, or
+user-level instructions. Answer with diagnosis, chosen location, proposed high-level change, and a confirmation question.
 
-`:harness [TARGET...]` runs the repository's relevant harness or consistency checks. In this repo, use the validation
-commands in `AGENTS.md` and the active task/spec context.
+### `:close [push|no-push]`, `:cl [push|no-push]`
 
-Argument hints:
-
-- No argument: run the normal relevant checks for the current changes.
-- `depot`: run the Depot provisioning plan, smoke, RuboCop, and shellcheck checks as applicable.
-- `shell`: run shell syntax and shellcheck checks.
-- `quick`: run the smallest useful check set.
-
-Treat unknown harness arguments as user intent and choose the closest relevant check set; explain the mapping briefly.
-
-## TODO
-
-`:todo [TEXT|edit|path]` targets the shared `.agents/notes/todo.md` inbox.
-
-- `:todo TEXT`: append `TEXT`.
-- `:todo edit` or `:todo --edit`: open the shared TODO in the default editor.
-- `:todo path` or `:todo --path`: print the shared TODO path.
-- `:todo` with no argument: print the shared TODO contents with numbered checklist items.
-
-`:todo! [TEXT|edit|path]` is a compatibility alias for the same shared TODO. Do not create a separate agent-owned TODO
-for ordinary repository work.
-
-When the user refers to a listed TODO number, interpret it as the numbered checklist item from the latest relevant
-`:todo` or `:todo!` listing. If the reference is stale or ambiguous, list the TODO again before acting. Use the target
-file path plus the checklist text, not the transient number, when promoting or editing local task state.
-
-## OK
-
-`:ok [TODO_NUMBER]` marks a shared TODO checklist item as done.
-
-- `:ok 2`: mark shared TODO item 2 as `- [x]`.
-- `:ok` with no argument: list shared TODO items, ask the user for a number, then mark that item as done.
-
-## Do
-
-`:do [TODO_NUMBER]` directs the agent to work on the numbered shared TODO item now. It accepts the same number argument
-as `:ok`, but it does not mark the item complete by itself.
-
-- `:do 2`: resolve shared TODO item 2, restate the selected item briefly, then treat that item as the current user task.
-- `:do` with no argument: list shared TODO items and ask the user for a number before starting work.
-- If the number is stale, invalid, or points at an already completed item, list the TODO and ask for a corrected number.
-- Do not write an in-progress state to `.agents/notes/todo.md`; active work lives in the current conversation.
-- After completing the work, mark the item done only when the user explicitly asks for `:ok NUMBER` or otherwise clearly
-  asks to close that item.
-- Trivial one-turn work can stay only in the conversation. If the selected item is broad, risky, multi-file,
-  multi-step, likely to span sessions, or likely to need reviewable decisions, create or update a bounded
-  `.agents/state/tasks/` task before implementation and use that task for planning, validation, and handoff notes.
-
-TODO numbers are transient display numbers from the current file contents. If the user gives a stale or invalid number,
-list the TODO again and ask for a corrected number.
-
-## Learn
-
-`:learn [ERROR_DESCRIPTION]` or `:le [ERROR_DESCRIPTION]` proposes harness improvements. Do not edit files immediately.
-
-With an argument, analyze a specific mistake using this prompt frame:
-
-```text
-Your mistake is: ERROR_DESCRIPTION.
-Carefully analyze why this mistake happened and what should change so you do not repeat it.
-```
-
-Without an argument, use this prompt frame:
-
-```text
-Considering this session's requests, the user's style, and the mistakes made so far, are there harness changes that
-would be useful in the future?
-```
-
-Then decide where the prevention belongs:
-
-- Existing skill: choose this when a specific workflow, language, tool, or domain skill caused or can prevent the
-  mistake.
-- New skill: choose this when the mistake reveals a recurring workflow that is not covered by an existing skill and is
-  specific enough to trigger reliably.
-- Repo-wise harness: choose this when the prevention is project-specific and belongs in root instructions, repo-local
-  specs, repo-local skills, tests, or local task state.
-- User-wise harness: choose this when the prevention is broad across repositories and belongs in user-level instructions
-  such as the global `AGENTS.md`.
-
-Answer with:
-
-1. A short diagnosis of the mistake or recurring pattern.
-2. The chosen prevention location and why alternatives are weaker.
-3. The exact proposed change at a high level.
-4. A confirmation question before making any edits.
-
-## Close
-
-`:close [push|no-push]` performs the `agents` closeout routine: check root instructions and `.agents/` consistency,
-update useful state or notes, refresh the checkpoint, and commit/push only if closeout produced tracked changes.
-
-Defaults:
-
-- Push closeout commits when a tracked closeout change was committed.
-- Use `:close no-push` to commit without pushing.
-- Use `:close push` to push after committing, and to push an already-ahead branch even when no new closeout commit was
-  needed.
-
-## TODO File
-
-Use `.agents/notes/todo.md` for the shared repository TODO inbox. It is tracked and editable by humans and agents, but
-it is still not canonical project truth. Promote useful items into `.agents/state/tasks/<task>/todo.md` or
-`.agents/specs/` when they become local bounded work or durable behavior.
-
-## TODO Helper
-
-Use this skill's helper, resolved relative to the directory that contains this `SKILL.md`. Do not look for `bin/todo`
-in the target repository root.
-
-```bash
-./bin/todo shared "Revisit Linux package baseline"
-./bin/todo human "Compatibility alias for the shared TODO"
-./bin/todo shared --edit
-./bin/todo shared --ok 2
-./bin/todo agent --path
-```
+Perform repository closeout: inspect status, check root instructions and `.agents/` consistency when relevant, summarize
+validation and remaining risk, refresh the checkpoint if the repo defines one, and commit/push only if closeout produced
+tracked changes or the input explicitly requested pushing an already-ahead branch.

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Format changed Go files before control returns to the caller.
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+is_go_file() {
+	local path=$1
+
+	[[ -f $path && $path == *.go ]]
+}
+
+main() {
+	command -v gofmt >/dev/null || exit 0
+	git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+
+	local root
+	root=$(git rev-parse --show-toplevel)
+	cd "$root"
+
+	local path
+	local -A seen=()
+	local -a paths=()
+
+	while IFS= read -r -d "" path; do
+		[[ -n ${seen[$path]:-} ]] && continue
+		seen[$path]=1
+		paths+=("$path")
+	done < <(
+		git diff --name-only -z --diff-filter=ACMRTUXB
+		git ls-files --others --exclude-standard -z
+	)
+
+	for path in "${paths[@]}"; do
+		is_go_file "$path" || continue
+		gofmt -w -- "$path"
+	done
+}
+
+main "$@"
