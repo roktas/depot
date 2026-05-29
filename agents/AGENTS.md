@@ -22,6 +22,17 @@
 - Keep code self-documenting; avoid commented-out code and obvious comments.
 - Treat chat code blocks like repository code.
 
+## Naming Things
+
+- Project- or language-specific naming rules override this section.
+- Use the simplest meaningful, pleasant name the context supports. Do not repeat context in the name; in `provision`,
+  prefer `Plan` over `ProvisionPlan`.
+- Before using separators such as `-`, `_`, `:`, or `/` in a compound name, stop and look for a simpler one-word name.
+- Match sibling names in the same scope, such as a module, class, file, or directory. Inspect nearby names before adding
+  a new one.
+- Private/internal names may be longer or plainer. Public API names should be shorter and more polished.
+- Let name length roughly follow scope: longer at global scope, shorter at local scope.
+
 ## Skills
 
 - Load relevant language/workflow skills before matching work.
