@@ -10,7 +10,7 @@ require "rbconfig"
 require "time"
 require "yaml"
 
-class ProvisionPlan
+class Plan
   DEFAULT_PACKAGE_TYPE = {
     "linux" => "brew",
     "macos" => "brew",
@@ -575,7 +575,7 @@ def main(argv)
     return 2
   end
 
-  ProvisionPlan.new(options).run
+  Plan.new(options).run
   0
 rescue StandardError => e
   warn "error: #{e.message}"
