@@ -47,8 +47,9 @@ closeout, refresh the checkpoint after any requested commits or pushes when prac
   `graphical.target`; reserve `DISPLAY`/`WAYLAND_DISPLAY` checks for active GUI session commands.
 - Prefer short contextual file, directory, and helper names. Avoid encoding implementation details in names unless
   they disambiguate real siblings or are part of an established external interface.
-- Do not add absolute filesystem paths to tracked repository files. Use repository-relative paths, module-relative
-  paths, or home-relative provisioning targets such as `~/.config/foo` when needed.
+- Do not add absolute filesystem paths to tracked repository files, including module frontmatter, instructions, and
+  scripts. Use repository-relative paths, module-relative paths, or home-relative provisioning targets such as
+  `~/.config/foo` when needed.
 - Do not migrate old `install.sh` files by default. Prefer README frontmatter and special sections; keep a script only
   when it is an intentional module implementation detail.
 - When searching for literal text that may contain shell metacharacters such as backticks, `$`, `!`, or quotes, do not
