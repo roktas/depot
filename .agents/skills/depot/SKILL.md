@@ -1,11 +1,38 @@
 ---
 name: depot
-description: Use in this repository to plan and perform Depot-style dotfiles provisioning from `.agents/specs/depot/spec.md`, including module discovery, README frontmatter interpretation, host/platform filtering, state-aware planning, package/link/copy actions, and confirmation-gated application.
+description: Use in this repository to plan and perform Depot-style dotfiles provisioning from `.agents/specs/depot/spec.md`. Trigger for explicit `$depot ...` commands, user messages whose first word is `depot`, or requests about installing, updating, repairing, bootstrapping, or inspecting this depot provisioning repo.
 ---
 
 # Depot
 
 Use this repo-local skill for provisioning this `depot` repository. Treat `.agents/specs/depot/spec.md` as the canonical behavior specification.
+
+## Command Interface
+
+Treat `$depot [INSTRUCTIONS]` and messages whose first word is `depot` as command-style prompts. Interpret the remaining
+text as additional provisioning instructions and act within this skill's workflow.
+
+When no explicit action is provided, choose the action from local context:
+
+1. If the host has no `.agents/state/hosts/HOST/depot.md` state, plan an initial install with `apply`.
+2. If the host state contains any `notok` module, plan `repair`.
+3. If the host state `head` differs from the current repo `HEAD`, plan `apply` to bring the host to the current repo
+   state.
+4. Otherwise, plan a managed update with `refresh`.
+
+Explicit words override the default:
+
+- `install`, `setup`, `provision`, `apply`: use `apply`.
+- `update`, `refresh`: use `refresh`.
+- `repair`: use `repair`.
+- `upgrade`: use `upgrade` only when explicitly requested; call out the broad package-manager scope first.
+- `bootstrap`: run or plan `bin/bootstrap` as the explicit fresh-host prelude.
+- `plan`, `dry run`, `inspect`: generate the plan only.
+
+Before applying any action, state exactly what you intend to do and ask for confirmation. Phrase the confirmation so the
+default answer is yes, for example: "I will run an `apply` plan for host `newton` and then apply the confirmed link and
+package actions. Proceed? [Y/n]". If the user only asked for a plan or inspection, do not apply actions after showing
+the plan unless they confirm.
 
 ## Workflow
 
