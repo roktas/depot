@@ -44,12 +44,17 @@ episode-scoped material belongs under `state/`.
 
 ### Specs
 
-Canonical structure:
+Common shapes:
 
 ```text
+.agents/specs/<feature>.md
 .agents/specs/<feature>/
   spec.md
 ```
+
+Use the single-file form when the feature is represented by one durable document and the file name is already clear in
+the `specs/` scope. Use the directory form when the feature needs multiple spec files, fixtures, examples, or sibling
+references. Do not force the directory form when it only repeats context, such as `specs/tilde/spec.md`.
 
 Use `specs/` when the document answers:
 

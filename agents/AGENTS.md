@@ -9,6 +9,8 @@
 
 - Continue in the current conversation language unless explicitly asked to switch. If language becomes unclear, use
   Turkish.
+- Context compaction, model changes, tool output, or quoted English source text are not reasons to switch languages.
+  After any transition, resume in the user's latest conversation language.
 - Keep code-facing text in English: comments, identifiers, file names, commit messages, and repository docs.
 - Be concise, direct, and explicit about errors, risks, tradeoffs, and uncertainty.
 - Prefer correctness over agreement.
@@ -17,10 +19,14 @@
 ## Engineering
 
 - Inspect context before acting; make deliberate, justified changes.
+- When the user bounds the review or edit scope to specific files or sources, stay inside that scope unless a required
+  dependency is missing or the user expands the scope.
 - Keep repositories clean: no leftover temp files, dead code, or unnecessary structure.
 - Prefer existing repo patterns over new abstractions.
 - Keep code self-documenting; avoid commented-out code and obvious comments.
 - Treat chat code blocks like repository code.
+- Do not write expanded home paths in tracked repository files. Use `~` for home-relative paths, for example
+  `~/.config/foo`, and use repository-relative or module-relative paths for repo files.
 
 ## Naming Things
 
@@ -39,6 +45,8 @@
 - Required dispatch: `bash` for shell or shell snippets, `commits` for commit messages, `dotagents` for `.agents/`
   artifacts.
 - Also load any skill required by repository or task-specific instructions.
+- Do not load the Turkish skill just because the conversation is in Turkish. Load it only when the task is about Turkish
+  prose, translation, terminology, tone, grammar, or Turkish-facing documentation/UI text.
 
 ## Session Continuity
 

@@ -1,235 +1,75 @@
 ---
 name: tilde
-description: Use in this repository to plan and perform Tilde-style dotfiles provisioning from `.agents/specs/tilde/spec.md`. Trigger for explicit `$tilde ...` commands, user messages whose first word is `tilde`, or requests about installing, updating, repairing, bootstrapping, or inspecting this tilde provisioning repo.
+description: Use for Tilde deployment, provisioning, and home-management work. Trigger for `$tilde ...`, messages whose first word is `tilde`, or requests to deploy, bootstrap, plan, apply, refresh, repair, upgrade, diagnose, inspect links, adopt app/config files, or work with Tilde home behavior.
 ---
 
 # Tilde
 
-Use this repo-local skill for provisioning this `tilde` repository. Treat `.agents/specs/tilde/spec.md` as the canonical behavior specification.
+This skill is standalone. Treat `references/spec.md` as the canonical behavior spec. In this repository,
+`.agents/specs/tilde.md` may exist as a relative symlink for discoverability; do not treat that alias as a second source
+of truth.
 
-## Command Interface
+Read only the relevant spec sections before changing behavior or executing commands. Keep `SKILL.md` short; durable
+semantics belong in `references/spec.md`, and runnable helpers belong in `bin/`.
 
-Treat `$tilde [INSTRUCTIONS]` and messages whose first word is `tilde` as command-style prompts. Interpret the remaining
-text as additional provisioning instructions and act within this skill's workflow.
+## Spec Map
 
-When no explicit action is provided, choose the action from local context:
+Use these links to load the narrowest useful part of the spec:
 
-1. If the host has no `.agents/state/hosts/HOST/tilde.md` state, plan an initial install with `apply`.
-2. If the host state contains any `notok` module, plan `repair`.
-3. If the host state `head` differs from the current repo `HEAD`, plan `apply` to bring the host to the current repo
-   state.
-4. Otherwise, plan a managed update with `refresh`.
+- Command parsing and confirmation: [Command Semantics](references/spec.md#command-semantics) and
+  [User Interaction](references/spec.md#user-interaction).
+- Home entrypoint, discovery, and adoption: [Home Router](references/spec.md#home-router),
+  [Core Managed Links](references/spec.md#core-managed-links), [Bounded Discovery](references/spec.md#bounded-discovery),
+  and [Adoption](references/spec.md#adoption).
+- Fresh-host, Dropbox, and remote setup: [Deployment](references/spec.md#deployment),
+  [Dropbox Preflight](references/spec.md#dropbox-preflight), [Bootstrap](references/spec.md#bootstrap), and
+  [Remote Modes](references/spec.md#remote-modes).
+- Module semantics and plan/apply behavior: [Module README](references/spec.md#module-readme),
+  [Deployment State](references/spec.md#deployment-state), and [Provisioning](references/spec.md#provisioning).
+- Package work: [Package Installation](references/spec.md#package-installation) and
+  [Package Updates](references/spec.md#package-updates).
+- Repository development: [Tilde Repository Development](references/development.md).
 
-Explicit words override the default:
+## Prompt Contract
 
-- `install`, `setup`, `provision`, `apply`: use `apply`.
-- `update`, `refresh`: use `refresh`.
-- `repair`: use `repair`.
-- `upgrade`: use `upgrade` only when explicitly requested; call out the broad package-manager scope first.
-- `bootstrap`: run or plan `bin/bootstrap` as the explicit fresh-host prelude.
-- `plan`, `dry run`, `inspect`: generate the plan only.
+Treat `$tilde <command> [subject...] [qualifiers...]` and first-word `tilde` messages as compact natural-language
+commands, not strict shell invocations. Interpret each command by its spec semantics, and do not introduce a separate
+command-scope model.
 
-Before applying any action, state exactly what you intend to do and ask for confirmation. Phrase the confirmation so the
-default answer is yes, for example: "I will run an `apply` plan for host `newton` and then apply the confirmed link and
-package actions. Proceed? [Y/n]". If the user only asked for a plan or inspection, do not apply actions after showing
-the plan unless they confirm.
+Use proposal-first behavior for writes, moves, removals, repository edits, package changes, and remote-host actions.
+Prefer structured confirmation and choice UI over raw prompts such as `[Y/n]`. In Codex, use available structured
+user-input or AFALA-style interaction; in other agents, use the closest native equivalent. If only text is available,
+present explicit choices with target, effect, and blast radius.
 
-## Workflow
+## Commands
 
-1. Read `.agents/specs/tilde/spec.md` when the user asks to provision, change provisioning behavior, or inspect the design.
-2. Ensure the worktree is clean before real local or `remote-git` provisioning. For `remote-git`, ensure the target
-   commit is pushed.
-3. Generate a non-destructive plan with `bin/plan`.
-4. Present the plan and ask for confirmation unless the user already gave bulk approval for this provisioning run.
-5. Apply the confirmed actions manually with normal tools. The helper does not apply changes.
-6. Update `.agents/state/hosts/HOST/tilde.md` in the repo copy where actions were applied. For remote provisioning
-   without Dropbox sync, copy that host state back into the local repo state archive before finishing.
+- `deploy`: prepare a local or remote host and apply desired state.
+- `bootstrap`: run or plan the explicit fresh-host prelude.
+- `plan`, `apply`, `refresh`, `repair`, `upgrade`: lower-level provisioning commands.
+- `status`: show a short read-only deployment and home-router summary.
+- `doctor`: run bounded diagnostics; this is not a whole-home audit.
+- `links`: inspect managed links and copies.
+- `adopt`: inspect the requested app, config, package, or path and propose public `tilde` or private `tilde-` placement.
+- `clean`, `organize`, `archive`, `dedupe`: preference-sensitive home commands; read `tilde-/AGENTS.md` when present and
+  otherwise stay conservative.
 
-## Remote Modes
+## Discovery
 
-- `remote-git`: default remote mode. Prepare the target repo with `git clone` or fetch/checkout, usually under
-  `~/.local/src/<repo-name>`. Use the cloned repository's own name; do not force the directory name to `home`. Use
-  `main` and the latest pushed commit unless instructed otherwise. Require a clean local worktree and pushed commit.
-- `remote-dropbox`: use the target repo already present under Dropbox. Do not require local and remote Git HEADs to
-  match. State is expected to sync through Dropbox, so no explicit state copy-back is needed.
-- `remote-any`: use the target repo path as-is. This mode is intentionally less deterministic; call out dirty worktree,
-  branch, or HEAD uncertainty and continue only with explicit confirmation.
+After deployment, home commands may start from `~`. Resolve the Tilde repo through the `~/AGENTS.md` symlink target
+chain, normally `.agents/skills/tilde/assets/AGENTS.md`; walk upward from that target until finding this skill and its
+spec. If that fails, use the current Tilde repo or an explicit user-provided path. Never search all of home just to find
+the repo.
 
-In all remote modes, resolve links and copies against the target machine's repo copy, not the local orchestrating repo.
-Write state on the target first. If the target is not Dropbox-synced, fetch the resulting
-`.agents/state/hosts/HOST/tilde.md` back into the local repo at the end.
+Do not recursively scan `$HOME` by default. No `find $HOME`, `fd $HOME`, or equivalent broad search unless the user
+explicitly requests it after scope and cost are described. Use bounded discovery from modules, explicit paths, managed
+targets, cheap XDG/home metadata, relevant app/config locations, and cheap package/app metadata.
 
-## Helper
+## Deployment
 
-Run from the repo root:
+Choose host kind from the target repo copy: `dropbox`, `git`, `self`, or `any`. For `dropbox`, Dropbox setup and account
+linking are interactive preconditions; guide the user, then rerun preflight. Do not create a Git clone on a `dropbox`
+target unless the user changes host kind.
 
-```bash
-.agents/skills/tilde/bin/plan
-```
-
-Useful options:
-
-```bash
-.agents/skills/tilde/bin/plan --host kant --platform linux
-.agents/skills/tilde/bin/plan --level minimal
-.agents/skills/tilde/bin/plan --level extra
-.agents/skills/tilde/bin/plan --mode refresh
-.agents/skills/tilde/bin/plan --mode repair
-.agents/skills/tilde/bin/plan --format markdown
-.agents/skills/tilde/bin/plan --allow-dirty
-```
-
-Use `--allow-dirty` only while developing or reviewing the skill. Real provisioning must use a clean worktree.
-
-## Development And Test Environments
-
-For Lima and the `there` helper setup and smoke-test commands, read `references/testing.md`.
-
-`bin/smoke` uses the external `"there"` command when running end-to-end tests. Keep this dependency loose:
-`"there"` must be discoverable through `PATH`, but this skill must not assume how it was installed or provided. Use
-the `there` documentation for detailed `"there"` usage.
-
-## Bootstrap
-
-Use `bin/bootstrap` from this skill when a fresh target host does not yet have the minimum tools needed for
-provisioning. Bootstrap is an explicit, state-free prelude step and is not a repository module. It must be idempotent,
-must be Bash, and must not require Ruby. It installs the platform package-manager baseline, Homebrew, and the `curl`,
-`git`, and `ruby` tools needed by the rest of this repository.
-
-## Modes
-
-- `apply`: apply this repo's desired state to the target host. This is the default mode and covers first provisioning
-  plus normal state/HEAD-based reconciliation.
-- `refresh`: update only managed external resources: active plan packages and README `Update` sections. Do not skip
-  solely because the repo `HEAD` is unchanged.
-- `repair`: retry modules marked `notok` in state at the same `HEAD`.
-- `upgrade`: perform broad package-manager upgrades only when explicitly requested. Describe the larger blast radius
-  before asking for confirmation.
-
-## Application Rules
-
-- README frontmatter may be omitted when a module has no explicit provisioning config; missing `all` and platform keys
-  are treated as empty maps by `bin/plan`.
-- `misc` is a normal provisioning module for small shared declarations that do not deserve a focused module. Keep it
-  small; if an item grows configuration, platform-specific behavior, or a clear identity, move it to a focused module.
-  `misc` has no special ordering and runs alphabetically with other non-platform root modules. If `misc-` exists, treat
-  it as an `extra` variant.
-- Plan module work in this order: active platform root module (`linux`, `macos`, or `windows`) first when present, the
-  active platform dash variant (`linux-`, `macos-`, or `windows-`) after that when present, then other root modules
-  alphabetically. Exclude inactive platform root modules and inactive platform variants.
-- Dash-suffixed module names such as `linux-` are ordinary modules. The suffix has no global meaning; each pair defines
-  its own local variant semantics in README text.
-- Root modules that define platform keys but do not define `all` are selected only when the active platform key exists.
-  This gates both frontmatter actions and special README sections. A platform key may use YAML null (`macos: ~`) to
-  select that platform without adding platform-specific actions.
-- `level` is optional and defaults to `normal`. Valid levels are `minimal`, `normal`, and `extra`; plan selection is a
-  threshold, so `normal` includes `minimal` and `normal`, while `extra` includes all three levels.
-- Link and copy sources are resolved relative to the module directory; `../` may reference shared files elsewhere in
-  this repo, but sources must not escape the repository.
-- A `links` target may be either one string or a list of strings. Use a list when the same source must be linked to
-  multiple targets.
-- Link sources ending with `/` use fan-in semantics: link each direct child of the source directory into the target
-  directory with the same basename, rather than linking the source directory itself.
-- `packages` must be a flat YAML list of `[package-type:]package-name` strings. Do not nest package types as mapping
-  keys; use `gemini-cli` or `brew:gemini-cli`, not `brew: [gemini-cli]`.
-- Treat `packages` as plan-time declarations. If package installation depends on runtime state such as GUI or desktop
-  host availability, keep it out of `packages` and put a guarded command in a special README section instead.
-- Install GUI- or desktop-host-dependent packages only through guarded special-section commands, not through frontmatter
-  `packages`. Do not use `DISPLAY` or `WAYLAND_DISPLAY` as the package-install guard because SSH provisioning can target
-  a desktop host without exporting a GUI session. On Linux, prefer `systemctl get-default == graphical.target` for
-  package installs. Keep `DISPLAY`, `WAYLAND_DISPLAY`, `XDG_CURRENT_DESKTOP`, or similar session checks for commands
-  that truly need an active GUI session, such as `gsettings`, MIME association, or launching GUI programs.
-- Missing `packages` means the module is virtual and installs no packages. Add package names explicitly for modules that
-  should install packages.
-- Do not remove packages unless the user explicitly asks for package removal.
-- Link overwrites, copy overwrites, and link removals are confirmation-scoped actions.
-- Remove a dropped link only if the target is a symlink into this repo, or if it is a dangling symlink.
-- Do not touch dropped link targets that are not symlinks or point outside this repo.
-- Do not remove dropped copy targets unless the user explicitly asks for copy removal.
-- If a special README section contains only `bash` fenced blocks, run them in written order after confirmation.
-- Special README sections may contain lower-level headings such as `### GNOME`; keep those as instructions inside the
-  selected section rather than adding new special-section semantics.
-- README bodies may scope special sections under `## All Platforms`, `## Linux`, `## MacOS`, or `## Windows`. Within
-  those scopes, write special sections one level lower, such as `### Install`. Select `All Platforms` and the active
-  platform only; ignore other platform scopes. Top-level special sections such as `## Install` remain valid and are
-  treated like all-platform instructions.
-- Special sections have plain exit-code semantics: `0` is success or intentional no-op; non-zero is failure. Do not use
-  custom skip exit codes, fenced-block metadata, or a separate precondition protocol.
-
-## Package Installation
-
-Group package installs by package type, present the commands in the plan, and run them only after confirmation. Package
-removal is never inferred from removed frontmatter entries.
-
-Use these installation commands:
-
-- `brew:<name>`: `brew install <name>`
-- `cask:<name>`: `brew install --cask <name>`
-- `deb:<name>`: `sudo apt install -y <name>`; run `sudo apt update` first when the package index may be stale. If this
-  becomes a non-interactive script, prefer `sudo apt-get install -y <name>`.
-- `npm:<name>`: `bun install -g <name>`
-- `gem:<name>`: `gem install --user-install --no-document <name>` unless local RubyGems config already routes installs
-  to a user-writable gem home. Do not use `sudo gem install`.
-- `egg:<name>`: `uv tool install <name>` for Python CLI tools. If the package does not expose the expected executable,
-  inspect the package documentation and use a module README special section for package-specific flags such as
-  `--with` or `--with-executables-from`.
-- `flatpak:<app-id>`: `flatpak install --user flathub <app-id>` unless the module explicitly requires a system-wide
-  Flatpak install.
-- `scoop:<name>`: `scoop install <name>`
-- `github:<owner>/<repo>`: no fixed shell command. Inspect the latest release assets with the GitHub API, GitHub MCP, or
-  `gh release` commands. Select the asset that best matches the target platform and architecture, download it to a temp
-  directory, verify checksum or provenance when the release provides it, extract it, and copy executable files to
-  `~/.local/bin`. If the correct asset or executable layout is ambiguous, ask before installing.
-
-For `github` assets, prefer official release metadata over scraping HTML. Useful `gh` commands:
-
-```bash
-gh release view --repo OWNER/REPO --json tagName,assets
-gh release download --repo OWNER/REPO --pattern 'PATTERN'
-```
-
-## Package Updates
-
-Default update scope is **managed packages only**: update only package entries present in the active provisioning plan,
-one package at a time or grouped by explicit package names. Do not run package-manager-wide upgrade commands unless the
-user explicitly asks for a full/global update. This keeps provisioning from changing unrelated packages that happen to
-be installed on the machine.
-
-Before managed updates, run metadata refresh commands at most once per package manager represented in the confirmed
-update set. Do this as a preflight step, before per-package update commands:
-
-- `brew update`
-- `sudo apt update`
-- `scoop update`
-- `flatpak update --appstream`
-
-Use these managed-package update commands:
-
-- `brew:<name>`: `brew upgrade <name>`
-- `cask:<name>`: `brew upgrade --cask <name>`. If the cask is excluded from normal upgrades because it uses
-  `version :latest` or self-updates, use `brew upgrade --cask --greedy <name>` only after calling out that extra scope.
-- `deb:<name>`: `sudo apt-get install --only-upgrade -y <name>` after `sudo apt update`. If the package may not be
-  installed yet, treat it as an install action instead.
-- `npm:<name>`: `bun update -g <name>`
-- `gem:<name>`: `gem update --user-install --no-document <name>`. Do not use bare `gem update`, because it updates all
-  installed gems.
-- `egg:<name>`: `uv tool upgrade <name>`. Use `uv tool install <name>` instead when changing version constraints or
-  installation flags.
-- `flatpak:<app-id>`: `flatpak update --user <app-id>` for per-user installs created by this skill.
-- `scoop:<name>`: run `scoop update` first to refresh Scoop and buckets, then `scoop update <name>`.
-- `github:<owner>/<repo>`: inspect the latest release assets again, compare with the currently installed binary when
-  possible, then download, verify, extract, and replace executables in `~/.local/bin` after confirmation. If the release
-  does not expose a reliable version signal, present the selected asset and ask before replacing.
-
-Only use global update commands for an explicit full-update request, and describe the broader blast radius first:
-
-```bash
-brew upgrade
-brew upgrade --cask
-sudo apt upgrade
-bun update -g
-gem update
-uv tool upgrade --all
-flatpak update
-scoop update *
-```
+For real local deployment or `remote-git`, require a clean worktree and pushed target commit. Generate plans with
+`bin/plan`; it never applies changes. Write deployment state on the target first and copy it back when the target is not
+Dropbox-synced. Run `bin/bootstrap` only as the explicit state-free bootstrap prelude.

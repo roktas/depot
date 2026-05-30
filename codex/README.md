@@ -3,7 +3,6 @@ all:
   packages:
     - cask:codex
   links:
-    AGENTS.md: ~/.codex/AGENTS.md
     hooks/: ~/.codex/hooks
     skills/: ~/.codex/skills
 ---
@@ -11,6 +10,9 @@ all:
 # Codex
 
 Codex-specific user assets.
+
+Codex uses the shared instructions from `~/.agents/AGENTS.md`. Keep this module limited to Codex-only hooks and skills;
+do not mirror shared agent instructions here.
 
 ## Setup
 

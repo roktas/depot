@@ -11,6 +11,9 @@ require "time"
 require "yaml"
 
 class Plan
+  CORE_LINKS = {
+    ".agents/skills/tilde/assets/AGENTS.md" => "~/AGENTS.md"
+  }.freeze
   DEFAULT_PACKAGE_TYPE = {
     "linux" => "brew",
     "macos" => "brew",
@@ -68,6 +71,7 @@ class Plan
       platform: @platform,
       state_path: state_path.to_s,
       previous_state: @previous_state,
+      core: core_plan,
       modules: planned_modules
     }
 
@@ -95,6 +99,18 @@ class Plan
       git("branch", "--show-current")
     rescue StandardError
       nil
+    end
+
+    def core_plan
+      {
+        links_to_create: apply_like? ? core_links : []
+      }
+    end
+
+    def core_links
+      CORE_LINKS.map do |source, target|
+        link_action(@repo, source, target)
+      end
     end
 
     def detect_platform
@@ -346,6 +362,12 @@ class Plan
       puts "- platform: `#{plan[:platform]}`"
       puts "- state: `#{plan[:state_path]}`"
       puts
+      puts "## Core"
+      puts
+      puts_action_list("Links", plan.fetch(:core).fetch(:links_to_create)) do |link|
+        "`#{link[:source]}` -> `#{link[:target]}`"
+      end
+
       plan[:modules].each do |mod|
         puts "## #{mod[:name]}"
         puts
@@ -537,9 +559,7 @@ class Plan
     end
 
     def validate_repo!
-      spec = @repo.join(".agents", "specs", "tilde", "spec.md")
       raise "Not a directory: #{@repo}" unless @repo.directory?
-      raise "Missing spec: #{spec}" unless spec.file?
     end
 
     def validate_worktree!

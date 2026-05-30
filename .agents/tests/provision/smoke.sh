@@ -101,6 +101,8 @@ EOF
 		abort "wrong mode" unless plan.fetch("mode") == "apply"
 		abort "wrong level" unless plan.fetch("level") == "normal"
 		abort "wrong platform" unless plan.fetch("platform") == "linux"
+		core_links = plan.fetch("core").fetch("links_to_create")
+		abort "missing core home router link" unless core_links.any? { |link| link.fetch("source") == ".agents/skills/tilde/assets/AGENTS.md" && link.fetch("target") == "~/AGENTS.md" }
 		linux = plan.fetch("modules").find { |mod| mod.fetch("name") == "linux" }
 		abort "missing linux platform module" unless linux
 		abort "linux platform module should be first" unless plan.fetch("modules").first.fetch("name") == "linux"
@@ -119,11 +121,13 @@ EOF
 		abort "agents should default to normal level" unless agents.fetch("level") == "normal"
 		abort "agents should be a virtual shared-asset module" unless agents.fetch("virtual") == true
 		abort "agents should not install agent-specific packages" unless agents.fetch("packages_to_install").empty?
+		abort "agents should not own the home router link" if agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/AGENTS.md" }
 		abort "agents should link shared instructions under ~/.agents" unless agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/AGENTS.md" }
 		abort "agents should keep common skills under ~/.agents" unless agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/skills/colon" }
 		abort "agents should not expose codex-only commits globally" if agents.fetch("links_to_create").any? { |link| link.fetch("target") == "~/.agents/skills/commits" }
 		abort "agents should not expose system skills globally" if agents.fetch("links_to_create").any? { |link| link.fetch("target").include?("/.system") }
 		abort "agents colon skill should be the common source" if File.symlink?("agents/skills/colon")
+		abort "agents TILDE alias should be removed" if File.exist?("agents/TILDE.md")
 		abort "agents- module should be removed" if plan.fetch("modules").any? { |mod| mod.fetch("name") == "agents-" }
 		codex = plan.fetch("modules").find { |mod| mod.fetch("name") == "codex" }
 		abort "missing codex module" unless codex
@@ -300,6 +304,7 @@ EOF
 	REFRESH_PLAN_JSON=$refresh_plan_json ruby -rjson -e '
 		plan = JSON.parse(File.read(ENV.fetch("REFRESH_PLAN_JSON")))
 		abort "wrong refresh mode" unless plan.fetch("mode") == "refresh"
+		abort "refresh should not create core links" unless plan.fetch("core").fetch("links_to_create").empty?
 		neovim = plan.fetch("modules").find { |mod| mod.fetch("name") == "neovim" }
 		abort "missing neovim module" unless neovim
 		abort "refresh should not create links" unless neovim.fetch("links_to_create").empty?
