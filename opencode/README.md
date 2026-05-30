@@ -4,6 +4,7 @@ all:
     - opencode
     - aicommits
   links:
+    AGENTS.md: ~/.config/opencode/AGENTS.md
     skills/: ~/.config/opencode/skills
 ---
 
