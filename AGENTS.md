@@ -47,9 +47,10 @@ closeout, refresh the checkpoint after any requested commits or pushes when prac
   `graphical.target`; reserve `DISPLAY`/`WAYLAND_DISPLAY` checks for active GUI session commands.
 - Prefer short contextual file, directory, and helper names. Avoid encoding implementation details in names unless
   they disambiguate real siblings or are part of an established external interface.
-- Keep `opencode/AGENTS.md` in sync with `agents/AGENTS.md`: whenever shared user instructions change, apply the same
-  change there too. `opencode/AGENTS.md` is basically a standalone copy of `agents/AGENTS.md`, strengthened with stricter
-  OpenCode-specific wording and mandatory skill-dispatch rules.
+- `agents` is the shared agent module. `codex` and `opencode` are agent-specific modules. Keep agent-specific modules
+  equivalent in feature set: when one changes, apply the same functional change to the other. The intended difference is
+  tone and weight only: `opencode` may use stronger, more restrictive, and extra instructions; frontier-agent modules
+  such as `codex` should stay more concise and relaxed.
 - Do not add absolute filesystem paths to tracked repository files, including module frontmatter, instructions, and
   scripts. Use repository-relative paths, module-relative paths, or home-relative provisioning targets such as
   `~/.config/foo` when needed.
