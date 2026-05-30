@@ -4,40 +4,40 @@ Use Lima with the external `"there"` helper for end-to-end provisioning tests.
 
 ## Lima
 
-The Depot smoke wrapper expects `"there"` to be available in `PATH`. Install the `there` package, or activate an
+The Tilde smoke wrapper expects `"there"` to be available in `PATH`. Install the `there` package, or activate an
 environment that provides a compatible `"there"` command.
 
 This skill intentionally does not encode how `"there"` is installed. See the `there` documentation for command behavior
 and detailed usage.
 
-Run the normal Depot smoke script inside the Lima instance:
+Run the normal Tilde smoke script inside the Lima instance:
 
 ```bash
-.agents/skills/depot/bin/smoke
+.agents/skills/tilde/bin/smoke
 ```
 
 Run the bootstrap helper inside the Lima instance:
 
 ```bash
-.agents/skills/depot/bin/smoke boot
+.agents/skills/tilde/bin/smoke boot
 ```
 
 For fast repeated tests, stop the instance instead of destroying it:
 
 ```bash
-.agents/skills/depot/bin/smoke stop
+.agents/skills/tilde/bin/smoke stop
 ```
 
 For a fresh-host test, destroy the instance explicitly:
 
 ```bash
-.agents/skills/depot/bin/smoke destroy
+.agents/skills/tilde/bin/smoke destroy
 ```
 
 Clean Lima's image cache only when explicitly requested:
 
 ```bash
-.agents/skills/depot/bin/smoke prune
+.agents/skills/tilde/bin/smoke prune
 ```
 
 ## Direct Command

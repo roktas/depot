@@ -32,7 +32,7 @@ hill() {
 initialize() {
 	local try
 
-	if try=$(hill . .local && echo "$PWD/.local/depot") && [[ -n $try ]]; then
+	if try=$(hill . .local && echo "$PWD/.local/tilde") && [[ -n $try ]]; then
 		export TODO_DIR=$try
 		return 0
 	fi

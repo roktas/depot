@@ -1,20 +1,20 @@
 ---
-name: depot
-description: Use in this repository to plan and perform Depot-style dotfiles provisioning from `.agents/specs/depot/spec.md`. Trigger for explicit `$depot ...` commands, user messages whose first word is `depot`, or requests about installing, updating, repairing, bootstrapping, or inspecting this depot provisioning repo.
+name: tilde
+description: Use in this repository to plan and perform Tilde-style dotfiles provisioning from `.agents/specs/tilde/spec.md`. Trigger for explicit `$tilde ...` commands, user messages whose first word is `tilde`, or requests about installing, updating, repairing, bootstrapping, or inspecting this tilde provisioning repo.
 ---
 
-# Depot
+# Tilde
 
-Use this repo-local skill for provisioning this `depot` repository. Treat `.agents/specs/depot/spec.md` as the canonical behavior specification.
+Use this repo-local skill for provisioning this `tilde` repository. Treat `.agents/specs/tilde/spec.md` as the canonical behavior specification.
 
 ## Command Interface
 
-Treat `$depot [INSTRUCTIONS]` and messages whose first word is `depot` as command-style prompts. Interpret the remaining
+Treat `$tilde [INSTRUCTIONS]` and messages whose first word is `tilde` as command-style prompts. Interpret the remaining
 text as additional provisioning instructions and act within this skill's workflow.
 
 When no explicit action is provided, choose the action from local context:
 
-1. If the host has no `.agents/state/hosts/HOST/depot.md` state, plan an initial install with `apply`.
+1. If the host has no `.agents/state/hosts/HOST/tilde.md` state, plan an initial install with `apply`.
 2. If the host state contains any `notok` module, plan `repair`.
 3. If the host state `head` differs from the current repo `HEAD`, plan `apply` to bring the host to the current repo
    state.
@@ -36,13 +36,13 @@ the plan unless they confirm.
 
 ## Workflow
 
-1. Read `.agents/specs/depot/spec.md` when the user asks to provision, change provisioning behavior, or inspect the design.
+1. Read `.agents/specs/tilde/spec.md` when the user asks to provision, change provisioning behavior, or inspect the design.
 2. Ensure the worktree is clean before real local or `remote-git` provisioning. For `remote-git`, ensure the target
    commit is pushed.
 3. Generate a non-destructive plan with `bin/plan`.
 4. Present the plan and ask for confirmation unless the user already gave bulk approval for this provisioning run.
 5. Apply the confirmed actions manually with normal tools. The helper does not apply changes.
-6. Update `.agents/state/hosts/HOST/depot.md` in the repo copy where actions were applied. For remote provisioning
+6. Update `.agents/state/hosts/HOST/tilde.md` in the repo copy where actions were applied. For remote provisioning
    without Dropbox sync, copy that host state back into the local repo state archive before finishing.
 
 ## Remote Modes
@@ -57,26 +57,26 @@ the plan unless they confirm.
 
 In all remote modes, resolve links and copies against the target machine's repo copy, not the local orchestrating repo.
 Write state on the target first. If the target is not Dropbox-synced, fetch the resulting
-`.agents/state/hosts/HOST/depot.md` back into the local repo at the end.
+`.agents/state/hosts/HOST/tilde.md` back into the local repo at the end.
 
 ## Helper
 
 Run from the repo root:
 
 ```bash
-.agents/skills/depot/bin/plan
+.agents/skills/tilde/bin/plan
 ```
 
 Useful options:
 
 ```bash
-.agents/skills/depot/bin/plan --host kant --platform linux
-.agents/skills/depot/bin/plan --level minimal
-.agents/skills/depot/bin/plan --level extra
-.agents/skills/depot/bin/plan --mode refresh
-.agents/skills/depot/bin/plan --mode repair
-.agents/skills/depot/bin/plan --format markdown
-.agents/skills/depot/bin/plan --allow-dirty
+.agents/skills/tilde/bin/plan --host kant --platform linux
+.agents/skills/tilde/bin/plan --level minimal
+.agents/skills/tilde/bin/plan --level extra
+.agents/skills/tilde/bin/plan --mode refresh
+.agents/skills/tilde/bin/plan --mode repair
+.agents/skills/tilde/bin/plan --format markdown
+.agents/skills/tilde/bin/plan --allow-dirty
 ```
 
 Use `--allow-dirty` only while developing or reviewing the skill. Real provisioning must use a clean worktree.

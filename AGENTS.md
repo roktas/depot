@@ -2,15 +2,15 @@
 
 ## Scope
 
-This repository is a Depot-style dotfiles provisioning repo.
+This repository is a Tilde-style dotfiles provisioning repo.
 
 ## Canonical Design
 
-- Durable provisioning spec: `.agents/specs/depot/spec.md`
-- Repo-local Depot skill: `.agents/skills/depot/SKILL.md`
-- Plan helper: `.agents/skills/depot/bin/plan`
-- Bootstrap helper: `.agents/skills/depot/bin/bootstrap`
-- Provisioning state: `.agents/state/hosts/HOST/depot.md`
+- Durable provisioning spec: `.agents/specs/tilde/spec.md`
+- Repo-local Tilde skill: `.agents/skills/tilde/SKILL.md`
+- Plan helper: `.agents/skills/tilde/bin/plan`
+- Bootstrap helper: `.agents/skills/tilde/bin/bootstrap`
+- Provisioning state: `.agents/state/hosts/HOST/tilde.md`
 - Agent resume checkpoint: `.agents/state/checkpoints/assistant.md`
 - Shared notes and TODO inbox: `.agents/notes/todo.md`
 - Local task state: `.agents/state/tasks/`
@@ -30,7 +30,7 @@ closeout, refresh the checkpoint after any requested commits or pushes when prac
 - Root modules must have `README.md`; YAML frontmatter is optional when a module has no explicit provisioning config.
 - `misc` is a normal provisioning module for small shared declarations that do not deserve a focused module. It has no
   special ordering and runs alphabetically with other non-platform root modules. If `misc-` exists, it must be `extra`.
-- Run `.agents/skills/depot/bin/bootstrap` explicitly on fresh hosts before normal provisioning when base tools are
+- Run `.agents/skills/tilde/bin/bootstrap` explicitly on fresh hosts before normal provisioning when base tools are
   missing.
 - Platform root modules are named `linux`, `macos`, or `windows`. Dash variants such as `linux-` are ordinary variant
   modules and run immediately after the active platform module. Normal plans use the active platform module first, the
@@ -62,18 +62,18 @@ closeout, refresh the checkpoint after any requested commits or pushes when prac
 
 ## Validation
 
-Run relevant checks after Depot skill or migrated module changes:
+Run relevant checks after Tilde skill or migrated module changes:
 
 ```bash
-.agents/skills/depot/bin/plan --allow-dirty --platform linux --host smoke --format markdown
+.agents/skills/tilde/bin/plan --allow-dirty --platform linux --host smoke --format markdown
 .agents/tests/provision/smoke.sh
-RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/depot/bin/plan
+RUBOCOP_SERVER=false RUBOCOP_CACHE_ROOT=/tmp/rubocop-cache rubocop --cache false --config .agents/tests/provision/rubocop.yml .agents/skills/tilde/bin/plan
 mapfile -t shell_files < <(rg --hidden -l '^#!.*(bash|sh)' -g '!**/.git/**' -g '!**/.agents/state/**')
 shellcheck "${shell_files[@]}"
 ```
 
 Use Lima with the external `"there"` helper for end-to-end smoke tests. See
-`.agents/skills/depot/references/testing.md`.
+`.agents/skills/tilde/references/testing.md`.
 
 This repository's `.envrc` may put a neighboring `there` checkout ahead of the packaged `"there"` command. In
 non-interactive tool shells, direnv may not be loaded automatically; use `direnv exec . COMMAND` when validating
@@ -82,7 +82,7 @@ commands that depend on `.envrc`.
 Lima:
 
 ```bash
-.agents/skills/depot/bin/smoke
-.agents/skills/depot/bin/smoke boot
-.agents/skills/depot/bin/smoke stop
+.agents/skills/tilde/bin/smoke
+.agents/skills/tilde/bin/smoke boot
+.agents/skills/tilde/bin/smoke stop
 ```

@@ -1,4 +1,4 @@
-# Depot Specification
+# Tilde Specification
 
 Bu proje, dotfiles benzeri bir repoyu agent yardımıyla yerel olarak veya SSH üzerinden uzak bir makinede
 provizyonlamayı hedefler.
@@ -31,7 +31,7 @@ provizyonlamayı hedefler.
 - Modül olarak işlenecek kök dizinlerde `README.md` bulunmalıdır. `README.md` olmayan kök dizinler provizyonlama dışı
   bırakılır.
 - Provizyonlama kararı state yüklendikten sonra verilir.
-- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa depot skill bootstrap helper'ı explicit olarak
+- Fresh host üzerinde normal provizyonlama başlamadan önce gerekiyorsa tilde skill bootstrap helper'ı explicit olarak
   çalıştırılır. Bu helper state dışıdır ve idempotent olmalıdır.
 - Normal provizyonlama yapılacaksa önce aktif platformun kök platform modülü (`linux`, `macos` veya `windows`) varsa
   uygulanır, sonra aktif platformun `-` varyantı (`linux-`, `macos-` veya `windows-`) varsa uygulanır, sonra diğer kök
@@ -41,7 +41,7 @@ provizyonlamayı hedefler.
   modül Linux dışında planlanmaz.
 - Her modül uygulanırken önce modül dizinine geçilir, `README.md` okunur, frontmatter verisi ve gövde talimatları
   değerlendirilir.
-- İlgili host için provizyonlama state'i işlem yapılan repo kökündeki `.agents/state/hosts/HOST/depot.md` dosyasına
+- İlgili host için provizyonlama state'i işlem yapılan repo kökündeki `.agents/state/hosts/HOST/tilde.md` dosyasına
   yazılır.
 
 ## Repo Yerleşimi
@@ -64,12 +64,12 @@ provizyonlamayı hedefler.
     bin/
   .agents/
     specs/
-      depot/
+      tilde/
         spec.md
     state/
       hosts/
         HOST/
-          depot.md
+          tilde.md
 ```
 
 `.agents/state/` çalışma zamanı state'idir. Git'e alınıp alınmaması repo sahibinin kararıdır; bu spec bunu zorunlu
@@ -248,7 +248,7 @@ Kullanıcı provizyonlama başlangıcında açıkça toplu onay verirse bu akı�
 
 ## Format: State Log
 
-Log dosyası kaynak repo içindeki `.agents/state/hosts/HOST/depot.md` lokasyonunda, YAML frontmatter'lı bir Markdown
+Log dosyası kaynak repo içindeki `.agents/state/hosts/HOST/tilde.md` lokasyonunda, YAML frontmatter'lı bir Markdown
 dosyadır. HOST
 `hostname -f` çıktısında sonda `.*` varsa çıkarılarak belirlenir (ör. `kant.local` için `kant`). YAML frontmatter
 aşağıdaki anahtarların yer aldığı bir sözlüktür:
@@ -261,7 +261,7 @@ aşağıdaki anahtarların yer aldığı bir sözlüktür:
   anahtar 3 değerden birini alabilir. `ok`: provizyonlama başarılı, `notok`: provizyonlama başarısız, `ignored`:
   provizyonlama yapılmadı/yapılmayacak.
 
-`kant` konağında örnek log: `.agents/state/hosts/kant/depot.md`
+`kant` konağında örnek log: `.agents/state/hosts/kant/tilde.md`
 
         ---
         head: a10a8ae3db88c91f792b54b76db93dc30e09341e
@@ -286,7 +286,7 @@ detaylar varsa kaydedilir.
 - State önce işlemin yürütüldüğü repo kopyasına yazılır. Yerel provizyonlamada bu yerel repo, SSH ile uzak
   provizyonlamada hedef makinedeki repo kopyasıdır.
 - Yerel repo pratik state arşividir. Uzak provizyonlama sonunda hedef repo Dropbox ile yerel makineye senkronize
-  olmuyorsa, ilgili host state dosyası hedef makineden yerel repo `.agents/state/hosts/HOST/depot.md` yoluna geri
+  olmuyorsa, ilgili host state dosyası hedef makineden yerel repo `.agents/state/hosts/HOST/tilde.md` yoluna geri
   kopyalanır.
 - Hedef repo Dropbox altında ise state için ayrıca kopyalama gerekmez; Dropbox senkronizasyonu state'i de taşır.
 - Hedef repo Git klonuysa ve `.agents/state` Git ignore nedeniyle taşınmıyorsa bu normaldir. State hedefte üretilir ve
@@ -323,7 +323,7 @@ altıdır; dizin adı sabit `home` değil, klonlanan reponun kendi adıdır.
 
 ### Platform Bootstrapping
 
-Platform bootstrap helper'ı `.agents/skills/depot/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın
+Platform bootstrap helper'ı `.agents/skills/tilde/bin/bootstrap` yolunda bulunur. Bu helper, normal provizyonlamanın
 çalışabilmesi için gereken en küçük ön hazırlığı yapar: temel transport araçları, Homebrew ve Ruby. Bootstrap Ruby'ye
 güvenemez; saf Bash olmalıdır.
 

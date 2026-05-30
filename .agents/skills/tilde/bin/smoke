@@ -52,7 +52,7 @@ main() {
 		there run .agents/tests/provision/smoke.sh
 		;;
 	boot)
-		there run .agents/skills/depot/bin/bootstrap
+		there run .agents/skills/tilde/bin/bootstrap
 		there run bash -lc 'ruby --version; git --version; curl --version | head -n 1'
 		;;
 	stop)
