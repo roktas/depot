@@ -5,6 +5,7 @@ all:
     - direnv
   links:
     direnvrc: ~/.config/direnv/direnvrc
+    direnv.toml: ~/.config/direnv/direnv.toml
 ---
 
 # Direnv

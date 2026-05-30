@@ -13,20 +13,35 @@ path_prepend() {
 }
 
 homebrew_shellenv() {
-	local prefix
+	local brew
 
-	for prefix in /home/linuxbrew/.linuxbrew /opt/homebrew /usr/local; do
-		if [[ -x $prefix/bin/brew ]]; then
-			eval "$("$prefix/bin/brew" shellenv)"
-			return
-		fi
-	done
+	if brew=$(command -v brew); then
+		eval "$("$brew" shellenv)"
+	elif [[ -x "$HOME"/.linuxbrew/bin/brew ]]; then
+		eval "$("$HOME"/.linuxbrew/bin/brew shellenv)"
+	fi
 }
 
 homebrew_shellenv
 path_prepend "$HOME"/.local/bin
 path_prepend "$HOME"/Dropbox/bin
 export PATH
+
+load_environment() {
+	local dir=${XDG_CONFIG_HOME:-$HOME/.config}/environment
+	local file
+
+	for file in "$dir"/variables "$dir"/credentials; do
+		[[ -r $file ]] || continue
+
+		set -a
+		. "$file"
+		set +a
+	done
+}
+
+load_environment
+unfunction load_environment
 
 export SHELL=$(command -v zsh)
 

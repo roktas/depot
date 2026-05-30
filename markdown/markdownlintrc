@@ -3,19 +3,19 @@
   "MD003": {
     "style": "atx"
   },
-  "MD004": {
-    "style": "sublist"
-  },
+  "MD004": false,
   "MD010": {
-    "ignore_code_blocks": true
+    "ignore_code_blocks": true,
   },
   "MD013": {
     "line_length": 120,
     "tables": false
   },
+  "MD018": false,
   "MD024": {
     "allow_different_nesting": true
   },
+  "MD025": false,
   "MD029": {
     "style": "ordered"
   },
@@ -25,5 +25,8 @@
       "iframe",
       "video"
     ]
-  }
+  },
+  "MD040": false,
+  "MD041": false,
+  "MD056": false
 }

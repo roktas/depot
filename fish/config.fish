@@ -2,15 +2,37 @@
 #  Init
 # ----------------------------------------------------------------------------------------------------------------------
 
-for prefix in /home/linuxbrew/.linuxbrew /opt/homebrew /usr/local
-    if test -x "$prefix"/bin/brew
-        eval ("$prefix"/bin/brew shellenv)
-        break
-    end
+if type -q brew
+    eval (brew shellenv)
+else if test -x "$HOME"/.linuxbrew/bin/brew
+    eval ("$HOME"/.linuxbrew/bin/brew shellenv)
 end
 
 fish_add_path "$HOME"/.local/bin
 fish_add_path "$HOME"/Dropbox/bin
+
+function load_environment
+    set -l dir
+
+    if set -q XDG_CONFIG_HOME
+        set dir "$XDG_CONFIG_HOME"/environment
+    else
+        set dir "$HOME"/.config/environment
+    end
+
+    for file in "$dir"/variables "$dir"/credentials
+        test -r "$file"; or continue
+
+        set -l pairs (bash -c 'set -a; . "$1"; while IFS= read -r line; do [[ -n $line && $line != \#* ]] || continue; name=${line%%=*}; if [[ $name =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then printf "%s=%s\0" "$name" "${!name-}"; fi; done < "$1"' -- "$file" | string split0)
+        for pair in $pairs
+            set -l item (string split -m1 = -- "$pair")
+            set -gx "$item[1]" "$item[2]"
+        end
+    end
+end
+
+load_environment
+functions -e load_environment
 
 if status --is-interactive; and isatty stdout; and not set -q TMUX; and not set -q NO_TMUX; and type -q tmux
     exec tmux new-session -A -s main
