@@ -15,8 +15,8 @@ Use an agent session with the Tilde skill enabled:
 
 ```text
 $tilde status
-$tilde links
-$tilde plan
+$tilde doctor
+$tilde deploy dry-run
 $tilde deploy
 $tilde update
 $tilde adopt neovim
