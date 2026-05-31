@@ -274,14 +274,10 @@ Bare `$tilde` means `update`. This default should handle the most common returni
 reconcile the repository's desired state with the live home, then update managed external resources. It is still
 proposal-first and must show the planned phases before making changes.
 
-`$tilde help` is the read-only command reference. With no subject, it lists all built-in and preference-sensitive
-commands with a one-line action description for each. With one command subject, it shows detailed help for only that
-command. If the subject is not a Tilde command, say that no such Tilde command exists, then behave like bare
-`$tilde help`.
-
-Show the general format before the command table:
-
-- General format: `$tilde <command> [<arguments>...]`
+`$tilde help` is the read-only command reference. Start the output by showing the general format,
+`$tilde <command> [<arguments>...]`. With no subject, it lists all built-in and preference-sensitive commands with a
+one-line action description for each. With one command subject, it shows detailed help for only that command. If the
+subject is not a Tilde command, say that no such Tilde command exists, then behave like bare `$tilde help`.
 
 Use this action inventory for help output:
 

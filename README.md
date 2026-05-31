@@ -2,22 +2,59 @@
 
 Dotfiles, home provisioning, and workspace management repository.
 
-Tilde is operated primarily through the Tilde agent skill. It is not only a dotfiles provisioning repo: it also gives an
-agent a bounded way to organize, inspect, adopt, and maintain the user's home directory as a working environment.
-
-The helper scripts provide deterministic bootstrap and provisioning plans. The skill uses those helpers for desired
-state work, and uses the spec for home-management workflows such as adopting app configuration into Tilde, inspecting
-managed links, diagnosing drift, organizing selected home areas, and coordinating private policy from `tilde-`.
+Tilde is operated primarily through the Tilde agent skill. It is more than a dotfiles provisioning repo: it gives an
+agent a bounded way to install tools, create managed links, inspect drift, adopt app configuration, and maintain the
+user's home directory as a working environment.
 
 Mutating work is proposal-first. The agent should describe the target, effect, and blast radius before applying anything
 that writes files, changes packages, moves home content, or touches a remote host.
 
+## Quick Start
+
+Use an agent session with the Tilde skill enabled. The normal workflow is to make this repository available on the target
+machine, preview or request deployment, then continue day-to-day work from `~`.
+
+For a personal machine with Dropbox, install and link Dropbox first, let this repository sync, then ask the agent:
+
+```text
+$tilde deploy this machine after Dropbox is synced
+```
+
+For a VPS, headless host, or any machine without Dropbox, clone the repository and deploy it as a Git-backed host:
+
+```bash
+git clone https://github.com/roktas/tilde.git ~/src/tilde
+cd ~/src/tilde
+```
+
+```text
+$tilde deploy this VPS as a git host
+```
+
+For a fresh or underprovisioned host, bootstrap may be needed before normal deployment:
+
+```bash
+.agents/skills/tilde/bin/bootstrap
+```
+
+When `https://tilde.roktas.dev` exists, the preferred public bootstrap transport will be:
+
+```bash
+curl -fsSL https://tilde.roktas.dev/bootstrap | bash
+```
+
+Preview the provisioning plan without applying changes:
+
+```bash
+.agents/skills/tilde/bin/plan --format markdown
+```
+
+The plan helper is read-only. It does not apply links, copies, package installs, or special README sections.
+
 ## Prompt Usage
 
-Tilde commands are prompt contracts, not a strict shell CLI. The command name is stable; the subject and qualifiers may
-be natural language.
-
-- General format: `$tilde <command> [<arguments>...]`
+Tilde commands are prompt contracts, not a strict shell CLI. The general format is
+`$tilde <command> [<arguments>...]`. The command name is stable; the subject and qualifiers may be natural language.
 
 | Command | Action |
 | --- | --- |
@@ -68,56 +105,33 @@ $tilde clean old screenshots
 $tilde dedupe downloaded PDFs
 ```
 
-Mutating commands are proposal-first: the agent should describe the target, effect, and blast radius before applying
-changes.
+Provisioning commands work from repository state. Home-management commands work from `~` after deployment.
+Preference-sensitive commands such as `clean`, `organize`, `archive`, and `dedupe` should read private policy from
+`tilde-/AGENTS.md` when it exists; otherwise they stay conservative and propose changes rather than inferring personal
+cleanup rules.
 
-Provisioning commands work from repository state. Home-management commands work from `~` after deployment, using the
-home router to find the canonical Tilde repo without recursively scanning the home directory. Preference-sensitive
-commands such as `clean`, `organize`, `archive`, and `dedupe` should read private policy from `tilde-/AGENTS.md` when it
-exists; otherwise they stay conservative and propose changes rather than inferring personal cleanup rules.
+## Working From Home
 
-## Home Router
+After deployment, `~/AGENTS.md` is a small managed entrypoint for agents working in the home directory. It lets the agent
+find the canonical Tilde repository and optional private companion repository without recursively scanning `~`.
 
-The canonical router template is `.agents/skills/tilde/assets/AGENTS.md`. Tilde deployment links it directly to
-`~/AGENTS.md` as a core managed link, before normal modules. The router is intentionally short: it routes agents to the
-canonical Tilde repository, the Tilde skill, and the optional private companion repository `tilde-`.
+This means normal follow-up work can start from the home directory:
 
-The router resolves the repository from the `~/AGENTS.md` symlink target chain. The normal target is
-`.agents/skills/tilde/assets/AGENTS.md`; agents walk upward from that target until they find
-`.agents/skills/tilde/SKILL.md` and `.agents/skills/tilde/references/spec.md`. This is a bounded ancestor walk, not a
-home scan.
-
-Private home layout and cleanup preferences do not belong in this public repository. Put them in `tilde-/AGENTS.md`
-when a private companion repo exists.
-
-## Bootstrap And Planning
-
-Fresh hosts may need the bootstrap helper before normal provisioning:
-
-```bash
-.agents/skills/tilde/bin/bootstrap
+```text
+$tilde status
+$tilde links
+$tilde adopt alacritty
+$tilde organize downloads
 ```
 
-When the future public site exists, the preferred public bootstrap transport will be:
+Private home layout, cleanup, archive, and organization preferences do not belong in this public repository. Put them in
+`tilde-/AGENTS.md` when a private companion repo exists.
 
-```bash
-curl -fsSL https://tilde.roktas.dev/bootstrap | bash
-```
+## Repository Structure
 
-Preview the provisioning plan:
-
-```bash
-.agents/skills/tilde/bin/plan --format markdown
-```
-
-The plan helper is read-only. It does not apply links, copies, package installs, or special README sections.
-
-## Repository Layout
-
-- Durable design: `.agents/skills/tilde/references/spec.md`
-- Discoverability alias: `.agents/specs/tilde.md`
+- Durable behavior spec: `.agents/skills/tilde/references/spec.md`
 - Tilde skill: `.agents/skills/tilde/SKILL.md`
-- Home router template: `.agents/skills/tilde/assets/AGENTS.md`
+- Home entrypoint template: `.agents/skills/tilde/assets/AGENTS.md`
 - Repository development notes: `.agents/skills/tilde/references/development.md`
 - Plan helper: `.agents/skills/tilde/bin/plan`
 - Bootstrap helper: `.agents/skills/tilde/bin/bootstrap`
