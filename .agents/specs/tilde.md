@@ -1,1 +1,0 @@
-../skills/tilde/references/spec.md

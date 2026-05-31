@@ -1,16 +1,23 @@
+---
+tilde:
+  protocol: tilde/v1
+  role: public
+  private: ../home-
+---
+
 # Agent Development Guide
 
 A file for [guiding coding agents](https://agents.md/). This file applies to the whole repository unless a nested
 `AGENTS.md` overrides it.
 
-Tilde is a public dotfiles, home provisioning, and workspace management repository operated through agent prompts, with
-deterministic helpers for bootstrap, planning, validation, and the core home router link.
+This is the public home data repository for Tilde-managed dotfiles, provisioning modules, and workspace configuration.
+The Tilde control plane is installed separately as the `tilde` skill, normally at `~/.agents/skills/tilde`.
 
-## Tilde Development
+## Home Development
 
 - Use the Tilde skill for deployment, provisioning, bootstrapping, repair, status, diagnostics, link inspection,
   adoption, and home-management behavior.
-- Read `.agents/skills/tilde/SKILL.md` before Tilde work; it links to the canonical spec and supporting references.
-- Read `.agents/skills/tilde/references/development.md` before editing provisioning behavior, skills, helper scripts,
+- Read `~/.agents/skills/tilde/SKILL.md` before Tilde work; it links to the canonical spec and supporting references.
+- Read `~/.agents/skills/tilde/references/development.md` before editing provisioning behavior, skills, helper scripts,
   module metadata, or validation docs.
 - Keep this file as repository-local instructions.

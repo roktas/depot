@@ -23,6 +23,10 @@ Keep canonical project docs outside `.agents/` unless they are specifically for 
 move long reusable detail into a skill or spec. Do not create top-level task, log, cache, scratch, or work directories;
 use `.agents/state/` for local runtime residue.
 
+In repositories that use the `.agents/` layout, interpret shorthand paths such as `notes/foo.md`, `specs/foo.md`, and
+`state/tasks/foo/` as `.agents/notes/foo.md`, `.agents/specs/foo.md`, and `.agents/state/tasks/foo/` when the requested
+artifact is agent-facing and the user has not explicitly asked for a top-level path.
+
 Use `.agents/state/tasks/YYYY-MM-DD-short-slug/` only for broad, risky, multi-file, multi-session, or explicitly
 requested work. After meaningful `.agents/` changes, check that root instructions, specs, skills, notes, and tests still
 agree.
