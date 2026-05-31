@@ -18,6 +18,8 @@ The Tilde control plane is installed separately as the `tilde` skill, normally a
 - Use the Tilde skill for deployment, provisioning, bootstrapping, repair, status, diagnostics, link inspection,
   adoption, and home-management behavior.
 - Read `~/.agents/skills/tilde/SKILL.md` before Tilde work; it links to the canonical spec and supporting references.
-- Read `~/.agents/skills/tilde/references/development.md` before editing provisioning behavior, skills, helper scripts,
-  module metadata, or validation docs.
+- Read `~/.agents/skills/tilde/references/spec.md` before changing module frontmatter or provisioning semantics.
+- Read `~/.agents/skills/tilde/references/development.md` before editing Tilde control-plane behavior, helper scripts,
+  or validation docs.
+- Deployment state belongs under `~/.local/state/tilde`, not in this repository.
 - Keep this file as repository-local instructions.

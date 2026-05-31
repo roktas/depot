@@ -7,6 +7,7 @@ control plane lives in the installed `tilde` skill, normally at `~/.agents/skill
 `tilde` repository.
 
 The private companion repository is conventionally named `home-`.
+Deployment state is local runtime data under `~/.local/state/tilde`; it is not stored in this repository.
 
 ## Usage
 
