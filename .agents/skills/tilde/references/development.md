@@ -36,6 +36,8 @@ checkpoint after requested commits or pushes when practical.
   canonical home router template. The plan helper owns the `~/AGENTS.md` core managed link; do not put that link in the
   `agents` module. Move durable behavior into the spec, reusable workflow into the skill, and development policy into
   this reference.
+- When changing Tilde prompt commands, help behavior, or command semantics in `SKILL.md` or the spec, update the
+  user-facing command table and examples in `README.md` when they are affected.
 - Root modules must have `README.md`; YAML frontmatter is optional when a module has no explicit provisioning config.
 - Follow the spec for module semantics: levels, platform modules, dash variants, `links`, `copies`, `packages`, special
   sections, install/update behavior, and guarded GUI or desktop-host commands.
