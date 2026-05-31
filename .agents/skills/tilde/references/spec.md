@@ -266,9 +266,46 @@ produced on the target and copied back at the end when needed.
 
 ## Command Semantics
 
-Tilde commands are a prompt contract, not a strict shell CLI. Treat `$tilde <command> [subject...] [qualifiers...]` as a
+Tilde commands are a prompt contract, not a strict shell CLI. Treat `$tilde [command] [subject...] [qualifiers...]` as a
 compact way to express intent. The command name is stable; the subject and qualifiers may be natural language. Do not add
 a canonical command-scope axis. Each command defines its own semantics, and explicit arguments refine the target.
+
+Bare `$tilde` means `update`. This default should handle the most common returning-user workflow after deployment:
+reconcile the repository's desired state with the live home, then update managed external resources. It is still
+proposal-first and must show the planned phases before making changes.
+
+`$tilde help` is the read-only command reference. With no subject, it lists all built-in and preference-sensitive
+commands with a one-line action description for each. With one command subject, it shows detailed help for only that
+command. If the subject is not a Tilde command, say that no such Tilde command exists, then behave like bare
+`$tilde help`.
+
+Use this action inventory for help output:
+
+| Command | Action |
+| --- | --- |
+| `adopt` | Adopt an app, config, package, or path into public `tilde` or private `tilde-`. |
+| `archive` | Move selected home content into an archive according to private policy. |
+| `apply` | Apply the lower-level provisioning plan after confirmation. |
+| `bootstrap` | Run or guide the fresh-host bootstrap prelude. |
+| `clean` | Propose conservative cleanup for selected home content. |
+| `dedupe` | Find and propose handling for duplicate selected home content. |
+| `deploy` | Prepare a local or remote host and apply desired state. |
+| `doctor` | Diagnose deployment, repository, host, router, and managed-link health. |
+| `help` | Show all commands or detailed help for one command. |
+| `links` | Inspect managed links and copies. |
+| `organize` | Propose organization changes for selected home content. |
+| `plan` | Show the lower-level provisioning plan without applying it. |
+| `refresh` | Update managed external resources only. |
+| `repair` | Retry failed deployment modules at the recorded state. |
+| `status` | Show a short read-only deployment and home-router summary. |
+| `update` | Reconcile desired state, then refresh managed external resources. |
+| `upgrade` | Run broad package-manager upgrades after explicit confirmation. |
+
+After the table, show these short help notes:
+
+- General format: `$tilde <command> [<arguments>...]`
+- Detailed command help: `$tilde help <command>`
+- Bare `$tilde` means `update`.
 
 Commands are proposal-first when they may change files, repositories, packages, or remote hosts. A proposal must describe
 the intended action and wait for confirmation before writes, moves, removals, package changes, or repository edits.
@@ -334,9 +371,13 @@ router is a Tilde deployment invariant.
 
 Built-in command semantics:
 
+- `help`: show the Tilde command reference. Usage: `$tilde help [command]`.
 - `deploy`: deploy Tilde desired state to a local or remote host. It may perform bootstrap, repository preparation,
   planning, applying, and state copy-back according to host kind.
 - `bootstrap`: run or guide the explicit bootstrap prelude for a fresh or underprovisioned target.
+- `update`: perform the normal returning-user maintenance flow. It first reconciles Tilde desired state with the live
+  home using lower-level `apply` semantics, then refreshes managed external resources using lower-level `refresh`
+  semantics. It is a prompt-level orchestration command, not a separate `bin/plan --mode` value.
 - `plan`: show the lower-level provisioning plan without applying it.
 - `apply`: apply the lower-level provisioning plan after confirmation.
 - `refresh`: update managed external resources only.
@@ -538,7 +579,7 @@ practical, but it is not perfectly idempotent.
 ### Modes
 
 - `apply`: apply repository desired state to the target host. This covers first provisioning and normal state/`HEAD`
-  reconciliation.
+  reconciliation, including new links, copies, packages, and selected special sections.
 - `refresh`: update only managed external resources: active plan packages and `README.md` `Update` sections. It may run
   even when `HEAD` is unchanged.
 - `repair`: retry modules marked `notok` in deployment state at the same `HEAD`.
@@ -546,6 +587,8 @@ practical, but it is not perfectly idempotent.
   explicit user request after scope is described.
 
 `apply` and `repair` are deployment-state/`HEAD` driven. `refresh` and `upgrade` are external-resource/time driven.
+The user-facing `update` command runs the `apply` and `refresh` phases in that order, after confirmation, so new desired
+state and existing managed external resources can both be brought current.
 
 ### Init
 

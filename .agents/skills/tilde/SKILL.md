@@ -1,6 +1,6 @@
 ---
 name: tilde
-description: Use for Tilde deployment, provisioning, and home-management work. Trigger for `$tilde ...`, messages whose first word is `tilde`, or requests to deploy, bootstrap, plan, apply, refresh, repair, upgrade, diagnose, inspect links, adopt app/config files, or work with Tilde home behavior.
+description: Use for Tilde deployment, provisioning, and home-management work. Trigger for `$tilde ...`, messages whose first word is `tilde`, or requests to deploy, bootstrap, help, plan, apply, refresh, repair, upgrade, diagnose, inspect links, adopt app/config files, or work with Tilde home behavior.
 ---
 
 # Tilde
@@ -32,9 +32,16 @@ Use these links to load the narrowest useful part of the spec:
 
 ## Prompt Contract
 
-Treat `$tilde <command> [subject...] [qualifiers...]` and first-word `tilde` messages as compact natural-language
+Treat `$tilde [command] [subject...] [qualifiers...]` and first-word `tilde` messages as compact natural-language
 commands, not strict shell invocations. Interpret each command by its spec semantics, and do not introduce a separate
 command-scope model.
+
+Bare `$tilde` means `update`: reconcile desired state with the live home, then refresh managed external resources after
+showing the planned phases and getting confirmation.
+
+`$tilde help` lists all commands with one-line action descriptions, then shows the general prompt format, detailed-help
+form, and bare-command default. `$tilde help COMMAND` shows only that command. If `COMMAND` is unknown, say so and then
+show the full command list.
 
 Use proposal-first behavior for writes, moves, removals, repository edits, package changes, and remote-host actions.
 Prefer structured confirmation and choice UI over raw prompts such as `[Y/n]`. In Codex, use available structured
@@ -43,8 +50,10 @@ present explicit choices with target, effect, and blast radius.
 
 ## Commands
 
+- `help`: show all commands or one command's usage.
 - `deploy`: prepare a local or remote host and apply desired state.
 - `bootstrap`: run or plan the explicit fresh-host prelude.
+- `update`: run the normal returning-user maintenance flow, combining lower-level `apply` and `refresh` semantics.
 - `plan`, `apply`, `refresh`, `repair`, `upgrade`: lower-level provisioning commands.
 - `status`: show a short read-only deployment and home-router summary.
 - `doctor`: run bounded diagnostics; this is not a whole-home audit.

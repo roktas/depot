@@ -14,24 +14,61 @@ that writes files, changes packages, moves home content, or touches a remote hos
 
 ## Prompt Usage
 
-Tilde commands are prompt contracts, not a strict shell CLI. Use them in an agent session:
+Tilde commands are prompt contracts, not a strict shell CLI. The command name is stable; the subject and qualifiers may
+be natural language.
+
+| Command | Action |
+| --- | --- |
+| `adopt` | Adopt an app, config, package, or path into public `tilde` or private `tilde-`. |
+| `archive` | Move selected home content into an archive according to private policy. |
+| `apply` | Apply the lower-level provisioning plan after confirmation. |
+| `bootstrap` | Run or guide the fresh-host bootstrap prelude. |
+| `clean` | Propose conservative cleanup for selected home content. |
+| `dedupe` | Find and propose handling for duplicate selected home content. |
+| `deploy` | Prepare a local or remote host and apply desired state. |
+| `doctor` | Diagnose deployment, repository, host, router, and managed-link health. |
+| `help` | Show all commands or detailed help for one command. |
+| `links` | Inspect managed links and copies. |
+| `organize` | Propose organization changes for selected home content. |
+| `plan` | Show the lower-level provisioning plan without applying it. |
+| `refresh` | Update managed external resources only. |
+| `repair` | Retry failed deployment modules at the recorded state. |
+| `status` | Show a short read-only deployment and home-router summary. |
+| `update` | Reconcile desired state, then refresh managed external resources. |
+| `upgrade` | Run broad package-manager upgrades after explicit confirmation. |
+
+- General format: `$tilde <command> [<arguments>...]`
+- Detailed command help: `$tilde help <command>`
+- Bare `$tilde` means `update`.
+
+Examples:
 
 ```text
+$tilde
+$tilde help
+$tilde help update
+$tilde update
 $tilde status
 $tilde doctor
 $tilde plan
 $tilde apply
 $tilde refresh managed packages
+$tilde repair this host
+$tilde upgrade managed packages
 $tilde deploy this VPS over SSH as a git host
 $tilde deploy the new laptop over SSH after Dropbox is synced
+$tilde bootstrap this headless VPS
 $tilde adopt neovim
+$tilde adopt ~/.config/foo into private policy
 $tilde links
 $tilde organize downloads
+$tilde archive old project exports
 $tilde clean old screenshots
+$tilde dedupe downloaded PDFs
 ```
 
-The command name is stable; the subject and qualifiers may be natural language. Mutating commands are proposal-first:
-the agent should describe the target, effect, and blast radius before applying changes.
+Mutating commands are proposal-first: the agent should describe the target, effect, and blast radius before applying
+changes.
 
 Provisioning commands work from repository state. Home-management commands work from `~` after deployment, using the
 home router to find the canonical Tilde repo without recursively scanning the home directory. Preference-sensitive
