@@ -1,10 +1,16 @@
 # Tilde
 
-Dotfiles and home provisioning repository.
+Dotfiles, home provisioning, and workspace management repository.
 
-Tilde is operated primarily through agent prompts. The helper scripts provide deterministic bootstrap and planning; the
-agent interprets the plan, proposes changes, and asks before applying anything that writes files, changes packages, or
-touches a remote host.
+Tilde is operated primarily through the Tilde agent skill. It is not only a dotfiles provisioning repo: it also gives an
+agent a bounded way to organize, inspect, adopt, and maintain the user's home directory as a working environment.
+
+The helper scripts provide deterministic bootstrap and provisioning plans. The skill uses those helpers for desired
+state work, and uses the spec for home-management workflows such as adopting app configuration into Tilde, inspecting
+managed links, diagnosing drift, organizing selected home areas, and coordinating private policy from `tilde-`.
+
+Mutating work is proposal-first. The agent should describe the target, effect, and blast radius before applying anything
+that writes files, changes packages, moves home content, or touches a remote host.
 
 ## Prompt Usage
 
@@ -21,10 +27,16 @@ $tilde deploy the new laptop over SSH after Dropbox is synced
 $tilde adopt neovim
 $tilde links
 $tilde organize downloads
+$tilde clean old screenshots
 ```
 
 The command name is stable; the subject and qualifiers may be natural language. Mutating commands are proposal-first:
 the agent should describe the target, effect, and blast radius before applying changes.
+
+Provisioning commands work from repository state. Home-management commands work from `~` after deployment, using the
+home router to find the canonical Tilde repo without recursively scanning the home directory. Preference-sensitive
+commands such as `clean`, `organize`, `archive`, and `dedupe` should read private policy from `tilde-/AGENTS.md` when it
+exists; otherwise they stay conservative and propose changes rather than inferring personal cleanup rules.
 
 ## Home Router
 

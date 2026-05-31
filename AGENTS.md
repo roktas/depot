@@ -1,8 +1,10 @@
-# Repository Instructions
+# Agent Development Guide
 
-Use the shared user instructions from `~/.agents/AGENTS.md` when available.
+A file for [guiding coding agents](https://agents.md/). This file applies to the whole repository unless a nested
+`AGENTS.md` overrides it.
 
-This repository is the public Tilde dotfiles and provisioning repository.
+Tilde is a public dotfiles, home provisioning, and workspace management repository operated through agent prompts, with
+deterministic helpers for bootstrap, planning, validation, and the core home router link.
 
 ## Tilde Development
 
@@ -11,5 +13,4 @@ This repository is the public Tilde dotfiles and provisioning repository.
 - Read `.agents/skills/tilde/SKILL.md` before Tilde work; it links to the canonical spec and supporting references.
 - Read `.agents/skills/tilde/references/development.md` before editing provisioning behavior, skills, helper scripts,
   module metadata, or validation docs.
-- Keep `AGENTS.md` as repository-local instructions. The canonical home router template is
-  `.agents/skills/tilde/assets/AGENTS.md`; the plan helper owns the `~/AGENTS.md` core managed link.
+- Keep this file as repository-local instructions.
