@@ -24,6 +24,7 @@
 - Keep repositories clean: no leftover temp files, dead code, or unnecessary structure.
 - Prefer existing repo patterns over new abstractions.
 - Keep code self-documenting; avoid commented-out code and obvious comments.
+- When running a script with a shebang, execute it directly (e.g. `./bin/foo`). Do not prefix with `bash`, `ruby`, `python`, or similar — trust the shebang to select the right interpreter.
 - Treat chat code blocks like repository code.
 - Do not write expanded home paths in tracked repository files. Use `~` for home-relative paths, for example
   `~/.config/foo`, and use repository-relative or module-relative paths for repo files.
