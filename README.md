@@ -17,6 +17,8 @@ that writes files, changes packages, moves home content, or touches a remote hos
 Tilde commands are prompt contracts, not a strict shell CLI. The command name is stable; the subject and qualifiers may
 be natural language.
 
+- General format: `$tilde <command> [<arguments>...]`
+
 | Command | Action |
 | --- | --- |
 | `adopt` | Adopt an app, config, package, or path into public `tilde` or private `tilde-`. |
@@ -37,7 +39,6 @@ be natural language.
 | `update` | Reconcile desired state, then refresh managed external resources. |
 | `upgrade` | Run broad package-manager upgrades after explicit confirmation. |
 
-- General format: `$tilde <command> [<arguments>...]`
 - Detailed command help: `$tilde help <command>`
 - Bare `$tilde` means `update`.
 

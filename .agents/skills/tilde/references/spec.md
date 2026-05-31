@@ -279,6 +279,10 @@ commands with a one-line action description for each. With one command subject, 
 command. If the subject is not a Tilde command, say that no such Tilde command exists, then behave like bare
 `$tilde help`.
 
+Show the general format before the command table:
+
+- General format: `$tilde <command> [<arguments>...]`
+
 Use this action inventory for help output:
 
 | Command | Action |
@@ -303,7 +307,6 @@ Use this action inventory for help output:
 
 After the table, show these short help notes:
 
-- General format: `$tilde <command> [<arguments>...]`
 - Detailed command help: `$tilde help <command>`
 - Bare `$tilde` means `update`.
 
