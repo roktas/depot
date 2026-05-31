@@ -129,16 +129,15 @@ Private home layout, cleanup, archive, and organization preferences do not belon
 
 ## Repository Structure
 
-- Durable behavior spec: `.agents/skills/tilde/references/spec.md`
-- Tilde skill: `.agents/skills/tilde/SKILL.md`
-- Home entrypoint template: `.agents/skills/tilde/assets/AGENTS.md`
-- Repository development notes: `.agents/skills/tilde/references/development.md`
-- Plan helper: `.agents/skills/tilde/bin/plan`
-- Bootstrap helper: `.agents/skills/tilde/bin/bootstrap`
+- [Durable behavior spec](.agents/skills/tilde/references/spec.md): `.agents/skills/tilde/references/spec.md`
+- [Tilde skill](.agents/skills/tilde/SKILL.md): `.agents/skills/tilde/SKILL.md`
+- [Home entrypoint template](.agents/skills/tilde/assets/AGENTS.md): `.agents/skills/tilde/assets/AGENTS.md`
+- [Repository development notes](.agents/skills/tilde/references/development.md):
+  `.agents/skills/tilde/references/development.md`
+- [Plan helper](.agents/skills/tilde/bin/plan): `.agents/skills/tilde/bin/plan`
+- [Bootstrap helper](.agents/skills/tilde/bin/bootstrap): `.agents/skills/tilde/bin/bootstrap`
 
 Root directories are provisioning modules when they contain `README.md`. Module frontmatter declares `links`, `copies`,
 and `packages`; README body sections may declare platform or lifecycle commands. Platform modules such as `linux` run
 first, platform dash variants such as `linux-` run immediately after their base platform module, and other root modules
-run alphabetically.
-
-`misc` is a normal provisioning module for small shared declarations without a focused module.
+run alphabetically. `misc` is a normal provisioning module for small shared declarations without a focused module.
