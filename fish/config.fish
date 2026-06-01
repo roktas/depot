@@ -145,16 +145,6 @@ function b --wraps=bundle --description 'alias b bundle'
     end
 end
 
-function co --wraps=codex --description 'alias co codex'
-    if test (count $argv) -eq 0
-        codex -a never -s workspace-write --add-dir .agents --add-dir .git resume --last
-    else if test (count $argv) -eq 1; and test "$argv[1]" = -
-        codex -a never -s workspace-write --add-dir .agents --add-dir .git resume
-    else
-        codex -a never -s workspace-write --add-dir .agents --add-dir .git $argv
-    end
-end
-
 function d --wraps=direnv --description 'alias d direnv'
     direnv $argv
 end
