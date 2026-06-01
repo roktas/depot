@@ -1,4 +1,0 @@
-interface:
-  display_name: "Commit Messages"
-  short_description: "Conventional Commits and commit history"
-  default_prompt: "Use $commits to write a Conventional Commit message."

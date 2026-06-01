@@ -31,7 +31,6 @@ Root directories are provisioning modules when they contain `README.md`. Module 
 and `packages`; README body sections may declare platform or lifecycle commands.
 
 - `agents/`: shared user-wide agent instructions and common skills exposed through `~/.agents`.
-- `codex/`, `opencode/`: agent-specific modules.
 - `linux/`, `macos/`, `windows/`: platform modules.
 - `linux-`, `macos-`, `windows-`: private or extra platform variants when present.
 
