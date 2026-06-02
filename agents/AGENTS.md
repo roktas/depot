@@ -4,6 +4,7 @@
 
 - These are shared user-wide defaults for any agent that reads `~/.agents`.
 - More specific repository, task, or tool instructions win.
+- This file is not `~/AGENTS.md`; keep target-home layout and preference policy in the home-directory entrypoint.
 
 ## Communication
 
