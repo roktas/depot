@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dotagents Workspace"
+  short_description: "Organize dotagents layout files"
+  default_prompt: "Use $dotagents to place repository-local agent assets under .agents/."

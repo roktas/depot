@@ -43,6 +43,8 @@
 ## Skills
 
 - Load relevant language/workflow skills before matching work.
+- Treat required dispatch rules as mandatory context-loading rules. They prevent missed context without constraining
+  implementation choices after the right skill is loaded.
 - Required dispatch: `bash` for shell or shell snippets, `commits` for commit messages, `dotagents` for `.agents/`
   artifacts.
 - Also load any skill required by repository or task-specific instructions.
