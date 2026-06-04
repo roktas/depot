@@ -1,3 +1,6 @@
+[install]
+globalBinDir = "~/.local/bin"
+
 [install.lockfile]
 path = ".cache/bun/bun.lockb"
 savePath = ".cache/bun/bun.lockb"
