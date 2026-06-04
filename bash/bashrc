@@ -25,6 +25,13 @@ homebrew_shellenv() {
 }
 
 homebrew_shellenv
+if [[ -n ${HOMEBREW_PREFIX:-} ]]; then
+	for formula in curl ruby zip; do
+		[[ -d $HOMEBREW_PREFIX/opt/$formula/bin ]] || continue
+		path_prepend "$HOMEBREW_PREFIX"/opt/"$formula"/bin
+	done
+	unset formula
+fi
 path_prepend "$HOME"/.local/bin
 path_prepend "$HOME"/Dropbox/bin
 export PATH
