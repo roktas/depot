@@ -12,7 +12,7 @@ end
 
 if set -q HOMEBREW_PREFIX
     for formula in curl ruby zip
-        fish_add_path --path "$HOMEBREW_PREFIX"/opt/"$formula"/bin
+        fish_add_path --move --path "$HOMEBREW_PREFIX"/opt/"$formula"/bin
     end
 end
 
