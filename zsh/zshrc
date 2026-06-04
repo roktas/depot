@@ -320,7 +320,8 @@ command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
 # Midnight Commander
 mc() {
-	local -i err=0 file=$XDG_RUNTIME_DIR/mc
+	local -i err=0
+	local file=$XDG_RUNTIME_DIR/mc
 
 	COLORTERM=truecolor command mc -P "$file" "$@" || err=$?
 
