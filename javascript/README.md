@@ -1,7 +1,7 @@
 ---
 all:
   packages:
-    - brew:oven-sh/bun/bun
+    - brew:bun
     - node
     - npm:@biomejs/biome
   links:
