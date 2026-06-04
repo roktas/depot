@@ -1,8 +1,6 @@
 ---
 all:
   level: extra
-  packages:
-    - github:mweirauch/dropignore
 ---
 
 # Linux Variant
