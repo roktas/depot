@@ -3,7 +3,7 @@ all:
   level: minimal
   packages:
     - neovim
-    - brew:tree-sitter-cli
+    - tree-sitter-cli
   links:
     init.lua: ~/.config/nvim/init.lua
     lazyvim.json: ~/.config/nvim/lazyvim.json

@@ -2,9 +2,9 @@
 all:
   level: minimal
   packages:
-    - brew:dockutil
-    - brew:duti
-    - brew:mole
+    - dockutil
+    - duti
+    - mole
 ---
 
 # macOS
