@@ -43,6 +43,10 @@ Before choosing a name, apply this preflight:
 4. Match sibling names in the same scope: style, length, and specificity.
 5. Public names should be short, polished, and memorable. Internal names may be plainer or more explicit.
 6. Let name length follow scope: longer globally, shorter locally.
+7. Add a qualifier only when it separates real sibling concepts in the current scope; do not add one just to sound more
+   precise.
+8. Avoid generic modeling words unless they name a real domain role. Name what the thing is for, not the container or
+   implementation shape.
 
 Use a name that violates this preflight only for a concrete reason, and state it briefly.
 
