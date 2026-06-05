@@ -6,6 +6,7 @@ macos:
   links:
     config.macos: ~/.config/ghostty/config
   packages:
+    - cask:font-ioskeley-mono
     - cask:ghostty
 ---
 
@@ -13,7 +14,7 @@ macos:
 
 Ghostty terminal configuration.
 
-Linux uses Spleen 32x64. macOS uses the system Monaco font.
+Linux uses Spleen 32x64. macOS uses Ioskeley Mono.
 
 ## MacOS
 
