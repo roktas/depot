@@ -1,2 +1,4 @@
 set -o emacs
+alias e=nvim
+alias E='sudo nvim'
 PS1='$PWD $ '
