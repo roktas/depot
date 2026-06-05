@@ -4,6 +4,7 @@ all:
   packages:
     - mc
   links:
+    kshrc: ~/.local/share/mc/kshrc
     mc.keymap: ~/.config/mc/mc.keymap
     menu: ~/.config/mc/menu
   copies:

@@ -1,0 +1,2 @@
+set -o emacs
+PS1='$PWD $ '
