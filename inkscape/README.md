@@ -1,10 +1,13 @@
 ---
 linux: ~
+macos:
+  packages:
+    - cask:inkscape
 ---
 
 # Inkscape
 
-Linux vector graphics editor module installed through Flatpak.
+Vector graphics editor module installed through Flatpak on Linux and Homebrew Cask on macOS.
 
 ## Linux
 
