@@ -41,7 +41,7 @@
 [merge]
 	stat             = true
 [core]
-	editor           = /usr/bin/nvim
+	editor           = editor
 	hookspath        = $HOME/.config/git/hooks
 [credential]
 	helper           = /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
