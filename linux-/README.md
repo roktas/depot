@@ -1,6 +1,9 @@
 ---
 all:
   level: extra
+linux:
+  packages:
+    - flatpak:com.calibre_ebook.calibre
 ---
 
 # Linux Variant
@@ -8,22 +11,6 @@ all:
 Extra Linux system provisioning for optional, guarded host capabilities and Linux-only desktop tools.
 
 ## Install
-
-### Calibre
-
-Install Calibre through Flatpak only on graphical Linux hosts.
-
-```bash
-if [[ $(systemctl get-default 2>/dev/null || true) != graphical.target ]]; then
-	exit 0
-fi
-
-if ! command -v flatpak >/dev/null; then
-	exit 0
-fi
-
-flatpak install -y --user flathub com.calibre_ebook.calibre
-```
 
 ### Firewall
 
