@@ -1,14 +1,23 @@
 ---
-linux:
+all:
   packages:
-    - deb:fonts-cascadia-code
-    - deb:fonts-firacode
-    - deb:fonts-inconsolata
-    - deb:fonts-powerline
-    - deb:fonts-prociono
-    - deb:fonts-quicksand
+    - fonttools
+    - cask:font-cabin
+    - cask:font-cascadia-code
+    - cask:font-fira-code
+    - cask:font-fontawesome
+    - cask:font-inconsolata
+    - cask:font-intel-one-mono
+    - cask:font-iosevka-nerd-font
+    - cask:font-jetbrains-mono
+    - cask:font-powerline-symbols
+    - cask:font-prociono
+    - cask:font-quicksand
+    - cask:font-roboto
+    - cask:font-symbols-only-nerd-font
+    - cask:font-ubuntu
 ---
 
 # Fonts
 
-Linux font packages used across terminal and desktop workflows.
+Shared font packages used across terminal and desktop workflows.
