@@ -16,7 +16,7 @@ if set -q HOMEBREW_PREFIX
     end
 end
 
-fish_add_path "$HOME"/.local/bin
+fish_add_path --move --path "$HOME"/.local/bin
 
 function load_environment
     set -l dir
@@ -40,6 +40,23 @@ end
 
 load_environment
 functions -e load_environment
+
+fish_add_path --move --path "$HOME"/.local/bin
+fish_add_path --move --path "$HOME"/Dropbox/allos/bin
+
+switch (uname -s)
+    case Linux
+        fish_add_path --move --path "$HOME"/Dropbox/linux/bin
+    case Darwin
+        fish_add_path --move --path "$HOME"/Dropbox/macos/bin
+end
+
+set -l clean_path
+for dir in $PATH
+    contains -- "$dir" $clean_path; or set -a clean_path "$dir"
+end
+set -gx PATH $clean_path
+set -e clean_path
 
 if status --is-interactive; and isatty stdout; and not set -q TMUX; and not set -q NO_TMUX; and type -q tmux
     exec tmux new-session -A -s main

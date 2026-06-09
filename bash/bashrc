@@ -8,10 +8,20 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 path_prepend() {
-	case :$PATH: in
-	*:"$1":*) ;;
-	*) PATH=$1${PATH:+:$PATH} ;;
-	esac
+	local dir=$1
+	local old_path=$PATH
+	local part
+
+	PATH=
+	while [[ $old_path == *:* ]]; do
+		part=${old_path%%:*}
+		old_path=${old_path#*:}
+		[[ $part != "$dir" ]] || continue
+		PATH=${PATH:+$PATH:}$part
+	done
+
+	[[ $old_path == "$dir" ]] || PATH=${PATH:+$PATH:}$old_path
+	PATH=$dir${PATH:+:$PATH}
 }
 
 homebrew_shellenv() {
@@ -51,6 +61,14 @@ load_environment() {
 
 load_environment
 unset -f load_environment
+
+path_prepend "$HOME"/.local/bin
+path_prepend "$HOME"/Dropbox/allos/bin
+case $OSTYPE in
+linux*) path_prepend "$HOME"/Dropbox/linux/bin ;;
+darwin*) path_prepend "$HOME"/Dropbox/macos/bin ;;
+esac
+export PATH
 
 export SHELL=$(command -v bash)
 
@@ -280,6 +298,7 @@ command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
 if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/bash ]]; then
 	if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/bash/conf.d ]]; then
 		for f in "${XDG_CONFIG_HOME:-$HOME/.config}"/bash/conf.d/*.sh; do
+			[[ -r $f ]] || continue
 			builtin source "$f"
 		done
 
@@ -290,6 +309,3 @@ if [[ -d ${XDG_CONFIG_HOME:-$HOME/.config}/bash ]]; then
 		builtin source "${XDG_CONFIG_HOME:-$HOME/.config}"/bash/config.sh
 	fi
 fi
-
-# opencode
-export PATH=$HOME/.opencode/bin:$PATH
