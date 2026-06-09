@@ -2,8 +2,11 @@
 linux:
   packages:
     - flatpak:md.obsidian.Obsidian
+macos:
+  packages:
+    - cask:obsidian
 ---
 
 # Obsidian
 
-Linux knowledge base application module installed through Flatpak.
+Obsidian installed through Flatpak on Linux and Homebrew Cask on macOS.
