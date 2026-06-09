@@ -1,7 +1,7 @@
 font-family = Ioskeley Mono
 font-size = 18
 font-synthetic-style = bold,italic,bold-italic
-macos-option-as-alt = true
+macos-option-as-alt = left
 
 background = #2e3440
 foreground = #d8dee9
