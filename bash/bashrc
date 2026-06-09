@@ -33,7 +33,6 @@ if [[ -n ${HOMEBREW_PREFIX:-} ]]; then
 	unset formula
 fi
 path_prepend "$HOME"/.local/bin
-path_prepend "$HOME"/Dropbox/bin
 export PATH
 
 load_environment() {

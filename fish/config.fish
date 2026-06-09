@@ -17,7 +17,6 @@ if set -q HOMEBREW_PREFIX
 end
 
 fish_add_path "$HOME"/.local/bin
-fish_add_path "$HOME"/Dropbox/bin
 
 function load_environment
     set -l dir

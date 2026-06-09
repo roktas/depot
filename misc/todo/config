@@ -37,11 +37,7 @@ initialize() {
 		return 0
 	fi
 
-	if [[ -d "$HOME"/Dropbox/opt/todotxt+ ]]; then
-		export TODO_DIR="$HOME"/Dropbox/opt/todotxt+
-	else
-		export TODO_DIR="$HOME"/.todo
-	fi
+	export TODO_DIR="$HOME"/.todo
 }
 
 initialize "$@"
