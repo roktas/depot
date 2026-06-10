@@ -66,7 +66,6 @@ set -U XDG_CACHE_HOME ~/.cache
 set -U XDG_CONFIG_HOME ~/.config
 set -U XDG_DATA_HOME ~/.local/share
 
-status --is-interactive; and type -q zoxide; and source (zoxide init fish | psub)
 status --is-interactive; and type -q direnv; and source (direnv hook fish | psub)
 status --is-interactive; and status --is-login; and type -q fastfetch; and fastfetch
 
