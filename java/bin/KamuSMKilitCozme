@@ -1,0 +1,7 @@
+#!/bin/sh
+
+exec java \
+	--add-exports=java.base/sun.security.x509=ALL-UNNAMED \
+	--add-exports=java.base/sun.security.pkcs=ALL-UNNAMED \
+	--add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED \
+	-jar "${1:-./KamuSMKilitCozmeUygulamasi.jar}"
