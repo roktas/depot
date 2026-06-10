@@ -24,7 +24,6 @@ if ! command -v apt-get >/dev/null; then
 fi
 
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends curl gnupg
 
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://dl.google.com/linux/linux_signing_key.pub |

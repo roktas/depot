@@ -1,11 +1,17 @@
 ---
 all:
   level: minimal
+  packages:
+    - ca-certificates
+    - curl
+    - gh
+    - gnupg
 ---
 
 # Linux
 
-Minimal Linux platform baseline for apt policy, locale, timezone, desktop packages, fonts, Flatpak, and GNOME settings.
+Minimal Linux platform baseline for apt policy, locale, timezone, desktop packages, fonts, Flatpak, GNOME settings, and
+shared command-line tools needed by later Linux module `Install` sections.
 
 ## Install
 
@@ -96,6 +102,19 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
 	avahi-daemon \
 	flatpak
+```
+
+### XDG Utils
+
+Install `xdg-mime` for later Linux module postinstall steps.
+
+```bash
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends xdg-utils
 ```
 
 ### GUI Packages

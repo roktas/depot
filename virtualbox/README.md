@@ -40,7 +40,7 @@ esac
 version=${PROVISION_VIRTUALBOX_VERSION:-7.2}
 
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends ca-certificates curl gnupg linux-headers-"$(uname -r)"
+sudo apt-get install -y --no-install-recommends linux-headers-"$(uname -r)"
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://www.virtualbox.org/download/oracle_vbox_2016.asc -o /etc/apt/keyrings/virtualbox.asc
 sudo chmod a+r /etc/apt/keyrings/virtualbox.asc

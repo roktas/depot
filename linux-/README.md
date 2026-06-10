@@ -55,7 +55,6 @@ fi
 . /etc/os-release
 
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL "https://download.docker.com/linux/$ID/gpg" -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
