@@ -217,11 +217,11 @@ function r --wraps=rails --description 'alias r rails'
     bundle exec rails $argv
 end
 
-function t --wraps=todo.sh --description 'alias todo.sh'
-    todo.sh -t $argv
+function t --wraps=todo --description 'alias todo'
+    todo $argv
 end
-function T --wraps=todo.sh --description 'alias todo.sh wtf'
-    todo.sh wtf
+function T --wraps=todo --description 'alias todo -o'
+    todo -o $argv
 end
 
 function v --wraps=vi --description 'alias v vi'

@@ -317,8 +317,8 @@ alias r='bundle exec rails'
 alias s='systemctl --user'
 alias S='sudo systemctl'
 
-alias t='todo.sh -t'
-alias T='todo.sh'
+alias t='todo'
+alias T='todo -o'
 
 alias v=vi
 alias V='sudo vi'
