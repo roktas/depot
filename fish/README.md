@@ -3,6 +3,7 @@ all:
   level: minimal
   packages:
     - fish
+    - fisher
   links:
     config.fish: ~/.config/fish/config.fish
     functions/: ~/.config/fish/functions
@@ -15,7 +16,7 @@ Minimal Fish shell setup with shared functions and plugin installation.
 ## Postinstall
 
 ```bash
-fish -c "fundle install"
+fish -c "fisher install metrofish/metrofish PatrickF1/fzf.fish"
 ```
 
 Set Fish as the login shell after ensuring its path is accepted by `chsh`. On macOS, Homebrew Fish is normally

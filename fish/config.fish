@@ -66,12 +66,6 @@ set -U XDG_CACHE_HOME ~/.cache
 set -U XDG_CONFIG_HOME ~/.config
 set -U XDG_DATA_HOME ~/.local/share
 
-if status --is-interactive; and not type -q fundle
-    eval (wget -qO- https://git.io/fundle-install)
-end
-
-set -g fundle_plugins_dir "$XDG_CONFIG_HOME"/fish/plugins
-
 status --is-interactive; and type -q zoxide; and source (zoxide init fish | psub)
 status --is-interactive; and type -q direnv; and source (direnv hook fish | psub)
 status --is-interactive; and status --is-login; and type -q fastfetch; and fastfetch
@@ -245,13 +239,6 @@ end
 # ----------------------------------------------------------------------------------------------------------------------
 # Plugins
 # ----------------------------------------------------------------------------------------------------------------------
-
-if type -q fundle
-    fundle plugin metrofish/metrofish
-    fundle plugin "PatrickF1/fzf.fish"
-
-    status --is-interactive; and fundle init
-end
 
 function _metro_git_is_dirty
     return 1
