@@ -38,6 +38,14 @@ gh release download \
 sudo apt install -y "$tmpdir"/OpenWebStart_linux_*.deb
 ```
 
+## KamuSM
+
+Use the `java-` wrapper to run `.jar` files downloaded via OpenWebStart for KamuSM signatures:
+
+```bash
+java- -jar KamuSMKilitCozme.jar
+```
+
 ## MacOS
 
 ### Postinstall
