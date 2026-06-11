@@ -17,16 +17,8 @@ Minimal Fish shell setup with shared functions and plugin installation.
 
 ```bash
 fish -c "fisher install metrofish/metrofish PatrickF1/fzf.fish icezyclon/zoxide.fish"
-```
 
-Set Fish as the login shell after ensuring its path is accepted by `chsh`. On macOS, Homebrew Fish is normally
-`/opt/homebrew/bin/fish`, which is not present in `/etc/shells` by default. This step requires an interactive terminal
-because `sudo` may prompt; remote deployment should defer and report it. Reconnect SSH after it succeeds so the new
-login shell takes effect.
-
-```bash
 fish_path=$(command -v fish 2>/dev/null || true)
-current_shell=${SHELL:-}
 
 if [[ -z $fish_path && -x /opt/homebrew/bin/fish ]]; then
 	fish_path=/opt/homebrew/bin/fish
@@ -42,19 +34,16 @@ Darwin)
 	current_shell=$(dscl . -read "/Users/$USER" UserShell | awk '{print $2}')
 	;;
 Linux)
-	if command -v getent >/dev/null; then
-		current_shell=$(getent passwd "$USER" | cut -d: -f7)
-	fi
+	current_shell=$(getent passwd "$USER" 2>/dev/null | cut -d: -f7 || true)
 	;;
 esac
 
-if [[ $current_shell != "$fish_path" ]]; then
+if [[ ${current_shell:-} != "$fish_path" ]]; then
 	if ! grep -Fxq "$fish_path" /etc/shells; then
 		printf '%s\n' "$fish_path" | sudo tee -a /etc/shells >/dev/null
 	fi
 
 	sudo chsh -s "$fish_path" "$USER"
+	printf 'Reconnect SSH to start Fish as the login shell.\n'
 fi
-
-printf 'Reconnect SSH to start Fish as the login shell.\n'
 ```
