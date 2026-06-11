@@ -1,16 +1,26 @@
 ---
 all:
+  level: minimal
   links:
     config: ~/.ssh/config
-linux:
-  level: minimal
 ---
 
 # SSH
 
-Minimal Linux SSH and sudo environment tuning.
+Shared SSH client configuration and Linux SSH and sudo environment tuning.
 
-## Install
+The shared client config uses `~/.ssh/config.d` for per-platform and private fragments.
+
+## Postinstall
+
+```bash
+mkdir -p ~/.ssh/config.d
+chmod 700 ~/.ssh ~/.ssh/config.d
+```
+
+## Linux
+
+### Install
 
 Apply conservative SSH and sudo environment tweaks.
 
