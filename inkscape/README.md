@@ -32,5 +32,5 @@ xdg-mime default org.inkscape.Inkscape.desktop image/svg+xml
 ### Postinstall
 
 ```bash
-xattr -d com.apple.quarantine /Applications/Inkscape.app
+xattr -d com.apple.quarantine /Applications/Inkscape.app 2>/dev/null || true
 ```
