@@ -1,4 +1,7 @@
 ---
+all:
+  links:
+    config: ~/.ssh/config
 linux:
   level: minimal
 ---
