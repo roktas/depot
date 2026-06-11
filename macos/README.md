@@ -13,3 +13,9 @@ all:
 Minimal macOS platform tools for managing system integration and maintenance.
 
 This module also provides common command-line tools needed by later macOS module `Install` sections.
+
+## Postinstall
+
+```bash
+sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist
+```
