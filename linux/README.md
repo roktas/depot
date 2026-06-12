@@ -6,6 +6,7 @@ all:
     - curl
     - gh
     - gnupg
+    - zoxide
 ---
 
 # Linux

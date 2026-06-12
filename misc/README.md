@@ -19,7 +19,6 @@ all:
     - ttyd
     - yazi
     - zip
-    - zoxide
   links:
     bat/config: ~/.config/bat/config
     bin/search: ~/.local/bin/search

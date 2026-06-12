@@ -6,6 +6,7 @@ all:
     - duti
     - gh
     - mole
+    - zoxide
 ---
 
 # macOS
