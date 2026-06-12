@@ -29,18 +29,18 @@ function load_environment
     set -l dir
 
     if set -q XDG_CONFIG_HOME
-        set dir "$XDG_CONFIG_HOME"/environment
+        set dir "$XDG_CONFIG_HOME"
     else
-        set dir "$HOME"/.config/environment
+        set dir "$HOME"/.config
     end
 
-    set -l files "$dir"/variables
+    set -l files
 
     if test -d "$dir"/environment.d
-        set -a files (command find "$dir"/environment.d -maxdepth 1 -type f -name '*.conf' ! -name 00-base.conf 2>/dev/null | sort)
+        set -a files (command find "$dir"/environment.d -maxdepth 1 -type f -name '*.conf' 2>/dev/null | sort)
     end
 
-    set -a files "$dir"/credentials
+    set -a files "$dir"/environment/credentials
 
     for file in $files
         test -r "$file"; or continue

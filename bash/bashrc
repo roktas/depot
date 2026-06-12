@@ -61,11 +61,10 @@ ruby_user_bin
 unset -f ruby_user_bin
 
 load_environment() {
-	local dir=${XDG_CONFIG_HOME:-$HOME/.config}/environment
+	local dir=${XDG_CONFIG_HOME:-$HOME/.config}
 	local file
 
-	for file in "$dir"/variables "$dir"/environment.d/*.conf "$dir"/credentials; do
-		[[ ${file##*/} != 00-base.conf ]] || continue
+	for file in "$dir"/environment.d/*.conf "$dir"/environment/credentials; do
 		[[ -r $file ]] || continue
 
 		set -a
