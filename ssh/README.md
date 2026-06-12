@@ -22,8 +22,6 @@ chmod 700 ~/.ssh ~/.ssh/config.d
 
 ### Install
 
-Apply conservative SSH and sudo environment tweaks.
-
 ```bash
 fix_block() {
 	local file=$1

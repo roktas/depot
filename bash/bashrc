@@ -1,4 +1,4 @@
-# shellcheck disable=1091,2148,2155
+# shellcheck disable=1091,2123,2148,2155
 
 # Some parts are adapted from https://github.com/mrzool/bash-sensible
 [[ -n ${PS1:-} ]] || return
@@ -31,6 +31,8 @@ homebrew_shellenv() {
 		eval "$("$brew" shellenv)"
 	elif [[ -x "$HOME"/.linuxbrew/bin/brew ]]; then
 		eval "$("$HOME"/.linuxbrew/bin/brew shellenv)"
+	elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 	fi
 }
 
@@ -44,6 +46,19 @@ if [[ -n ${HOMEBREW_PREFIX:-} ]]; then
 fi
 path_prepend "$HOME"/.local/bin
 export PATH
+
+ruby_user_bin() {
+	local version
+
+	command -v ruby &>/dev/null || return
+	version=$(ruby -rrbconfig -e 'print RbConfig::CONFIG["ruby_version"]' 2>/dev/null) || return
+	[[ -n $version ]] || return
+
+	path_prepend "$HOME"/.local/share/gem/ruby/"$version"/bin
+}
+
+ruby_user_bin
+unset -f ruby_user_bin
 
 load_environment() {
 	local dir=${XDG_CONFIG_HOME:-$HOME/.config}/environment

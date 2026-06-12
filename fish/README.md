@@ -4,6 +4,7 @@ all:
   packages:
     - fish
     - fisher
+    - zoxide
   links:
     config.fish: ~/.config/fish/config.fish
     functions/: ~/.config/fish/functions

@@ -8,12 +8,19 @@ else if test -x /opt/homebrew/bin/brew
     eval (/opt/homebrew/bin/brew shellenv)
 else if test -x "$HOME"/.linuxbrew/bin/brew
     eval ("$HOME"/.linuxbrew/bin/brew shellenv)
+else if test -x /home/linuxbrew/.linuxbrew/bin/brew
+    eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
 end
 
 if set -q HOMEBREW_PREFIX
     for formula in curl ruby zip
         fish_add_path --move --path "$HOMEBREW_PREFIX"/opt/"$formula"/bin
     end
+end
+
+if type -q ruby
+    set -l ruby_version (ruby -rrbconfig -e 'print RbConfig::CONFIG["ruby_version"]' 2>/dev/null)
+    test -n "$ruby_version"; and fish_add_path --move --path "$HOME"/.local/share/gem/ruby/"$ruby_version"/bin
 end
 
 fish_add_path --move --path "$HOME"/.local/bin
