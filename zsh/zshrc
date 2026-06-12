@@ -49,7 +49,8 @@ load_environment() {
 	local dir=${XDG_CONFIG_HOME:-$HOME/.config}/environment
 	local file
 
-	for file in "$dir"/variables "$dir"/credentials; do
+	for file in "$dir"/variables "$dir"/environment.d/*.conf(N) "$dir"/credentials; do
+		[[ ${file##*/} != 00-base.conf ]] || continue
 		[[ -r $file ]] || continue
 
 		set -a

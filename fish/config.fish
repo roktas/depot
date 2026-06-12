@@ -34,7 +34,15 @@ function load_environment
         set dir "$HOME"/.config/environment
     end
 
-    for file in "$dir"/variables "$dir"/credentials
+    set -l files "$dir"/variables
+
+    if test -d "$dir"/environment.d
+        set -a files (command find "$dir"/environment.d -maxdepth 1 -type f -name '*.conf' ! -name 00-base.conf 2>/dev/null | sort)
+    end
+
+    set -a files "$dir"/credentials
+
+    for file in $files
         test -r "$file"; or continue
 
         set -l pairs (bash -c 'set -a; . "$1"; while IFS= read -r line; do [[ -n $line && $line != \#* ]] || continue; name=${line%%=*}; if [[ $name =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then printf "%s=%s\0" "$name" "${!name-}"; fi; done < "$1"' -- "$file" | string split0)
