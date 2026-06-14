@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
+set -Eeuo pipefail
+shopt -s nullglob
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+IFS=$' \n'
 
-export LC_ALL=C.UTF-8 LANG=C.UTF-8
+export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
 readonly KLUDGE_CONFIG_FILE=biome.json
 readonly KLUDGE_CONFIG_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/biome

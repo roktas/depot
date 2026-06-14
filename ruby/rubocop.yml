@@ -3,9 +3,8 @@ inherit_gem:
 
 plugins:
   - "rubocop-md"
-  - "rubocop-rake"
-require:
   - "rubocop-packaging"
+  - "rubocop-rake"
 
 Layout/HashAlignment:
   Enabled: true

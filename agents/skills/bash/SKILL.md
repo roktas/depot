@@ -138,5 +138,5 @@ metadata:
 - **Local** - `local x=$(...)` swallows exit codes. Define `local x` first, then assign.
 - **Unbound** - With `set -u`, use `${var:-}` to avoid errors on unbound vars.
 - **Locale** - Sorting, character classes (`[a-z]`), and number formatting depend on locale. Add
-  `export LC_ALL=C.UTF-8 LANG=C.UTF-8` to the prelude in locale-dependent scripts for predictable
+  `export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8` to the prelude in locale-dependent scripts for predictable
   behavior.

@@ -4,6 +4,10 @@ all:
   packages:
     - ruby
     - gem:rubocop
+    - gem:rubocop-md
+    - gem:rubocop-packaging
+    - gem:rubocop-rails-omakase
+    - gem:rubocop-rake
   links:
     irbrc: ~/.config/irb/irbrc
     gemrc: ~/.config/gem/gemrc
