@@ -157,7 +157,7 @@ end
 function b --wraps=bundle --description 'alias b bundle'
     switch $argv[1]
         case "."
-            if not set -q arg[1]; and not test -f .envrc
+            if not set -q argv[2]; and not test -f .envrc
                 echo 'use ruby' >.envrc
                 sleep 0.1
                 direnv allow .
