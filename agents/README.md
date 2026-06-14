@@ -10,5 +10,3 @@ all:
 Common agent instructions and skills installed through the shared `~/.agents` surface.
 
 Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.
-
-The `tilde` skill is linked from the sibling control-plane repository for this maintainer deployment.

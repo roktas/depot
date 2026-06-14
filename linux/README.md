@@ -73,7 +73,8 @@ generate_locales() {
 }
 
 graphical_host() {
-	[[ $(systemctl get-default 2>/dev/null || true) == graphical.target ]]
+	[[ $(systemctl get-default 2>/dev/null || true) == graphical.target ]] || return 1
+	systemctl is-enabled gdm3 sddm lightdm display-manager 2>/dev/null | grep -q enabled
 }
 
 install_desktop_packages() {
