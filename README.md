@@ -24,6 +24,9 @@ Use an agent session with the Tilde skill enabled:
 
 These are agent prompt examples, not shell commands.
 
+When a shell runtime helper is needed, use the loaded Tilde skill's `bin/tilde` or
+`~/.agents/skills/tilde/bin/tilde`; do not rely on bare `tilde` being on `PATH`.
+
 Mutating work is proposal-first. The agent should describe the target, effect, and blast radius before applying anything
 that writes files, changes packages, moves home content, or touches a remote host.
 
