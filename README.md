@@ -14,13 +14,15 @@ Deployment state is local runtime data under `~/.local/state/tilde`; it is not s
 Use an agent session with the Tilde skill enabled:
 
 ```text
-$tilde status
-$tilde doctor
-$tilde deploy dry-run
-$tilde deploy
-$tilde update
-$tilde adopt neovim
+/tilde status
+/tilde doctor
+/tilde deploy dry-run
+/tilde deploy
+/tilde update
+/tilde adopt neovim
 ```
+
+These are agent prompt examples, not shell commands.
 
 Mutating work is proposal-first. The agent should describe the target, effect, and blast radius before applying anything
 that writes files, changes packages, moves home content, or touches a remote host.
