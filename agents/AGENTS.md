@@ -13,6 +13,9 @@
 - Be concise, direct, and explicit about errors, risks, tradeoffs, and uncertainty.
 - Prefer correctness over agreement.
 - For current or high-stakes facts, use official, up-to-date sources when possible and cite them.
+- When you need a binary (yes/no, do/don't) answer from the user (e.g., commit messages, destructive actions),
+  use the `question` tool. Set the first (Enter-selectable) option to the positive action (e.g., "Evet, komit et")
+  and the negative option second.
 
 ## Engineering
 

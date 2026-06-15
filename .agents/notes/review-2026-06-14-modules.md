@@ -4,10 +4,6 @@ Review date: 2026-06-14
 Scope: selected modules in `~/Dropbox/home` and `~/Dropbox/home-`
 Changes: none (read-only review); one fix applied separately
 
-## Fixed separately
-
-- `fish/config.fish`: `b` bundle helper used `arg[1]` instead of `argv[2]`, so the `.envrc` setup branch checked a non-existent variable.
-
 ## Findings
 
 ### 1. SSH client config file permissions are 644
@@ -27,10 +23,3 @@ Because Tilde links `~/.ssh/config` as a symlink to the repository file, SSH che
 ### 4. macOS Screen Sharing Postinstall could document load-failed-5
 
 The Postinstall uses `sudo launchctl load -w` and then verifies service activity. Field experience shows `launchctl load` may emit `Load failed: 5` while still succeeding; the current idempotence check handles this correctly. Adding a short inline comment about `Load failed: 5` being benign would make the behavior explicit for future readers.
-
-## Positive observations
-
-- `misc/todo` actions use clean symlink shortcuts (`e -> edit`, `n -> note`, `pr -> projectview`, `r -> revive`) and consistent Bash boilerplate.
-- `ssh` uses `~/.ssh/config.d/*.conf` Include pattern, which works well with the private `home-/ssh/config.d/macos.conf` fragment.
-- `macos` Screen Sharing Postinstall has good idempotence and error handling.
-- All Bash code blocks in the reviewed modules pass `bash -n` syntax validation.
