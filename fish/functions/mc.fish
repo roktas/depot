@@ -5,7 +5,7 @@ function mc --wraps=mc
 	end
 	set -q shell[1] || set shell /bin/bash
 	set -q TMPDIR || set -l TMPDIR /tmp
-	set -l vars SHELL="$shell" COLORTERM=truecolor
+	set -l vars SHELL="$shell" COLORTERM=truecolor LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 	set -l t (mktemp -p "$TMPDIR" -d mc.XXXXXXXX ) || return
 
 	if set -q t[1]

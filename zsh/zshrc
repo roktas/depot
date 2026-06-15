@@ -348,7 +348,7 @@ mc() {
 	local -i err=0
 	local file=$XDG_RUNTIME_DIR/mc
 
-	COLORTERM=truecolor command mc -P "$file" "$@" || err=$?
+	env COLORTERM=truecolor LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 mc -P "$file" "$@" || err=$?
 
 	if [ -r "$file" ]; then
 		dir=$(cat "$file")
