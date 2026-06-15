@@ -232,11 +232,20 @@ function r --wraps=rails --description 'alias r rails'
     bundle exec rails $argv
 end
 
-function t --wraps=todo --description 'alias todo'
-    todo $argv
+function t --wraps=todo --description 'todo list or command'
+    if test (count $argv) -eq 0
+        todo -l
+    else
+        todo $argv
+    end
 end
-function T --wraps=todo --description 'alias todo -o'
-    todo -o $argv
+function T --wraps=todo --description todo
+    if test (count $argv) -ne 0
+        printf '%s\n' 'T: no arguments accepted' >&2
+        return 2
+    end
+
+    todo
 end
 
 function v --wraps=vi --description 'alias v vi'

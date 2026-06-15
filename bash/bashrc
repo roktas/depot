@@ -244,8 +244,22 @@ alias r='bundle exec rails'
 alias s='systemctl --user'
 alias S='sudo systemctl'
 
-alias t='todo'
-alias T='todo -o'
+t() {
+	if [[ $# -eq 0 ]]; then
+		todo -l
+	else
+		todo "$@"
+	fi
+}
+
+T() {
+	if [[ $# -ne 0 ]]; then
+		printf '%s\n' 'T: no arguments accepted' >&2
+		return 2
+	fi
+
+	todo
+}
 
 alias v=vi
 alias V='sudo vi'
