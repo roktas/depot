@@ -11,7 +11,7 @@ Shared SSH client configuration and Linux SSH and sudo environment tuning.
 
 The shared client config uses `~/.ssh/config.d` for per-platform and private fragments.
 
-## Postinstall
+## Post Install
 
 ```bash
 mkdir -p ~/.ssh/config.d
@@ -23,27 +23,19 @@ chmod 700 ~/.ssh ~/.ssh/config.d
 ### Install
 
 ```bash
-fix_block() {
-	local file=$1
+if [[ -f /etc/ssh/sshd_config ]]; then
+	sudo perl -0pi -e 's/^# BEGIN HOME PROVISION\n.*?^# END HOME PROVISION\n?//ms' /etc/ssh/sshd_config
+fi
 
-	[[ -f $file ]] || return 0
-	sudo sed -i '/BEGIN HOME PROVISION/,/END HOME PROVISION/d' "$file"
-	{
-		echo "# BEGIN HOME PROVISION"
-		cat
-		echo "# END HOME PROVISION"
-	} | sudo tee -a "$file" >/dev/null
-}
+sudo span ensure /etc/ssh/sshd_config ssh <<'EOF'
+UseDNS no
+AllowAgentForwarding yes
+ClientAliveInterval 60
+ClientAliveCountMax 60
+AcceptEnv LANG LC_* pass_*
+EOF
 
-{
-	echo "UseDNS no"
-	echo "AllowAgentForwarding yes"
-	echo "ClientAliveInterval 60"
-	echo "ClientAliveCountMax 60"
-	echo "AcceptEnv LANG LC_* pass_*"
-} | fix_block /etc/ssh/sshd_config
-
-printf '%s\n' 'Defaults env_keep += "SSH_*"' | sudo tee /etc/sudoers.d/ssh >/dev/null
+sudo line ensure /etc/sudoers.d/ssh 'Defaults env_keep += "SSH_*"'
 sudo chmod 0440 /etc/sudoers.d/ssh
 
 if command -v systemctl >/dev/null; then

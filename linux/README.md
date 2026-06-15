@@ -23,9 +23,9 @@ fi
 
 configure_apt_policy() {
 	sudo install -d /etc/apt/apt.conf.d
-	printf '%s\n' 'Acquire::Languages "none";' | sudo tee /etc/apt/apt.conf.d/99notranslations >/dev/null
-	printf '%s\n' 'APT::Install-Recommends "false";' 'APT::Install-Suggests "false";' |
-		sudo tee /etc/apt/apt.conf.d/01norecommends >/dev/null
+	sudo line ensure /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
+	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
+	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
 }
 
 configure_flatpak() {

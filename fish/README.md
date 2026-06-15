@@ -14,7 +14,7 @@ all:
 
 Minimal Fish shell setup with shared functions and plugin installation.
 
-## Postinstall
+## Post Install
 
 ```bash
 fish -c "fisher install metrofish/metrofish PatrickF1/fzf.fish icezyclon/zoxide.fish"
@@ -40,10 +40,7 @@ Linux)
 esac
 
 if [[ ${current_shell:-} != "$fish_path" ]]; then
-	if ! grep -Fxq "$fish_path" /etc/shells; then
-		printf '%s\n' "$fish_path" | sudo tee -a /etc/shells >/dev/null
-	fi
-
+	sudo line ensure /etc/shells "$fish_path"
 	sudo chsh -s "$fish_path" "$USER"
 	printf 'Reconnect SSH to start Fish as the login shell.\n'
 fi

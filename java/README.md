@@ -48,7 +48,7 @@ java- -jar KamuSMKilitCozme.jar
 
 ## MacOS
 
-### Postinstall
+### Post Install
 
 ```bash
 sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk

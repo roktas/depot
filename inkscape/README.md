@@ -13,7 +13,7 @@ Vector graphics editor module installed through Flatpak on Linux and Homebrew Ca
 
 ## Linux
 
-### Postinstall
+### Post Install
 
 ```bash
 if [[ -z ${DISPLAY:-}${WAYLAND_DISPLAY:-} ]]; then
@@ -29,7 +29,7 @@ xdg-mime default org.inkscape.Inkscape.desktop image/svg+xml
 
 ## MacOS
 
-### Postinstall
+### Post Install
 
 ```bash
 xattr -d com.apple.quarantine /Applications/Inkscape.app 2>/dev/null || true

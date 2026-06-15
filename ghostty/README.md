@@ -18,7 +18,7 @@ Linux uses Spleen 32x64. macOS uses Ioskeley Mono.
 
 ## MacOS
 
-### Postinstall
+### Post Install
 
 ```bash
 source=$HOME/Dropbox/home/ghostty/terminfo/xterm-ghostty.terminfo

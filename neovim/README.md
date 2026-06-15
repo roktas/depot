@@ -15,7 +15,7 @@ all:
 
 Minimal Neovim and `vi` setup with LazyVim-oriented user configuration.
 
-## Postinstall
+## Post Install
 
 ```bash
 config=${XDG_CONFIG_HOME:-"$HOME"/.config}/vi

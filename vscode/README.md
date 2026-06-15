@@ -12,7 +12,7 @@ macos:
 
 Extra Visual Studio Code module with user settings and extension installation.
 
-## Postinstall
+## Post Install
 
 ```bash
 if command -v code &>/dev/null; then

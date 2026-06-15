@@ -61,7 +61,7 @@ elif command -v vboxmanage >/dev/null; then
 fi
 ```
 
-### Postinstall
+### Post Install
 
 Install the Oracle VirtualBox Extension Pack only when explicitly requested. This may require accepting Oracle's license
 terms during installation.
