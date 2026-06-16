@@ -72,6 +72,20 @@ metadata:
 
 ## Patterns
 
+- **POSIX sh contexts**: If the target interpreter is `sh`, `/bin/sh`, POSIX shell, or a remote heredoc that will be
+  read by `sh`, do not use the Bash prelude or Bash-only style rules. The Bash prelude below is only for scripts that
+  actually run under Bash. For POSIX `sh`, use a small compatible prelude such as:
+
+  ```sh
+  set -eu
+  unset CDPATH
+  ```
+
+  Do not add `set -o pipefail`, `set -E`, `[[ ... ]]`, arrays, `local`, `source`, `function name { ...; }`, process
+  substitution, here-strings, brace expansion, `mapfile`, `readarray`, `$'...'` strings, or Bash redirections such as
+  `&>/dev/null`. Use POSIX forms instead: `[ ... ]`, `case`, `. file`, `name() { ...; }`, explicit loops, temp files,
+  here-documents, `printf`, and `>/dev/null 2>&1`. Check POSIX-targeted snippets with `shellcheck -s sh` when practical.
+
 - **Prelude**: Place the following block, including the blank lines, at the beginning of the file
 
   ```bash
