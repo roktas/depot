@@ -1,3 +1,4 @@
+[general]
 live_config_reload = true
 
 [colors]
@@ -209,10 +210,6 @@ multiplier = 3
 [selection]
 semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
-[shell]
-args = ["tmux", "-u"]
-program = "/usr/bin/env"
-
 [window.dimensions]
 columns = 124
 lines = 40
@@ -220,3 +217,9 @@ lines = 40
 [window.padding]
 x = 2
 y = 2
+
+[terminal]
+
+[terminal.shell]
+args = ["tmux", "-u"]
+program = "/usr/bin/env"
