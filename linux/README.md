@@ -55,14 +55,14 @@ generate_locales() {
 	case $distribution in
 	debian)
 		printf '%s\n' \
-			"locales locales/locales_to_be_generated multiselect tr_TR.UTF-8 UTF-8, en_US.UTF-8 UTF-8" \
+			"locales locales/locales_to_be_generated multiselect tr_TR.UTF-8 UTF-8, en_US.UTF-8 UTF-8, C.UTF-8 UTF-8" \
 			"locales locales/default_environment_locale select $locale" |
 			sudo debconf-set-selections
 		sudo rm -f /etc/locale.gen
 		sudo env DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive locales
 		;;
 	ubuntu)
-		sudo locale-gen tr_TR.UTF-8 en_US.UTF-8
+		sudo locale-gen tr_TR.UTF-8 en_US.UTF-8 C.UTF-8
 		;;
 	*)
 		return 0
