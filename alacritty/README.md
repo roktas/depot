@@ -2,9 +2,12 @@
 all:
   links:
     alacritty.toml: ~/.config/alacritty/alacritty.toml
+linux:
+  packages:
+    - deb:alacritty
+macos:
+  packages:
+    - cask:alacritty
 ---
 
 # Alacritty
-
-Alacritty user configuration. Package installation is intentionally omitted until a current Linux-friendly source is
-chosen.
