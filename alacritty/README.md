@@ -18,6 +18,13 @@ Alacritty terminal emulator configuration and package installation.
 Install alacritty via apt on Debian-family Linux hosts.
 
 ```bash
+graphical_host() {
+	[[ $(systemctl get-default 2>/dev/null || true) == graphical.target ]] || return 1
+	systemctl is-enabled gdm3 sddm lightdm display-manager 2>/dev/null | grep -q enabled
+}
+
+graphical_host || exit 0
+
 if command -v alacritty >/dev/null; then
 	exit 0
 fi
