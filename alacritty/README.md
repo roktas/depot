@@ -2,9 +2,6 @@
 all:
   links:
     alacritty.toml: ~/.config/alacritty/alacritty.toml
-linux:
-  packages:
-    - deb:alacritty
 macos:
   packages:
     - cask:alacritty
@@ -13,3 +10,21 @@ macos:
 # Alacritty
 
 Alacritty terminal emulator configuration and package installation.
+
+## Linux
+
+### Install
+
+Install alacritty via apt on Debian-family Linux hosts.
+
+```bash
+if command -v alacritty >/dev/null; then
+	exit 0
+fi
+
+if ! command -v apt-get >/dev/null; then
+	exit 0
+fi
+
+sudo apt-get install -y --no-install-recommends alacritty
+```
