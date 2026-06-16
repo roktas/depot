@@ -11,3 +11,5 @@ macos:
 ---
 
 # Alacritty
+
+Alacritty terminal emulator configuration and package installation.
