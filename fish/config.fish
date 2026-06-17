@@ -34,13 +34,15 @@ function load_environment
         set dir "$HOME"/.config
     end
 
-    set -l files
+	set -l files
 
-    if test -d "$dir"/environment.d
-        set -a files (command find "$dir"/environment.d -maxdepth 1 -type f -name '*.conf' 2>/dev/null | sort)
-    end
+	if test -d "$dir"/environment.d
+		for file in "$dir"/environment.d/*.conf
+			test -r "$file"; and set -a files "$file"
+		end
+	end
 
-    set -a files "$dir"/environment/credentials
+	set -a files "$dir"/environment/credentials
 
     for file in $files
         test -r "$file"; or continue
