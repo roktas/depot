@@ -57,7 +57,7 @@ load_environment
 functions -e load_environment
 
 fish_add_path --move --path "$HOME"/.local/bin
-fish_add_path --move --path "$HOME"/Dropbox/allos/bin
+fish_add_path --move --path "$HOME"/Dropbox/_/bin
 
 switch (uname -s)
     case Linux

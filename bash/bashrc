@@ -78,7 +78,7 @@ load_environment
 unset -f load_environment
 
 path_prepend "$HOME"/.local/bin
-path_prepend "$HOME"/Dropbox/allos/bin
+path_prepend "$HOME"/Dropbox/_/bin
 case $OSTYPE in
 linux*) path_prepend "$HOME"/Dropbox/linux/bin ;;
 darwin*) path_prepend "$HOME"/Dropbox/macos/bin ;;
