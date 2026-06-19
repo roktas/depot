@@ -2,11 +2,11 @@
 all:
   level: minimal
   packages:
-    - ca-certificates
-    - curl
-    - gh
-    - gnupg
-    - zoxide
+    - brew:ca-certificates
+    - brew:curl
+    - brew:gh
+    - brew:gnupg
+    - brew:zoxide
 ---
 
 # Linux
