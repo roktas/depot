@@ -1,11 +1,15 @@
 ---
 all:
   level: extra
+  links:
+    default.yml: ~/.lima/default.yml
+linux:
+  packages:
+    - lima
+macos:
   packages:
     - lima
     - there
-  links:
-    default.yml: ~/.lima/default.yml
 ---
 
 # Lima
