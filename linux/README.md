@@ -123,24 +123,76 @@ set_timezone() {
 	sudo timedatectl set-timezone "$timezone"
 }
 
+configure_apt_policy
+generate_locales
+set_timezone
+install_desktop_packages
+configure_flatpak
+```
+
+## Configure
+
+```bash
+load_session_environment() {
+	local name
+	local uid
+	local value
+
+	for name in XDG_CURRENT_DESKTOP DESKTOP_SESSION XDG_RUNTIME_DIR DBUS_SESSION_BUS_ADDRESS; do
+		[[ -z ${!name:-} ]] || continue
+
+		value=$(systemctl --user show-environment 2>/dev/null | sed -n "s/^$name=//p" | tail -n 1)
+		[[ -n $value ]] || continue
+
+		export "$name=$value"
+	done
+
+	uid=$(id -u)
+	if [[ -z ${XDG_RUNTIME_DIR:-} && -d /run/user/$uid ]]; then
+		export XDG_RUNTIME_DIR=/run/user/$uid
+	fi
+
+	if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} && -n ${XDG_RUNTIME_DIR:-} && -S $XDG_RUNTIME_DIR/bus ]]; then
+		export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
+	fi
+}
+
+gnome_desktop() {
+	local session=${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}
+
+	case ${session,,} in
+	*gnome*) return 0 ;;
+	esac
+
+	command -v gnome-shell >/dev/null
+}
+
+gsettings_command() {
+	if [[ -n ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
+		gsettings "$@"
+	elif command -v dbus-run-session >/dev/null; then
+		dbus-run-session -- gsettings "$@"
+	else
+		gsettings "$@"
+	fi
+}
+
 unbind() {
 	local -a args=()
 
-	read -r -a args < <(gsettings list-recursively | grep "'$1'" | cut -d' ' -f-2 2>/dev/null) || true
+	read -r -a args < <(gsettings_command list-recursively | grep "'$1'" | cut -d' ' -f-2 2>/dev/null) || true
 
 	if (( ${#args[@]} )); then
 		echo >&2 "Unbinding $1..."
-		gsettings set "${args[@]}" "[]"
+		gsettings_command set "${args[@]}" "[]"
 	fi
 }
 
 apply_gnome_settings() {
 	command -v gsettings >/dev/null || return 0
-	command -v xdg-mime >/dev/null || return 0
 
-	if [[ ${XDG_CURRENT_DESKTOP:-} != *GNOME* && ${DESKTOP_SESSION:-} != *gnome* ]]; then
-		return 0
-	fi
+	load_session_environment
+	gnome_desktop || return 0
 
 	unbind "F1"; unbind "<Shift>F1"; unbind "<Alt>F1"
 	unbind "F2"; unbind "<Shift>F2"; unbind "<Alt>F2"
@@ -157,19 +209,10 @@ apply_gnome_settings() {
 	unbind "<Alt>Above_Tab"; unbind "<Super>Above_Tab"
 
 	echo >&2 "Setting keyboard repeat interval to 10..."
-	gsettings set org.gnome.desktop.peripherals.keyboard repeat-interval 10
+	gsettings_command set org.gnome.desktop.peripherals.keyboard repeat-interval 10
 	echo >&2 "Setting keyboard delay to 250..."
-	gsettings set org.gnome.desktop.peripherals.keyboard delay 250
-
-	gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'Flameshot'
-	gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'sh -c -- "flameshot gui"'
-	gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Control>Print'
+	gsettings_command set org.gnome.desktop.peripherals.keyboard delay 250
 }
 
-configure_apt_policy
-generate_locales
-set_timezone
-install_desktop_packages
-configure_flatpak
 apply_gnome_settings
 ```
