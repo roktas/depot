@@ -1,0 +1,24 @@
+Metrics/AbcSize:
+  Exclude:
+    - "../../Dropbox/tilde/bin/line"
+    - "../../Dropbox/tilde/bin/span"
+    - "../../Dropbox/tilde/libexec/apply"
+    - "../../Dropbox/tilde/libexec/doctor"
+    - "../../Dropbox/tilde/libexec/plan"
+    - "../../Dropbox/tilde/libexec/status"
+
+Metrics/ClassLength:
+  Exclude:
+    - "../../Dropbox/tilde/bin/span"
+    - "../../Dropbox/tilde/libexec/apply"
+    - "../../Dropbox/tilde/libexec/doctor"
+    - "../../Dropbox/tilde/libexec/plan"
+    - "../../Dropbox/tilde/libexec/status"
+
+Metrics/MethodLength:
+  Exclude:
+    - "../../Dropbox/tilde/bin/span"
+    - "../../Dropbox/tilde/libexec/apply"
+    - "../../Dropbox/tilde/libexec/doctor"
+    - "../../Dropbox/tilde/libexec/plan"
+    - "../../Dropbox/tilde/libexec/status"

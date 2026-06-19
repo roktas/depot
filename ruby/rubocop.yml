@@ -1,15 +1,17 @@
+inherit_from: .rubocop_todo.yml
 inherit_gem:
-  rubocop-rails-omakase: rubocop.yml
+  rubocop-rubyfmt:
+    - config/full.yml
+inherit_mode:
+  merge:
+    - Exclude
 
 plugins:
+  - "rubocop-rubyfmt"
   - "rubocop-md"
   - "rubocop-packaging"
   - "rubocop-rake"
 
-Layout/HashAlignment:
-  Enabled: true
-  EnforcedHashRocketStyle: table
-  EnforcedColonStyle: table
 Layout/LineLength:
   Max: 120
   Exclude:
@@ -26,32 +28,15 @@ Metrics/MethodLength:
   Exclude:
     - "test/**/*.rb"
 
-Naming/FileName:
-  Exclude:
-    - "**/Vagrantfile"
-    - ".*/**/Vagrantfile"
-
-Rails/RefuteMethods:
-  Enabled: false
-
 Style/AsciiComments:
   Enabled: false
 Style/Documentation:
   Enabled: false
-Style/ParallelAssignment:
+Style/IfUnlessModifier:
   Enabled: false
-Style/LambdaCall:
-  Enabled: false
-Style/MethodCallWithArgsParentheses:
-  Exclude:
-    - "**/Vagrantfile"
-    - ".*/**/Vagrantfile"
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - "**/Vagrantfile"
-    - ".*/**/Vagrantfile"
 
 AllCops:
   NewCops: enable
+  TargetRubyVersion: 3.4
   Exclude:
     - "vendor/**/*"
