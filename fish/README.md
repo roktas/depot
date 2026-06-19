@@ -18,7 +18,11 @@ Minimal Fish shell setup with shared functions and plugin installation.
 
 ```bash
 fish -c "fisher install metrofish/metrofish PatrickF1/fzf.fish icezyclon/zoxide.fish"
+```
 
+## Configure
+
+```bash
 fish_path=$(command -v fish 2>/dev/null || true)
 
 if [[ -z $fish_path && -x /opt/homebrew/bin/fish ]]; then
