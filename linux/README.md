@@ -167,13 +167,25 @@ gnome_desktop() {
 	command -v gnome-shell >/dev/null
 }
 
+gsettings_bin() {
+	if [[ -x /usr/bin/gsettings ]]; then
+		printf '%s\n' /usr/bin/gsettings
+		return
+	fi
+
+	command -v gsettings
+}
+
 gsettings_command() {
+	local gsettings
+	gsettings=$(gsettings_bin) || return
+
 	if [[ -n ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
-		gsettings "$@"
+		"$gsettings" "$@"
 	elif command -v dbus-run-session >/dev/null; then
-		dbus-run-session -- gsettings "$@"
+		dbus-run-session -- "$gsettings" "$@"
 	else
-		gsettings "$@"
+		"$gsettings" "$@"
 	fi
 }
 
@@ -189,7 +201,7 @@ unbind() {
 }
 
 apply_gnome_settings() {
-	command -v gsettings >/dev/null || return 0
+	gsettings_bin >/dev/null || return 0
 
 	load_session_environment
 	gnome_desktop || return 0
