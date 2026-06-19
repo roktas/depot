@@ -74,7 +74,7 @@ printf 'W: skipping Ghostty install: no apt package or snap command is available
 
 ## MacOS
 
-### Post Install
+### Configure
 
 ```bash
 source=$HOME/Dropbox/home/ghostty/terminfo/xterm-ghostty.terminfo

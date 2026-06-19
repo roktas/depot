@@ -28,50 +28,6 @@ configure_apt_policy() {
 	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
 }
 
-configure_flatpak() {
-	command -v flatpak >/dev/null || return 0
-
-	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-}
-
-generate_locales() {
-	local distribution
-	local locale=${PROVISION_LOCALE:-en_US.UTF-8}
-
-	case :en_US.UTF-8:tr_TR.UTF-8: in
-	*:"$locale":*)
-		;;
-	*)
-		echo >&2 "Unsupported locale: $locale"
-		exit 1
-		;;
-	esac
-
-	sudo apt-get update
-	sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends locales
-
-	distribution=$(unset ID && . /etc/os-release 2>/dev/null && echo "$ID")
-
-	case $distribution in
-	debian)
-		printf '%s\n' \
-			"locales locales/locales_to_be_generated multiselect tr_TR.UTF-8 UTF-8, en_US.UTF-8 UTF-8, C.UTF-8 UTF-8" \
-			"locales locales/default_environment_locale select $locale" |
-			sudo debconf-set-selections
-		sudo rm -f /etc/locale.gen
-		sudo env DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive locales
-		;;
-	ubuntu)
-		sudo locale-gen tr_TR.UTF-8 en_US.UTF-8 C.UTF-8
-		;;
-	*)
-		return 0
-		;;
-	esac
-
-	sudo update-locale LANG="$locale"
-}
-
 graphical_host() {
 	local session=${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}
 
@@ -115,24 +71,69 @@ install_desktop_packages() {
 		xdg-utils
 }
 
-set_timezone() {
-	local timezone=${PROVISION_TIMEZONE:-Europe/Istanbul}
-
-	command -v timedatectl >/dev/null || return 0
-
-	sudo timedatectl set-timezone "$timezone"
+install_locales() {
+	sudo apt-get update
+	sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends locales
 }
 
 configure_apt_policy
-generate_locales
-set_timezone
+install_locales
 install_desktop_packages
-configure_flatpak
 ```
 
 ## Configure
 
 ```bash
+configure_apt_policy() {
+	command -v apt-get >/dev/null || return 0
+
+	sudo install -d /etc/apt/apt.conf.d
+	sudo line ensure /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
+	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
+	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
+}
+
+configure_flatpak() {
+	command -v flatpak >/dev/null || return 0
+
+	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+}
+
+generate_locales() {
+	local distribution
+	local locale=${PROVISION_LOCALE:-en_US.UTF-8}
+
+	case :en_US.UTF-8:tr_TR.UTF-8: in
+	*:"$locale":*)
+		;;
+	*)
+		echo >&2 "Unsupported locale: $locale"
+		exit 1
+		;;
+	esac
+
+	distribution=$(unset ID && . /etc/os-release 2>/dev/null && echo "$ID")
+
+	case $distribution in
+	debian)
+		printf '%s\n' \
+			"locales locales/locales_to_be_generated multiselect tr_TR.UTF-8 UTF-8, en_US.UTF-8 UTF-8, C.UTF-8 UTF-8" \
+			"locales locales/default_environment_locale select $locale" |
+			sudo debconf-set-selections
+		sudo rm -f /etc/locale.gen
+		sudo env DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive locales
+		;;
+	ubuntu)
+		sudo locale-gen tr_TR.UTF-8 en_US.UTF-8 C.UTF-8
+		;;
+	*)
+		return 0
+		;;
+	esac
+
+	sudo update-locale LANG="$locale"
+}
+
 load_session_environment() {
 	local name
 	local uid
@@ -226,5 +227,17 @@ apply_gnome_settings() {
 	gsettings_command set org.gnome.desktop.peripherals.keyboard delay 250
 }
 
+set_timezone() {
+	local timezone=${PROVISION_TIMEZONE:-Europe/Istanbul}
+
+	command -v timedatectl >/dev/null || return 0
+
+	sudo timedatectl set-timezone "$timezone"
+}
+
+configure_apt_policy
+generate_locales
+set_timezone
+configure_flatpak
 apply_gnome_settings
 ```

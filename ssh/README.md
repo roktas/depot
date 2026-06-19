@@ -12,18 +12,20 @@ Shared SSH client configuration and Linux SSH and sudo environment tuning.
 
 The shared client config uses `~/.ssh/config.d` for per-platform and private fragments.
 
-## Post Install
+## Configure
 
 ```bash
 mkdir -p ~/.ssh/config.d
 chmod 700 ~/.ssh ~/.ssh/config.d
 ```
 
-## Linux
-
-### Install
+### Linux
 
 ```bash
+if [[ $(uname -s) != Linux ]]; then
+	exit 0
+fi
+
 if [[ -f /etc/ssh/sshd_config ]]; then
 	sudo perl -0pi -e 's/^# BEGIN HOME PROVISION\n.*?^# END HOME PROVISION\n?//ms' /etc/ssh/sshd_config
 fi

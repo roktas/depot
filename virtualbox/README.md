@@ -61,7 +61,7 @@ elif command -v vboxmanage >/dev/null; then
 fi
 ```
 
-### Post Install
+### Configure
 
 Install the Oracle VirtualBox Extension Pack only when explicitly requested. This may require accepting Oracle's license
 terms during installation.
@@ -80,6 +80,28 @@ version=$("$vboxmanage" --version)
 version=${version%r*}
 extpack=Oracle_VM_VirtualBox_Extension_Pack-"$version".vbox-extpack
 file=${TMPDIR:-/tmp}/"$extpack"
+
+if "$vboxmanage" list extpacks 2>/dev/null |
+	awk -v version="$version" '
+		/^Pack no\. / {
+			found = 0
+		}
+		/^Extension Packs:/ {
+			next
+		}
+		/^Name:[[:space:]]+Oracle VM VirtualBox Extension Pack$/ {
+			found = 1
+		}
+		/^Version:/ && found && $2 == version {
+			ok = 1
+		}
+		END {
+			exit ok ? 0 : 1
+		}
+	'
+then
+	exit 0
+fi
 
 curl -fL "https://download.virtualbox.org/virtualbox/$version/$extpack" -o "$file"
 sudo "$vboxmanage" extpack install --replace "$file"

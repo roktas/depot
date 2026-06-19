@@ -15,18 +15,21 @@ all:
 
 Minimal Neovim and `vi` setup with LazyVim-oriented user configuration.
 
-## Post Install
+## Configure
 
 ```bash
 config=${XDG_CONFIG_HOME:-"$HOME"/.config}/vi
 
 if [[ ! -e $config ]]; then
+	mkdir -p "${config%/*}"
 	git clone https://github.com/nvim-lua/kickstart.nvim.git "$config"
 fi
 ```
 
 ```bash
-nvim --headless +qall!
+if command -v nvim >/dev/null; then
+	nvim --headless +qall!
+fi
 ```
 
 ## Update

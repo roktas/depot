@@ -12,15 +12,29 @@ macos:
 
 Extra Visual Studio Code module with user settings and extension installation.
 
-## Post Install
+## Configure
 
 ```bash
-if command -v code &>/dev/null; then
-	code --force --install-extension GitHub.codespaces
-	code --force --install-extension GitHub.github-vscode-theme
-	code --force --install-extension adpyke.codesnap
-	code --force --install-extension arcticicestudio.nord-visual-studio-code
-	code --force --install-extension chrislajoie.vscode-modelines
-	code --force --install-extension ms-vscode-remote.vscode-remote-extensionpack
+if ! command -v code >/dev/null; then
+	exit 0
 fi
+
+extensions=(
+	GitHub.codespaces
+	GitHub.github-vscode-theme
+	adpyke.codesnap
+	arcticicestudio.nord-visual-studio-code
+	chrislajoie.vscode-modelines
+	ms-vscode-remote.vscode-remote-extensionpack
+)
+
+mapfile -t installed < <(code --list-extensions)
+
+for extension in "${extensions[@]}"; do
+	if printf '%s\n' "${installed[@]}" | grep -Fqx "$extension"; then
+		continue
+	fi
+
+	code --install-extension "$extension"
+done
 ```
