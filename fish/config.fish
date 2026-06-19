@@ -85,6 +85,7 @@ set -U XDG_DATA_HOME ~/.local/share
 
 status --is-interactive; and type -q direnv; and source (direnv hook fish | psub)
 status --is-interactive; and status --is-login; and type -q fastfetch; and fastfetch
+type -q zoxide; and zoxide init fish | source
 
 # ----------------------------------------------------------------------------------------------------------------------
 #  Settings

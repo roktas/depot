@@ -14,15 +14,32 @@ all:
 
 Minimal Fish shell setup with shared functions and plugin installation.
 
-## Post Install
-
-```bash
-fish -c "fisher install metrofish/metrofish PatrickF1/fzf.fish icezyclon/zoxide.fish"
-```
-
 ## Configure
 
 ```bash
+install_plugins() {
+	local fish_path=$1
+
+	"$fish_path" <<'FISH'
+set -l plugins metrofish/metrofish PatrickF1/fzf.fish
+
+functions -q fisher
+or begin
+	printf '%s\n' 'fisher is not available' >&2
+	exit 1
+end
+
+set -l installed (fisher list 2>/dev/null)
+set -l missing
+
+for plugin in $plugins
+	contains -- $plugin $installed; or set -a missing $plugin
+end
+
+test (count $missing) -eq 0; or fisher install $missing
+FISH
+}
+
 fish_path=$(command -v fish 2>/dev/null || true)
 
 if [[ -z $fish_path && -x /opt/homebrew/bin/fish ]]; then
@@ -33,6 +50,8 @@ if [[ -z $fish_path ]]; then
 	printf 'fish is not installed or not on PATH\n' >&2
 	exit 1
 fi
+
+install_plugins "$fish_path"
 
 case $(uname -s) in
 Darwin)
