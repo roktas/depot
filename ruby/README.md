@@ -3,6 +3,7 @@ all:
   level: minimal
   packages:
     - ruby
+    - rubyfmt
     - gem:rubocop
     - gem:rubocop-md
     - gem:rubocop-packaging
@@ -16,4 +17,4 @@ all:
 
 # Ruby
 
-Minimal Ruby setup with IRB and RuboCop user configuration.
+Minimal Ruby setup with IRB, formatting, and RuboCop user configuration.

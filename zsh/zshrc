@@ -61,6 +61,19 @@ load_environment() {
 load_environment
 unfunction load_environment
 
+ruby_user_bin() {
+	local dir
+
+	command -v ruby &>/dev/null || return
+	dir=$(ruby -e 'print File.join(Gem.user_dir, "bin")' 2>/dev/null) || return
+	[[ -n $dir && -d $dir ]] || return
+
+	path_prepend "$dir"
+}
+
+ruby_user_bin
+unfunction ruby_user_bin
+
 path_prepend "$HOME"/.local/bin
 path_prepend "$HOME"/Dropbox/_/bin
 case $OSTYPE in

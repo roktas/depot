@@ -14,7 +14,6 @@
     "lazyvim.plugins.extras.lang.yaml",
     "plugins.extras.lang.bash",
     "plugins.extras.lang.context",
-    "plugins.extras.lang.crystal",
     "plugins.extras.lang.markdown",
     "plugins.extras.lang.ruby"
   ],

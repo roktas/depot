@@ -47,19 +47,6 @@ fi
 path_prepend "$HOME"/.local/bin
 export PATH
 
-ruby_user_bin() {
-	local version
-
-	command -v ruby &>/dev/null || return
-	version=$(ruby -rrbconfig -e 'print RbConfig::CONFIG["ruby_version"]' 2>/dev/null) || return
-	[[ -n $version ]] || return
-
-	path_prepend "$HOME"/.local/share/gem/ruby/"$version"/bin
-}
-
-ruby_user_bin
-unset -f ruby_user_bin
-
 load_environment() {
 	local dir=${XDG_CONFIG_HOME:-$HOME/.config}
 	local file
@@ -76,6 +63,19 @@ load_environment() {
 
 load_environment
 unset -f load_environment
+
+ruby_user_bin() {
+	local dir
+
+	command -v ruby &>/dev/null || return
+	dir=$(ruby -e 'print File.join(Gem.user_dir, "bin")' 2>/dev/null) || return
+	[[ -n $dir && -d $dir ]] || return
+
+	path_prepend "$dir"
+}
+
+ruby_user_bin
+unset -f ruby_user_bin
 
 path_prepend "$HOME"/.local/bin
 path_prepend "$HOME"/Dropbox/_/bin

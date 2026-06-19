@@ -18,11 +18,6 @@ if set -q HOMEBREW_PREFIX
     end
 end
 
-if type -q ruby
-    set -l ruby_version (ruby -rrbconfig -e 'print RbConfig::CONFIG["ruby_version"]' 2>/dev/null)
-    test -n "$ruby_version"; and fish_add_path --move --path "$HOME"/.local/share/gem/ruby/"$ruby_version"/bin
-end
-
 fish_add_path --move --path "$HOME"/.local/bin
 
 function load_environment
@@ -57,6 +52,11 @@ end
 
 load_environment
 functions -e load_environment
+
+if type -q ruby
+    set -l gem_user_bin (ruby -e 'print File.join(Gem.user_dir, "bin")' 2>/dev/null)
+    test -n "$gem_user_bin"; and fish_add_path --move --path "$gem_user_bin"
+end
 
 fish_add_path --move --path "$HOME"/.local/bin
 fish_add_path --move --path "$HOME"/Dropbox/_/bin
