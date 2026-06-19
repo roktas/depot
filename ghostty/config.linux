@@ -27,7 +27,7 @@ palette = 13=#b48ead
 palette = 14=#8fbcbb
 palette = 15=#eceff4
 
-command = /usr/bin/env tmux -u
+command = direct:/usr/bin/env PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin /home/linuxbrew/.linuxbrew/bin/tmux -u
 window-width = 124
 window-height = 40
 window-padding-x = 2

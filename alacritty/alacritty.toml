@@ -221,5 +221,5 @@ y = 2
 [terminal]
 
 [terminal.shell]
-args = ["tmux", "-u"]
-program = "/usr/bin/env"
+args = ["-u"]
+program = "/home/linuxbrew/.linuxbrew/bin/tmux"

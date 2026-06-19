@@ -3,6 +3,7 @@ all:
   level: minimal
   links:
     config: ~/.ssh/config
+    hushlogin: ~/.hushlogin
 ---
 
 # SSH
