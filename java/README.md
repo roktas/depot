@@ -51,5 +51,20 @@ java- -jar KamuSMKilitCozme.jar
 ### Configure
 
 ```bash
-sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk
+command -v brew >/dev/null || exit 0
+
+prefix=$(brew --prefix openjdk 2>/dev/null || brew --prefix java 2>/dev/null || true)
+source=${prefix:+$prefix/libexec/openjdk.jdk}
+target=/Library/Java/JavaVirtualMachines/openjdk.jdk
+
+[[ -n $source && -e $source ]] || exit 0
+[[ -L $target && $(readlink "$target") == "$source" ]] && exit 0
+
+if [[ -e $target && ! -L $target ]]; then
+	printf 'E: %s exists and is not a symlink\n' "$target" >&2
+	exit 1
+fi
+
+sudo install -d "$(dirname "$target")"
+sudo ln -sfn "$source" "$target"
 ```
