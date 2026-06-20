@@ -26,11 +26,12 @@ if [[ $(uname -s) != Linux ]]; then
 	exit 0
 fi
 
-if [[ -f /etc/ssh/sshd_config ]]; then
-	sudo perl -0pi -e 's/^# BEGIN HOME PROVISION\n.*?^# END HOME PROVISION\n?//ms' /etc/ssh/sshd_config
-fi
+changed=0
+current=$(mktemp)
+desired=$(mktemp)
+trap 'rm -f "$current" "$desired"' EXIT HUP INT QUIT TERM
 
-sudo span ensure /etc/ssh/sshd_config ssh <<'EOF'
+cat >"$desired" <<'EOF'
 UseDNS no
 AllowAgentForwarding yes
 ClientAliveInterval 60
@@ -38,10 +39,36 @@ ClientAliveCountMax 60
 AcceptEnv LANG LC_* pass_*
 EOF
 
-sudo line ensure /etc/sudoers.d/ssh 'Defaults env_keep += "SSH_*"'
-sudo chmod 0440 /etc/sudoers.d/ssh
+ssh_span_current() {
+	[[ -r /etc/ssh/sshd_config ]] || return 1
 
-if command -v systemctl >/dev/null; then
+	awk '
+		/^# >>> tilde:ssh$/ { active = 1; next }
+		/^# <<< tilde:ssh$/ { found = 1; active = 0; next }
+		active { print }
+		END { exit found ? 0 : 1 }
+	' /etc/ssh/sshd_config >"$current"
+	cmp -s "$desired" "$current"
+}
+
+if [[ -f /etc/ssh/sshd_config ]] && grep -q '^# BEGIN HOME PROVISION$' /etc/ssh/sshd_config; then
+	sudo perl -0pi -e 's/^# BEGIN HOME PROVISION\n.*?^# END HOME PROVISION\n?//ms' /etc/ssh/sshd_config
+	changed=1
+fi
+
+if ! ssh_span_current; then
+	# shellcheck disable=SC2024
+	sudo span ensure /etc/ssh/sshd_config ssh <"$desired"
+	changed=1
+fi
+
+if [[ ! -e /etc/sudoers.d/ssh ]]; then
+	sudo line ensure /etc/sudoers.d/ssh 'Defaults env_keep += "SSH_*"'
+	sudo chmod 0440 /etc/sudoers.d/ssh
+	changed=1
+fi
+
+if (( changed )) && command -v systemctl >/dev/null; then
 	sudo systemctl restart ssh || sudo systemctl restart sshd || true
 fi
 ```

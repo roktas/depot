@@ -22,10 +22,19 @@ if ! command -v apt-get >/dev/null; then
 fi
 
 configure_apt_policy() {
+	ensure_apt_line /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
+	ensure_apt_line /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
+	ensure_apt_line /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
+}
+
+ensure_apt_line() {
+	local file=$1
+	local line=$2
+
+	[[ -f $file ]] && grep -Fxq "$line" "$file" && return 0
+
 	sudo install -d /etc/apt/apt.conf.d
-	sudo line ensure /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
-	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
-	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
+	sudo line ensure "$file" "$line"
 }
 
 graphical_host() {
@@ -87,10 +96,9 @@ install_desktop_packages
 configure_apt_policy() {
 	command -v apt-get >/dev/null || return 0
 
-	sudo install -d /etc/apt/apt.conf.d
-	sudo line ensure /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
-	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
-	sudo line ensure /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
+	ensure_apt_line /etc/apt/apt.conf.d/99notranslations 'Acquire::Languages "none";'
+	ensure_apt_line /etc/apt/apt.conf.d/01norecommends 'APT::Install-Recommends "false";'
+	ensure_apt_line /etc/apt/apt.conf.d/01norecommends 'APT::Install-Suggests "false";'
 }
 
 configure_flatpak() {
@@ -103,14 +111,16 @@ generate_locales() {
 	local distribution
 	local locale=${PROVISION_LOCALE:-en_US.UTF-8}
 
-	case :en_US.UTF-8:tr_TR.UTF-8: in
-	*:"$locale":*)
+	case $locale in
+	C.UTF-8 | en_US.UTF-8 | tr_TR.UTF-8)
 		;;
 	*)
 		echo >&2 "Unsupported locale: $locale"
 		exit 1
 		;;
 	esac
+
+	locales_ready "$locale" && return 0
 
 	distribution=$(unset ID && . /etc/os-release 2>/dev/null && echo "$ID")
 
@@ -132,6 +142,35 @@ generate_locales() {
 	esac
 
 	sudo update-locale LANG="$locale"
+}
+
+ensure_apt_line() {
+	local file=$1
+	local line=$2
+
+	[[ -f $file ]] && grep -Fxq "$line" "$file" && return 0
+
+	sudo install -d /etc/apt/apt.conf.d
+	sudo line ensure "$file" "$line"
+}
+
+locale_available() {
+	local locale=$1
+
+	local normalized
+	normalized=${locale,,}
+	normalized=${normalized/utf-8/utf8}
+
+	locale -a 2>/dev/null | tr '[:upper:]' '[:lower:]' | sed 's/utf-8/utf8/g' | grep -Fxq "$normalized"
+}
+
+locales_ready() {
+	local locale=$1
+
+	locale_available C.UTF-8 || return 1
+	locale_available en_US.UTF-8 || return 1
+	locale_available tr_TR.UTF-8 || return 1
+	grep -Eq "^LANG=\"?$locale\"?$" /etc/default/locale 2>/dev/null
 }
 
 load_session_environment() {
