@@ -23,4 +23,5 @@ Use `box` for service-aware manual control. `dropbox status` remains safe for di
 `box stop`, and `box restart` keep manual operations aligned with the systemd user service where one is installed.
 
 On non-Linux platforms, `box` does not manage a service. It keeps the same command habit and delegates to the Dropbox
-CLI when available.
+CLI when available. If the CLI is missing, `box status` reports whether the Dropbox app appears active from the live
+process state.

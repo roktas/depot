@@ -36,7 +36,40 @@ disable_desktop_autostart() {
 }
 
 dropbox_command() {
-	command -v dropbox || abort "dropbox command is missing"
+	dropbox_command_path || abort "dropbox command is missing"
+}
+
+dropbox_command_path() {
+	command -v dropbox
+}
+
+dropbox_installed() {
+	case $(uname -s) in
+	Darwin)
+		[[ -d /Applications/Dropbox.app || -d $HOME/Applications/Dropbox.app ]]
+		;;
+	Linux)
+		[[ -d $HOME/.dropbox || -x $HOME/.dropbox-dist/dropboxd ]] || command -v dropbox >/dev/null 2>&1
+		;;
+	*)
+		command -v dropbox >/dev/null 2>&1
+		;;
+	esac
+}
+
+dropbox_running() {
+	case $(uname -s) in
+	Darwin)
+		pgrep -f '/Dropbox.app/Contents/MacOS/Dropbox([[:space:]]|$)' >/dev/null 2>&1
+		;;
+	Linux)
+		pgrep -u "$(id -u)" -x dropbox >/dev/null 2>&1 ||
+			pgrep -u "$(id -u)" -x dropboxd >/dev/null 2>&1
+		;;
+	*)
+		pgrep -u "$(id -u)" -f '[Dd]ropbox' >/dev/null 2>&1
+		;;
+	esac
 }
 
 dropbox_ready() {
@@ -268,7 +301,7 @@ command.status() {
 	local dropbox
 	local enabled
 
-	dropbox=$(dropbox_command)
+	dropbox=$(dropbox_command_path || true)
 	if [[ $(uname -s) != Linux ]]; then
 		printf 'service: unsupported\n'
 	elif service_exists; then
@@ -280,8 +313,19 @@ command.status() {
 		printf 'service: missing\n'
 	fi
 
-	printf 'dropbox: '
-	"$dropbox" status
+	if [[ -n $dropbox ]]; then
+		printf 'dropbox: '
+		"$dropbox" status
+	elif dropbox_running; then
+		printf 'sync: active (Dropbox app running)\n'
+		printf 'dropbox: cli missing\n'
+	elif dropbox_installed; then
+		printf 'sync: inactive (Dropbox app installed, not running)\n'
+		printf 'dropbox: cli missing\n'
+	else
+		printf 'sync: unavailable (Dropbox app missing)\n'
+		printf 'dropbox: cli missing\n'
+	fi
 }
 
 command.stop() {
