@@ -1,5 +1,9 @@
 ---
 all:
+  hosts:
+    - newton
+    - spinoza
+    - kant
   level: normal
   links:
     bin/box: ~/.local/bin/box
