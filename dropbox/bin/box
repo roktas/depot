@@ -188,9 +188,18 @@ set_desktop_key() {
 }
 
 stop_legacy_dropbox() {
-	if ! systemctl_user is-active "$SERVICE" >/dev/null 2>&1 &&
-		pgrep -u "$(id -u)" -x dropbox >/dev/null 2>&1; then
+	systemctl_user is-active "$SERVICE" >/dev/null 2>&1 && return 0
+
+	if pgrep -u "$(id -u)" -x dropbox >/dev/null 2>&1 ||
+		pgrep -u "$(id -u)" -x dropboxd >/dev/null 2>&1; then
 		dropbox stop >/dev/null 2>&1 || true
+		sleep 2
+	fi
+
+	if pgrep -u "$(id -u)" -x dropbox >/dev/null 2>&1 ||
+		pgrep -u "$(id -u)" -x dropboxd >/dev/null 2>&1; then
+		pkill -u "$(id -u)" -x dropbox >/dev/null 2>&1 || true
+		pkill -u "$(id -u)" -x dropboxd >/dev/null 2>&1 || true
 	fi
 }
 
