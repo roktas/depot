@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+readonly SERVICE=dropbox.service
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+warn() {
+	printf '%s\n' "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+dropbox_command() {
+	command -v dropbox || abort "dropbox command is missing"
+}
+
+load_user_bus() {
+	local uid
+
+	uid=$(id -u)
+	if [[ -z ${XDG_RUNTIME_DIR:-} && -d /run/user/$uid ]]; then
+		export XDG_RUNTIME_DIR=/run/user/$uid
+	fi
+
+	if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} && -n ${XDG_RUNTIME_DIR:-} && -S $XDG_RUNTIME_DIR/bus ]]; then
+		export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
+	fi
+}
+
+linger_state() {
+	loginctl show-user "$(id -un)" -p Linger --value 2>/dev/null || printf 'unknown\n'
+}
+
+service_exists() {
+	command -v systemctl >/dev/null 2>&1 || return 1
+
+	load_user_bus
+	systemctl --user cat "$SERVICE" >/dev/null 2>&1
+}
+
+systemctl_user() {
+	load_user_bus
+	systemctl --user "$@"
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Commands
+# ------------------------------------------------------------------------------------------------------------------------
+
+command.disable() {
+	service_exists || abort "$SERVICE is not installed"
+	systemctl_user disable --now "$SERVICE"
+}
+
+command.enable() {
+	service_exists || abort "$SERVICE is not installed"
+	if [[ $(uname -s) == Linux && $(linger_state) != yes ]]; then
+		warn "W: linger is disabled; run: sudo loginctl enable-linger $(id -un)"
+	fi
+	systemctl_user enable --now "$SERVICE"
+}
+
+command.logs() {
+	service_exists || abort "$SERVICE is not installed"
+	journalctl --user -u "$SERVICE" "$@"
+}
+
+command.restart() {
+	if service_exists; then
+		systemctl_user restart "$SERVICE"
+	else
+		"$(dropbox_command)" stop >/dev/null 2>&1 || true
+		"$(dropbox_command)" start
+	fi
+}
+
+command.start() {
+	if service_exists; then
+		systemctl_user start "$SERVICE"
+	else
+		"$(dropbox_command)" start "$@"
+	fi
+}
+
+command.status() {
+	local active
+	local dropbox
+	local enabled
+
+	dropbox=$(dropbox_command)
+	if [[ $(uname -s) != Linux ]]; then
+		printf 'service: unsupported\n'
+	elif service_exists; then
+		enabled=$(systemctl_user is-enabled "$SERVICE" 2>/dev/null || true)
+		active=$(systemctl_user is-active "$SERVICE" 2>/dev/null || true)
+		printf 'service: %s / %s\n' "${enabled:-unknown}" "${active:-unknown}"
+		printf 'linger: %s\n' "$(linger_state)"
+	else
+		printf 'service: missing\n'
+	fi
+
+	printf 'dropbox: '
+	"$dropbox" status
+}
+
+command.stop() {
+	if service_exists; then
+		systemctl_user stop "$SERVICE"
+	else
+		"$(dropbox_command)" stop "$@"
+	fi
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+usage() {
+	cat <<'EOF'
+Usage: box COMMAND [ARG...]
+
+Commands:
+  status       Show service and Dropbox sync status
+  start        Start Dropbox through the user service when available
+  stop         Stop Dropbox through the user service when available
+  restart      Restart Dropbox through the user service when available
+  enable       Enable and start the user service
+  disable      Disable and stop the user service
+  logs         Show user-service logs
+  cli ARG...   Run the Dropbox CLI directly
+EOF
+}
+
+main() {
+	local command=${1:-status}
+
+	[[ $# -eq 0 ]] || shift
+	case $command in
+	status | start | stop | restart | enable | disable | logs)
+		"command.$command" "$@"
+		;;
+	cli)
+		"$(dropbox_command)" "$@"
+		;;
+	-h | --help | help)
+		usage
+		;;
+	*)
+		"$(dropbox_command)" "$command" "$@"
+		;;
+	esac
+}
+
+main "$@"

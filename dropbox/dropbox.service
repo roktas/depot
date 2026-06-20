@@ -1,0 +1,13 @@
+[Unit]
+Description=Dropbox Sync Service
+ConditionPathExists=%h/.dropbox
+ConditionFileIsExecutable=%h/.dropbox-dist/dropboxd
+
+[Service]
+Type=simple
+ExecStart=%h/.dropbox-dist/dropboxd
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target
