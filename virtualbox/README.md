@@ -27,6 +27,7 @@ if ! command -v apt-get >/dev/null; then
 	exit 0
 fi
 
+# shellcheck source=/dev/null
 . /etc/os-release
 
 case ${ID:-} in
@@ -55,9 +56,9 @@ sudo apt-get install -y --no-install-recommends "virtualbox-$version"
 sudo adduser "$USER" vboxusers || true
 
 if command -v VBoxManage >/dev/null; then
-	VBoxManage setproperty machinefolder "$HOME/Virtualbox"
+	VBoxManage setproperty machinefolder "$HOME/VirtualBox"
 elif command -v vboxmanage >/dev/null; then
-	vboxmanage setproperty machinefolder "$HOME/Virtualbox"
+	vboxmanage setproperty machinefolder "$HOME/VirtualBox"
 fi
 ```
 

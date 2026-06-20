@@ -122,7 +122,12 @@ generate_locales() {
 
 	locales_ready "$locale" && return 0
 
-	distribution=$(unset ID && . /etc/os-release 2>/dev/null && echo "$ID")
+	distribution=$(
+		unset ID
+		# shellcheck source=/dev/null
+		. /etc/os-release 2>/dev/null
+		echo "$ID"
+	)
 
 	case $distribution in
 	debian)

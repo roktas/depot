@@ -53,11 +53,6 @@ fi
 
 sudo apt-get update
 
-# Remove stale unsigned chrome.list that duplicates the signed google-chrome.list.
-if [[ -f /etc/apt/sources.list.d/chrome.list ]]; then
-	sudo rm -f /etc/apt/sources.list.d/chrome.list
-fi
-
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://dl.google.com/linux/linux_signing_key.pub |
 	sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/google-chrome.gpg

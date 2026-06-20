@@ -119,7 +119,7 @@ EOF_SERVICE
 	if [[ -L $service ]]; then
 		link=$(readlink "$service")
 		case $link in
-		*/Dropbox/home/dropbox/dropbox.service | */Dropbox/home-/dropbox/dropbox.service | */.local/src/home/dropbox/dropbox.service | */.local/src/home-/dropbox/dropbox.service)
+		*/Dropbox/home/dropbox/dropbox.service | */.local/src/home/dropbox/dropbox.service)
 			rm -f "$service"
 			;;
 		*)

@@ -52,6 +52,7 @@ if ! command -v apt-get >/dev/null; then
 	exit 0
 fi
 
+# shellcheck source=/dev/null
 . /etc/os-release
 
 sudo apt-get update
