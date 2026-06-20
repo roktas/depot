@@ -24,14 +24,16 @@ EOF
 }
 
 tailscale_bin() {
-	if command -v tailscale >/dev/null; then
-		command -v tailscale
+	local os
+	local path
+
+	os=$(uname -s)
+	if [[ $os == Linux && -x /usr/bin/tailscale ]]; then
+		printf '%s\n' /usr/bin/tailscale
 		return
 	fi
 
-	if [[ $(uname -s) == Darwin ]]; then
-		local path
-
+	if [[ $os == Darwin ]]; then
 		for path in \
 			/Applications/Tailscale.app/Contents/MacOS/Tailscale \
 			"$HOME"/Applications/Tailscale.app/Contents/MacOS/Tailscale; do
@@ -42,7 +44,36 @@ tailscale_bin() {
 		done
 	fi
 
+	if command -v tailscale >/dev/null; then
+		command -v tailscale
+		return
+	fi
+
 	abort "tailscale CLI not found"
+}
+
+external_ip() {
+	local curl
+	local ip
+	local url
+
+	curl=$(command -v curl || true)
+	[[ -n $curl ]] || {
+		printf 'unavailable (curl missing)\n'
+		return
+	}
+
+	for url in https://ipinfo.io/ip https://ifconfig.me/ip https://icanhazip.com; do
+		ip=$("$curl" -fsSL --max-time 5 "$url" 2>/dev/null || true)
+		ip=${ip//$'\r'/}
+		ip=${ip//$'\n'/}
+		if [[ $ip =~ ^[0-9A-Fa-f:.]+$ ]]; then
+			printf '%s\n' "$ip"
+			return
+		fi
+	done
+
+	printf 'unavailable\n'
 }
 
 exit_node() {
@@ -75,6 +106,13 @@ command_off() {
 	local tailscale=$1
 
 	tailscale_set "$tailscale" --exit-node=
+}
+
+command_status() {
+	local tailscale=$1
+
+	printf 'external-ip: %s\n' "$(external_ip)"
+	"$tailscale" status
 }
 
 main() {
@@ -111,7 +149,7 @@ main() {
 		;;
 	status)
 		(($# == 0)) || abort "too many arguments"
-		"$tailscale" status
+		command_status "$tailscale"
 		;;
 	list)
 		(($# == 0)) || abort "too many arguments"
