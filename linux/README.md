@@ -275,6 +275,7 @@ set_timezone() {
 	local timezone=${PROVISION_TIMEZONE:-Europe/Istanbul}
 
 	command -v timedatectl >/dev/null || return 0
+	[[ $(timedatectl show -p Timezone --value 2>/dev/null || true) == "$timezone" ]] && return 0
 
 	sudo timedatectl set-timezone "$timezone"
 }

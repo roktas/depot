@@ -51,15 +51,23 @@ if ! command -v apt-get >/dev/null; then
 	exit 0
 fi
 
-sudo apt-get update
+arch=$(dpkg --print-architecture)
+source_line="deb [arch=$arch signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main"
+
+chrome_ready() {
+	command -v google-chrome-beta >/dev/null || return 1
+	[[ -r /etc/apt/keyrings/google-chrome.gpg ]] || return 1
+	grep -Fxq "$source_line" /etc/apt/sources.list.d/google-chrome.list 2>/dev/null
+}
+
+chrome_ready && exit 0
 
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://dl.google.com/linux/linux_signing_key.pub |
 	sudo gpg --dearmor --batch --yes -o /etc/apt/keyrings/google-chrome.gpg
 sudo chmod a+r /etc/apt/keyrings/google-chrome.gpg
 
-arch=$(dpkg --print-architecture)
-printf 'deb [arch=%s signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main\n' "$arch" |
+printf '%s\n' "$source_line" |
 	sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
 
 sudo apt-get update
