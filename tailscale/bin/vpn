@@ -16,6 +16,7 @@ warn() {
 usage() {
 	cat <<'EOF'
 Usage:
+  vpn
   vpn on [EXIT_NODE]
   vpn off
   vpn status
@@ -52,6 +53,18 @@ tailscale_bin() {
 	abort "tailscale CLI not found"
 }
 
+http_text() {
+	local curl=$1
+	local url=$2
+
+	local value
+
+	value=$("$curl" -fsSL --max-time 5 "$url" 2>/dev/null || true)
+	value=${value//$'\r'/}
+	value=${value//$'\n'/}
+	printf '%s\n' "$value"
+}
+
 external_ip() {
 	local curl
 	local ip
@@ -74,6 +87,30 @@ external_ip() {
 	done
 
 	printf 'unavailable\n'
+}
+
+external_location() {
+	local city
+	local country
+	local curl
+	local location
+	local region
+
+	curl=$(command -v curl || true)
+	[[ -n $curl ]] || {
+		printf 'unavailable\n'
+		return
+	}
+
+	city=$(http_text "$curl" https://ipinfo.io/city)
+	region=$(http_text "$curl" https://ipinfo.io/region)
+	country=$(http_text "$curl" https://ipinfo.io/country)
+
+	location=$city
+	[[ -z $region ]] || location=${location:+$location, }$region
+	[[ -z $country ]] || location=${location:+$location, }$country
+
+	printf '%s\n' "${location:-unavailable}"
 }
 
 exit_node() {
@@ -111,12 +148,12 @@ command_off() {
 command_status() {
 	local tailscale=$1
 
-	printf 'external-ip: %s\n' "$(external_ip)"
+	printf 'IP: %s  Location: %s\n\n' "$(external_ip)" "$(external_location)"
 	"$tailscale" status
 }
 
 main() {
-	local command=${1:-}
+	local command=${1:-status}
 	local tailscale
 
 	case $command in
@@ -125,10 +162,6 @@ main() {
 		return
 		;;
 	on | off | status | list) ;;
-	"")
-		usage
-		return 1
-		;;
 	*)
 		usage >&2
 		abort "unknown command: $command"

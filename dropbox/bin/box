@@ -81,6 +81,31 @@ dropbox_ready() {
 	[[ -x $HOME/.dropbox-dist/dropboxd ]]
 }
 
+dropbox_status_output() {
+	local dropbox=$1
+
+	"$dropbox" status 2>&1 || true
+}
+
+dropbox_sync_state() {
+	local status=$1
+
+	case ${status,,} in
+	*up\ to\ date* | *not\ running* | *isn\'t\ running* | *paused* | *idle*)
+		printf 'idle\n'
+		;;
+	*syncing* | *indexing* | *uploading* | *downloading* | *starting* | *connecting*)
+		printf 'active\n'
+		;;
+	"")
+		printf 'unknown\n'
+		;;
+	*)
+		printf 'unknown\n'
+		;;
+	esac
+}
+
 enable_linger() {
 	local user
 
@@ -300,6 +325,8 @@ command.status() {
 	local active
 	local dropbox
 	local enabled
+	local line
+	local status
 
 	dropbox=$(dropbox_command_path || true)
 	if [[ $(uname -s) != Linux ]]; then
@@ -314,13 +341,20 @@ command.status() {
 	fi
 
 	if [[ -n $dropbox ]]; then
-		printf 'dropbox: '
-		"$dropbox" status
+		status=$(dropbox_status_output "$dropbox")
+		printf 'sync: %s\n' "$(dropbox_sync_state "$status")"
+		if [[ -n $status ]]; then
+			while IFS= read -r line; do
+				printf 'dropbox: %s\n' "$line"
+			done <<<"$status"
+		else
+			printf 'dropbox: status unavailable\n'
+		fi
 	elif dropbox_running; then
-		printf 'sync: active (Dropbox app running)\n'
-		printf 'dropbox: cli missing\n'
+		printf 'sync: unknown (Dropbox CLI unavailable)\n'
+		printf 'dropbox: running\n'
 	elif dropbox_installed; then
-		printf 'sync: inactive (Dropbox app installed, not running)\n'
+		printf 'sync: idle (Dropbox not running)\n'
 		printf 'dropbox: cli missing\n'
 	else
 		printf 'sync: unavailable (Dropbox app missing)\n'
@@ -342,7 +376,7 @@ command.stop() {
 
 usage() {
 	cat <<'EOF'
-Usage: box COMMAND [ARG...]
+Usage: box [COMMAND] [ARG...]
 
 Commands:
   status       Show service and Dropbox sync status
