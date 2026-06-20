@@ -21,7 +21,7 @@ command references matter.
 
 Use explicit config and session-token auth unless the workspace says otherwise:
 
-```bash
+```text
 oci <command> --config-file ~/.oci/config --profile SESSION --auth security_token
 ```
 
