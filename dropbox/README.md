@@ -7,8 +7,15 @@ all:
 
 # Dropbox
 
-Installs the `box` wrapper for service-aware Dropbox control where a host has a managed Dropbox service, while still
-delegating to the Dropbox CLI on hosts without one.
+Installs the `box` wrapper and, on initialized Linux Dropbox hosts, runs Dropbox through a linger-enabled user service.
+Unsupported platforms and hosts without an initialized Dropbox installation are skipped by live guardrails.
+
+## Configure
+
+```bash
+[[ -x $HOME/.local/bin/box ]] || exit 0
+"$HOME/.local/bin/box" provision
+```
 
 ## Notes
 
