@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+warn() {
+	printf '%s\n' "$*" >&2
+}
+
+usage() {
+	cat <<'EOF'
+Usage:
+  vpn on [EXIT_NODE]
+  vpn off
+  vpn status
+  vpn list
+EOF
+}
+
+tailscale_bin() {
+	if command -v tailscale >/dev/null; then
+		command -v tailscale
+		return
+	fi
+
+	if [[ $(uname -s) == Darwin ]]; then
+		local path
+
+		for path in \
+			/Applications/Tailscale.app/Contents/MacOS/Tailscale \
+			"$HOME"/Applications/Tailscale.app/Contents/MacOS/Tailscale; do
+			if [[ -x $path ]]; then
+				printf '%s\n' "$path"
+				return
+			fi
+		done
+	fi
+
+	abort "tailscale CLI not found"
+}
+
+exit_node() {
+	local node=${1:-${TAILSCALE_EXIT_NODE:-}}
+
+	[[ -n $node ]] || abort "missing exit node; set TAILSCALE_EXIT_NODE or pass EXIT_NODE"
+	printf '%s\n' "$node"
+}
+
+tailscale_set() {
+	local tailscale=$1
+	shift
+
+	if [[ $(uname -s) == Linux ]]; then
+		sudo "$tailscale" set "$@"
+	else
+		"$tailscale" set "$@"
+	fi
+}
+
+command_on() {
+	local tailscale=$1
+	local node
+
+	node=$(exit_node "${2:-}")
+	tailscale_set "$tailscale" --exit-node="$node" --exit-node-allow-lan-access
+}
+
+command_off() {
+	local tailscale=$1
+
+	tailscale_set "$tailscale" --exit-node=
+}
+
+main() {
+	local command=${1:-}
+	local tailscale
+
+	case $command in
+	-h | --help | help)
+		usage
+		return
+		;;
+	on | off | status | list) ;;
+	"")
+		usage
+		return 1
+		;;
+	*)
+		usage >&2
+		abort "unknown command: $command"
+		;;
+	esac
+
+	tailscale=$(tailscale_bin)
+	shift || true
+
+	case $command in
+	on)
+		(($# <= 1)) || abort "too many arguments"
+		command_on "$tailscale" "${1:-}"
+		;;
+	off)
+		(($# == 0)) || abort "too many arguments"
+		command_off "$tailscale"
+		;;
+	status)
+		(($# == 0)) || abort "too many arguments"
+		"$tailscale" status
+		;;
+	list)
+		(($# == 0)) || abort "too many arguments"
+		"$tailscale" exit-node list
+		;;
+	esac
+}
+
+main "$@"
