@@ -25,6 +25,8 @@
   assumption and proceed.
 - Stay inside user-bounded review or edit scope unless a required dependency is missing or the user expands scope.
 - Keep repositories clean: no leftover temp files, dead code, or unnecessary structure.
+- Keep persistent desired-state code free of one-off migrations. When migration is needed, run it as an explicit
+  operator step and leave only the final steady-state behavior in tracked modules or docs.
 - Prefer existing repo patterns over new abstractions.
 - Keep code self-documenting; avoid obvious comments and commented-out code.
 - Run scripts with shebangs directly, e.g. `./bin/foo`; do not prefix with `bash`, `ruby`, `python`, or similar.
