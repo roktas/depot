@@ -31,7 +31,10 @@ if command -v nvim >/dev/null; then
 	nvim_config=${XDG_CONFIG_HOME:-"$HOME"/.config}/nvim
 
 	if [[ -e $nvim_config/init.lua && -e $nvim_config/lazyvim.json && -d $nvim_config/lua ]]; then
-		nvim --headless '+Lazy! install' +qa
+		nvim --headless \
+			'+Lazy! install' \
+			'+lua require("config.mason").install_tools()' \
+			+qa
 	fi
 fi
 ```
