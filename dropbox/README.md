@@ -49,7 +49,6 @@ systemctl_user() {
 
 disable_desktop_autostart() {
 	local file=$HOME/.config/autostart/dropbox.desktop
-	local tmp
 
 	if command -v timeout >/dev/null; then
 		timeout 10s dropbox autostart n >/dev/null 2>&1 || true
@@ -58,12 +57,27 @@ disable_desktop_autostart() {
 	fi
 
 	[[ -f $file ]] || return 0
+
+	set_desktop_key "$file" Hidden true
+	set_desktop_key "$file" X-GNOME-Autostart-enabled false
+}
+
+set_desktop_key() {
+	local file=$1
+	local key=$2
+	local value=$3
+
+	local tmp
+
 	tmp=$(mktemp) || exit
 	awk '
-		BEGIN { found = 0 }
-		/^Hidden=/ {
+		BEGIN {
+			found = 0
+			prefix = key "="
+		}
+		index($0, prefix) == 1 {
 			if (!found) {
-				print "Hidden=true"
+				print key "=" value
 				found = 1
 			}
 			next
@@ -71,10 +85,10 @@ disable_desktop_autostart() {
 		{ print }
 		END {
 			if (!found) {
-				print "Hidden=true"
+				print key "=" value
 			}
 		}
-	' "$file" >"$tmp" || {
+	' key="$key" value="$value" "$file" >"$tmp" || {
 		rm -f "$tmp"
 		return 1
 	}
