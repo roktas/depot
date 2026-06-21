@@ -77,7 +77,7 @@ set -gx PATH $clean_path
 set -e clean_path
 
 if status --is-interactive; and isatty stdout; and not set -q TMUX; and not set -q NO_TMUX; and type -q tmux
-    exec tmux new-session -A -s main
+    exec tmux new-session -A -s main -n Hello
 end
 
 set -U XDG_CACHE_HOME ~/.cache
