@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+abort() {
+	warn "E: $*"
+	exit 1
+}
+
+warn() {
+	echo -e "$*" >&2
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+export_session() {
+	local session_id=$1
+
+	local status
+	local tempfile
+
+	tempfile=$(mktemp) || exit
+	if ! opencode export "$session_id" >"$tempfile"; then
+		rm -f "$tempfile"
+		return 1
+	fi
+
+	ruby -e '
+		input = File.read(ARGV.fetch(0))
+		start = input.index("{")
+		abort("opencode export did not emit JSON") unless start
+		print input[start..]
+	' "$tempfile"
+	status=$?
+	rm -f "$tempfile"
+	return "$status"
+}
+
+latest_id() {
+	opencode session list -n 1 --format json | ruby -rjson -e '
+		sessions = JSON.parse(STDIN.read)
+		abort("no opencode sessions") if sessions.empty?
+		puts sessions.fetch(0).fetch("id")
+	'
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+usage() {
+	cat <<-EOF
+		Usage:
+		  oc
+		  oc SESSION_ID
+		  oc --id
+	EOF
+}
+
+main() {
+	command -v opencode >/dev/null || abort "opencode is not on PATH"
+	command -v ruby >/dev/null || abort "ruby is not on PATH"
+
+	case ${1:-} in
+	-h | --help | help)
+		usage
+		;;
+	--id | id)
+		latest_id
+		;;
+	"")
+		export_session "$(latest_id)"
+		;;
+	*)
+		(($# == 1)) || abort "usage: oc [SESSION_ID]"
+		export_session "$1"
+		;;
+	esac
+}
+
+main "$@"

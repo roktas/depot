@@ -1,6 +1,6 @@
 ---
 name: colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
+description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:opencode TEXT`, `:oc TEXT`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
 metadata:
   author: https://github.com/roktas
   version: "1.0.0"
@@ -30,6 +30,19 @@ already established that local history is authoritative.
 
 Inspect the repository, commit the current work using the `:commit` behavior, then push using the `:push` behavior. If
 there is nothing to commit, skip the commit step and only push when the branch is ahead of its upstream.
+
+### `:opencode [INSTRUCTION]`, `:oc [INSTRUCTION]`
+
+Inspect the latest OpenCode session in the context of `INSTRUCTION`. Get the latest session id with
+`opencode session list -n 1 --format json`, export that session as raw JSON with `opencode export SESSION_ID`, read the
+conversation, and then apply `INSTRUCTION` to that transcript. Use this skill's `bin/oc` helper when available,
+resolved relative to this `SKILL.md`; it exports the latest session by default and strips OpenCode's leading status
+line so stdout is valid JSON. Prefer the helper over piping `opencode export` directly, because raw export can truncate
+through a pipe; if the helper is unavailable, redirect the export to a temporary file before parsing it. Do not use
+`--sanitize` unless the user explicitly requests sanitized output. Do not paste the full raw export into the chat; quote
+or summarize only the parts needed to answer or continue the task.
+
+If `INSTRUCTION` is empty, summarize the latest session's goal, outcome, failures, and concrete follow-up actions.
 
 ### `:todo [TEXT|edit|path]`, `:to [TEXT|edit|path]`
 
