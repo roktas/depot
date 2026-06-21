@@ -1,6 +1,5 @@
 ---
-linux:
-  level: extra
+level: extra
 ---
 
 # VirtualBox

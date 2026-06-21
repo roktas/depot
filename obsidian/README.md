@@ -1,7 +1,5 @@
 ---
 level: extra
-linux:
-  level: extra
 macos:
   packages:
     - cask:obsidian
@@ -14,13 +12,11 @@ Extra Obsidian desktop module.
 macOS uses Homebrew Cask. Debian-family Linux hosts install the official amd64 `.deb` from the latest Obsidian GitHub
 release when Obsidian is not already installed.
 
-## Install
+## Linux
+
+### Install
 
 ```bash
-if [[ $(uname -s) != Linux ]]; then
-	exit 0
-fi
-
 graphical_host() {
 	local session=${XDG_CURRENT_DESKTOP:-}${DESKTOP_SESSION:-}
 

@@ -19,13 +19,11 @@ mkdir -p ~/.ssh/config.d
 chmod 700 ~/.ssh ~/.ssh/config.d
 ```
 
-### Linux
+## Linux
+
+### Configure
 
 ```bash
-if [[ $(uname -s) != Linux ]]; then
-	exit 0
-fi
-
 changed=0
 current=$(mktemp)
 desired=$(mktemp)

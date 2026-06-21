@@ -35,6 +35,18 @@ that writes files, changes packages, moves home content, or touches a remote hos
 Root directories are provisioning modules when they contain `README.md`. Module frontmatter declares `links`, `copies`,
 and `packages`; README body sections may declare platform or lifecycle commands.
 
+Platform-specific commands use platform headings with lifecycle sections nested below them:
+
+```text
+## Linux
+### Install
+
+## MacOS
+### Configure
+```
+
+Do not add placeholder frontmatter just to make a platform-scoped section run.
+
 - `agents/`: shared user-wide agent instructions and common skills exposed through `~/.agents`.
 - `linux/`, `macos/`, `windows/`: platform modules.
 - `linux-`, `macos-`, `windows-`: private or extra platform variants when present.
