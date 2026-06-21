@@ -27,6 +27,12 @@
 - Keep repositories clean: no leftover temp files, dead code, or unnecessary structure.
 - Keep persistent desired-state code free of one-off migrations. When migration is needed, run it as an explicit
   operator step and leave only the final steady-state behavior in tracked modules or docs.
+- Do not paper over defects with sentinel or dummy state, narrow special cases, compatibility shims, or migration code
+  that merely bypasses the failure. Find the root cause in the model, parser, runtime, architecture, or instructions and
+  fix that cause directly.
+- When the correct fix requires a broad or architectural change, plan it deliberately, add or update tests first, and
+  validate the design before relying on it. Temporary workarounds are allowed only as explicit one-off operator recovery
+  steps; do not leave them in persistent code, desired state, or documentation.
 - Prefer existing repo patterns over new abstractions.
 - Keep code self-documenting; avoid obvious comments and commented-out code.
 - Run scripts with shebangs directly, e.g. `./bin/foo`; do not prefix with `bash`, `ruby`, `python`, or similar.
