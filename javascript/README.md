@@ -5,6 +5,7 @@ all:
     - node
     - npm:@biomejs/biome
   links:
+    environment.d/bun.conf: ~/.config/environment.d/bun.conf
     bunfig.toml: ~/.config/.bunfig.toml
     npmrc: ~/.npmrc
     eslintrc: ~/.eslintrc

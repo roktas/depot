@@ -77,6 +77,7 @@ ruby_user_bin() {
 ruby_user_bin
 unset -f ruby_user_bin
 
+path_prepend "$HOME"/.bun/bin
 path_prepend "$HOME"/.local/bin
 path_prepend "$HOME"/Dropbox/_/bin
 case $OSTYPE in

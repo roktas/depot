@@ -58,6 +58,7 @@ if type -q ruby
     test -n "$gem_user_bin"; and fish_add_path --move --path "$gem_user_bin"
 end
 
+fish_add_path --move --path "$HOME"/.bun/bin
 fish_add_path --move --path "$HOME"/.local/bin
 fish_add_path --move --path "$HOME"/Dropbox/_/bin
 
