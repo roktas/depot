@@ -33,14 +33,23 @@ there is nothing to commit, skip the commit step and only push when the branch i
 
 ### `:opencode [INSTRUCTION]`, `:oc [INSTRUCTION]`
 
-Inspect the latest OpenCode session in the context of `INSTRUCTION`. Get the latest session id with
-`opencode session list -n 1 --format json`, export that session as raw JSON with `opencode export SESSION_ID`, read the
-conversation, and then apply `INSTRUCTION` to that transcript. Use this skill's `bin/oc` helper when available,
-resolved relative to this `SKILL.md`; it exports the latest session by default and strips OpenCode's leading status
-line so stdout is valid JSON. Prefer the helper over piping `opencode export` directly, because raw export can truncate
-through a pipe; if the helper is unavailable, redirect the export to a temporary file before parsing it. Do not use
-`--sanitize` unless the user explicitly requests sanitized output. Do not paste the full raw export into the chat; quote
-or summarize only the parts needed to answer or continue the task.
+Inspect the latest OpenCode session in the context selected by `INSTRUCTION`. First trim surrounding whitespace. If
+`INSTRUCTION` is one non-empty word, treat it as a skill name: resolve that skill's source copy, preferring
+`~/Dropbox/home/agents/skills/NAME`, then `~/Dropbox/home-/agents/skills/NAME`, then the installed copy. Behave as if
+the user had written: "I just completed an OpenCode task with a weaker model using the NAME skill. Inspect the
+operations in that session and identify which NAME skill instructions the weaker model misinterpreted, or which
+instructions it technically interpreted correctly but struggled with enough to make the work longer. Based on that
+finding, improve the NAME skill in its source repository. Commit and push the resulting changes. If the weaker model
+interpreted the skill well enough, do not make a change." If `INSTRUCTION` contains multiple words, do not treat any
+word as a skill name; use the full sentence as the task context for reading the session.
+
+Get the latest session id with `opencode session list -n 1 --format json`, export that session as raw JSON with
+`opencode export SESSION_ID`, read the conversation, and then apply the selected context to that transcript. Use this
+skill's `bin/oc` helper when available, resolved relative to this `SKILL.md`; it exports the latest session by default
+and strips OpenCode's leading status line so stdout is valid JSON. Prefer the helper over piping `opencode export`
+directly, because raw export can truncate through a pipe; if the helper is unavailable, redirect the export to a
+temporary file before parsing it. Do not use `--sanitize` unless the user explicitly requests sanitized output. Do not
+paste the full raw export into the chat; quote or summarize only the parts needed to answer or continue the task.
 
 If `INSTRUCTION` is empty, summarize the latest session's goal, outcome, failures, and concrete follow-up actions.
 
