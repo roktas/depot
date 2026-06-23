@@ -9,18 +9,16 @@ Use this reference as generic `.agents/` layout guidance. More specific instruct
 1. The user's current request
 2. Root repository instructions such as `AGENTS.md`
 3. Durable specs under `.agents/specs/`
-4. Shared notes under `.agents/notes/`
-5. This reference
+4. This reference
 
-If a future agent runtime provides native task, memory, TODO, or checkpoint behavior, prefer the platform feature when
-it clearly supersedes a repo-local convention. Keep tracked repo-local files only for artifacts that remain useful to
-review, version, or share across tools.
+If a future agent runtime provides native task, memory, or TODO behavior, prefer the platform feature when it clearly
+supersedes a repo-local convention. Keep tracked repo-local files only for artifacts that remain useful to review,
+version, or share across tools.
 
 ## Core Layout
 
 ```text
 .agents/
-  notes/   shared versioned notes, inboxes, and drafts
   skills/  reusable agent capabilities
   specs/   durable repo-level or feature-level specifications
   tests/   agent-facing validation harnesses and fixtures
@@ -31,18 +29,52 @@ Mental model:
 
 ```text
 specs/  = what must be true
-notes/  = shared drafts and inboxes before promotion
 skills/ = reusable agent behavior
 tests/  = how agent-facing behavior is validated
 state/  = local runtime residue and task state
 ```
 
-Top-level directories should contain durable or reviewable agent assets. Local, transient, machine-generated, or
-episode-scoped material belongs under `state/`.
+`.agents/` is not a second project root. Human-facing project docs and shared human-agent planning docs live at the
+repository root unless they are explicitly agent-only.
 
-## Durable Areas
+## Root Project Docs
 
-### Specs
+Use these root files when a repository adopts project-level planning docs:
+
+```text
+PLAN.md       project incubation, boot planning, or living project plan
+TODO.md       shared current queue for humans and agents
+CHANGELOG.md  append-only project record
+README.md     human-facing project invariant
+AGENTS.md     agent-facing operational invariant
+```
+
+Root `TODO.md` is the shared queue. Use this shape unless the repository defines a more specific one:
+
+```md
+## Now
+
+## Next
+
+## Inbox
+```
+
+Add new unprioritized ideas to `Inbox`. Move items into `Now` or `Next` only when the current task or the user has made
+that priority clear. Do not add a `Done` section; completed work is represented by the commit history and
+`CHANGELOG.md`.
+
+Root `PLAN.md` is the first source for boot decisions and planning rationale. When planning material becomes durable
+project truth, place it where it belongs:
+
+- behavior, interfaces, invariants, acceptance criteria, formats, or architecture -> `.agents/specs/`
+- human-facing project facts -> `README.md`
+- agent operational rules -> `AGENTS.md`
+- current queue items -> `TODO.md`
+- completed work or milestones -> `CHANGELOG.md`
+
+Load `references/project.md` for project-start templates, boot closeout, and `PLAN.md` handling.
+
+## Specs
 
 Common shapes:
 
@@ -63,33 +95,7 @@ Use `specs/` when the document answers:
 Specs hold behavior, invariants, interfaces, acceptance criteria, data formats, constraints, and architectural rules.
 If specs and local task state disagree, the spec wins; update or discard stale state.
 
-### Notes
-
-Canonical shared TODO:
-
-```text
-.agents/notes/todo.md
-```
-
-Use `notes/` for tracked working material that should survive sessions and be reviewable, but is not yet durable spec
-truth.
-
-Good fits:
-
-```text
-shared TODO inbox
-early spec drafts
-cross-task questions
-rough decisions waiting for promotion
-coordination notes that should be reviewed later
-```
-
-Promote notes into `specs/` when they become durable project truth. Move a note into `state/tasks/` only when it
-becomes local active work context that should not be reviewed or versioned.
-
-Keep shared TODOs in `.agents/notes/todo.md`. Keep local task TODOs under `.agents/state/tasks/`.
-
-### Skills
+## Skills
 
 When a skill needs executable helper programs, prefer a simple `bin/` layout inside the skill directory:
 
@@ -105,17 +111,17 @@ Use extensionless command names in `bin/` when the helper is meant to be run dir
 language. Prefer `.agents/skills/<skill>/bin/plan` over deeper paths such as
 `.agents/skills/<skill>/scripts/plan.rb` when the file is a user- or agent-facing command.
 
-Use `scripts/` for non-command support scripts, generators, migrations, one-off maintainers, or files that are not the
-primary command surface of the skill.
+Use `scripts/` for non-command support scripts, generators, one-off maintainers, or files that are not the primary
+command surface of the skill.
 
 If multiple helpers need shared code, add a small `lib/` directory inside the skill and keep shared implementation
 there. Do not add `lib/` preemptively; create it only when duplication or complexity makes it useful.
 
 When writing or editing helper scripts under `.agents/`, use the relevant language skill when one is available. Apply
-the same rule to fenced code blocks in `SKILL.md`, `AGENTS.md`, specs, notes, task state, and other agent-facing
+the same rule to fenced code blocks in `SKILL.md`, `AGENTS.md`, specs, task state, and other agent-facing
 documentation.
 
-### Tests
+## Tests
 
 Examples:
 
@@ -144,7 +150,6 @@ Examples:
 .agents/state/logs/
 .agents/state/sessions/
 .agents/state/tasks/
-.agents/state/checkpoints/
 .agents/state/scratch/
 .agents/state/tmp/
 .agents/state/cache/
@@ -173,13 +178,12 @@ session traces
 tool-call dumps
 task state
 temporary scratch files
-checkpoints
 intermediate outputs
 local caches
 ```
 
-If raw state becomes meaningful for future humans, summarize it into `notes/` or `specs/`. If it creates local
-follow-up work, reflect that in `.agents/state/tasks/<task>/todo.md`.
+If raw state becomes meaningful for future humans, summarize it into root project docs or `.agents/specs/`. If it
+creates local follow-up work, reflect that in `.agents/state/tasks/<task>/todo.md`.
 
 ### Tasks
 
@@ -207,7 +211,8 @@ Create a task directory when the work is broad, risky, multi-file, likely to spa
 notes. Do not create one for trivial one-turn edits unless the user explicitly asks for local task state.
 
 Task state is mutable, local, and normally ignored by Git. It is not durable project truth and should not be committed.
-Promote durable decisions into `specs/` and shared non-canonical context into `notes/`.
+Promote durable decisions into `specs/`; promote shared project intent into root `TODO.md`, `PLAN.md`, or
+`CHANGELOG.md`.
 
 Suggested `task.md` sections:
 
@@ -237,41 +242,15 @@ For long-running work, refresh useful sections before pausing, ending a session,
 - Remaining work or next recommended first step
 - Specs, skills, tests, or root instructions updated as part of the task
 
-Use `todo.md` as a coordination checklist. Keep open items actionable and bounded. Mark an item complete only after it
-is implemented or deliberately resolved. If an item is intentionally skipped, close it with a short reason instead of
-leaving it ambiguous.
-
-### Checkpoints
-
-Use `.agents/state/checkpoints/assistant.md` only when a repository benefits from resume-aware agent sessions and the
-root instructions define or allow that convention. The checkpoint is runtime state, not project truth, and should
-normally remain untracked.
-
-At session start, compare the checkpoint with the current branch, `HEAD`, and worktree state before editing when the
-repository asks for that behavior. If `HEAD` changed, inspect recent commits when practical and summarize the drift.
-During this session-start drift check, reread current canonical skills, specs, or root instructions before applying
-conventions remembered from an earlier session. Treat the repository version as authoritative.
-
-At session closeout, refresh the checkpoint only when the user signals closeout and it is practical after any requested
-commits or pushes. Keep it small and factual:
-
-```yaml
----
-repo: name
-branch: main
-head: HEAD_SHA
-dirty: false
-timestamp: 2026-05-21T21:30:00+03:00
----
-
-Last assistant checkpoint.
-```
+Use `todo.md` as a local coordination checklist. Keep open items actionable and bounded. Mark an item complete only
+after it is implemented or deliberately resolved. If an item is intentionally skipped, close it with a short reason
+instead of leaving it ambiguous.
 
 ## Repository Instructions
 
 If the repository has an `AGENTS.md` or similar root instruction file, keep it short and operational. Use it for
-repository-wide conventions, canonical file locations, and validation commands. Do not put detailed task history or
-temporary decisions there.
+repository-wide conventions, canonical file locations, validation commands, and whether `PLAN.md` is boot-only or a
+living plan. Do not put detailed task history or temporary decisions there.
 
 When updating `.agents/specs/`, `.agents/skills/`, or long-lived task state, check root instructions for drift. If root
 instructions and a spec disagree, prefer the spec for detailed behavior and update root instructions to point to it or
@@ -284,14 +263,14 @@ Prompt shortcuts belong to the focused `colon` skill; this layout reference shou
 After meaningful `.agents/` changes, check that:
 
 - Specs contain durable behavior, not temporary execution notes.
-- Durable decisions from local task state have been promoted to specs or notes when needed.
-- TODO items reflect the current state of work.
+- Durable decisions from local task state have been promoted to specs or root project docs when needed.
+- Root `TODO.md` reflects the current state of shared work.
 - Agent-facing tests still match the specs, skills, and root validation commands they support.
 - Root repository instructions still point to the right canonical files and validation commands.
 - Skill instructions do not contain project-specific details unless the skill is intentionally repo-local.
-- Local runtime residue remains under `.agents/state/` or is summarized into notes or specs.
+- Local runtime residue remains under `.agents/state/` or is summarized into root project docs or specs.
 
-## Avoid Extra Top-Level Directories
+## Avoid Extra Directories
 
 Avoid creating:
 
@@ -305,5 +284,14 @@ Avoid creating:
 .agents/plans/
 .agents/todos/
 .agents/tasks/
+.agents/notes/
 .agents/test-output/
+tasks/
+logs/
+tmp/
+cache/
+scratch/
+work/
+plans/
+todos/
 ```

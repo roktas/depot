@@ -73,5 +73,5 @@ Use a name that violates this preflight only for a concrete reason, and state it
 ## Session Continuity
 
 - On resumed git workspaces, inspect branch, `HEAD`, and dirty state before editing.
-- Follow checkpoint or handoff conventions; if `HEAD` or dirty state changed since the last checkpoint, summarize drift
-  first.
+- Follow repository handoff conventions when present; if branch, `HEAD`, or dirty state changed since the last handoff
+  or visible session context, summarize drift first.

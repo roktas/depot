@@ -17,6 +17,41 @@ warn() {
 # Helpers
 # ------------------------------------------------------------------------------------------------------------------------
 
+append_item() {
+	local todo_file=$1
+	local item=$2
+
+	local inserted=
+	local in_inbox=
+	local line
+	local tempfile
+
+	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
+
+	while IFS= read -r line; do
+		if [[ -n $in_inbox && -z $inserted && $line == "## "* ]]; then
+			printf '%s\n\n' "- [ ] $item" >>"$tempfile"
+			inserted=true
+			in_inbox=
+		fi
+
+		printf '%s\n' "$line" >>"$tempfile"
+
+		if [[ $line == "## Inbox" ]]; then
+			in_inbox=true
+		fi
+	done <"$todo_file"
+
+	if [[ -z $inserted ]]; then
+		if [[ -z $in_inbox ]]; then
+			printf '\n## Inbox\n\n' >>"$tempfile"
+		fi
+		printf '%s\n' "- [ ] $item" >>"$tempfile"
+	fi
+
+	mv "$tempfile" "$todo_file"
+}
+
 editor() {
 	local todo_file=$1
 
@@ -53,12 +88,16 @@ ensure_file() {
 	cat >"$todo_file" <<-EOF
 		# TODO
 
+		## Now
+
+		## Next
+
 		## Inbox
 
 	EOF
 }
 
-mark_ok() {
+remove_item() {
 	local todo_file=$1
 	local item=$2
 
@@ -77,9 +116,7 @@ mark_ok() {
 			((current += 1))
 			if ((current == item)); then
 				found=true
-				if [[ $line == "- [ ] "* ]]; then
-					line="- [x] ${line#"- [ ] "}"
-				fi
+				continue
 			fi
 			;;
 		esac
@@ -117,7 +154,7 @@ todo_path() {
 
 	case $owner in
 	shared | human | agent)
-		printf '%s\n' "$root/.agents/notes/todo.md"
+		printf '%s\n' "$root/TODO.md"
 		;;
 	*)
 		abort "owner must be shared, human, or agent"
@@ -176,7 +213,7 @@ main() {
 			item=$(prompt_ok_item "$todo_file")
 		fi
 
-		mark_ok "$todo_file" "$item"
+		remove_item "$todo_file" "$item"
 		printf '%s\n' "$todo_file"
 		;;
 	--edit | edit)
@@ -189,7 +226,7 @@ main() {
 		usage
 		;;
 	*)
-		printf -- '- [ ] %s\n' "$*" >>"$todo_file"
+		append_item "$todo_file" "$*"
 		printf '%s\n' "$todo_file"
 		;;
 	esac

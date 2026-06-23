@@ -55,16 +55,16 @@ If `INSTRUCTION` is empty, summarize the latest session's goal, outcome, failure
 
 ### `:todo [TEXT|edit|path]`, `:to [TEXT|edit|path]`
 
-Use the shared repository TODO inbox at `.agents/notes/todo.md`. With text, append it as a shared TODO. With no input,
-print the TODO contents with numbered checklist items. With `edit`/`--edit`, open the file in the default editor. With
-`path`/`--path`, print the file path. Use this skill's `bin/todo` helper when available, resolved relative to this
-`SKILL.md`, not from the target repository root.
+Use the shared repository queue at root `TODO.md`. With text, append it as an unchecked item under `Inbox`. With no
+input, print the TODO contents with numbered checklist items. With `edit`/`--edit`, open the file in the default
+editor. With `path`/`--path`, print the file path. Use this skill's `bin/todo` helper when available, resolved relative
+to this `SKILL.md`, not from the target repository root.
 
 ### `:ok [TODO_NUMBER]`
 
-Mark the numbered shared TODO checklist item as done. If no number is provided, list the TODO items and ask for a number
-before editing. TODO numbers are transient display numbers; if the number is stale, invalid, ambiguous, or already
-completed, list the TODO again before acting.
+Remove the numbered shared TODO checklist item from root `TODO.md` after it has been completed or deliberately
+resolved. If no number is provided, list the TODO items and ask for a number before editing. TODO numbers are transient
+display numbers; if the number is stale, invalid, or ambiguous, list the TODO again before acting.
 
 ### `:do [TODO_NUMBER]`
 
@@ -82,5 +82,5 @@ user-level instructions. Answer with diagnosis, chosen location, proposed high-l
 ### `:close [push|no-push]`, `:cl [push|no-push]`
 
 Perform repository closeout: inspect status, check root instructions and `.agents/` consistency when relevant, summarize
-validation and remaining risk, refresh the checkpoint if the repo defines one, and commit/push only if closeout produced
-tracked changes or the input explicitly requested pushing an already-ahead branch.
+validation and remaining risk, and commit/push only if closeout produced tracked changes or the input explicitly
+requested pushing an already-ahead branch.
