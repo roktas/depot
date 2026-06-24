@@ -43,13 +43,15 @@ finding, improve the NAME skill in its source repository. Commit and push the re
 interpreted the skill well enough, do not make a change." If `INSTRUCTION` contains multiple words, do not treat any
 word as a skill name; use the full sentence as the task context for reading the session.
 
-Get the latest session id with `opencode session list -n 1 --format json`, export that session as raw JSON with
-`opencode export SESSION_ID`, read the conversation, and then apply the selected context to that transcript. Use this
-skill's `bin/oc` helper when available, resolved relative to this `SKILL.md`; it exports the latest session by default
-and strips OpenCode's leading status line so stdout is valid JSON. Prefer the helper over piping `opencode export`
-directly, because raw export can truncate through a pipe; if the helper is unavailable, redirect the export to a
-temporary file before parsing it. Do not use `--sanitize` unless the user explicitly requests sanitized output. Do not
-paste the full raw export into the chat; quote or summarize only the parts needed to answer or continue the task.
+Get the latest unarchived top-level session from OpenCode's global database, ordered by `time_updated`; do not use
+`opencode session list` for this because it filters sessions by the caller's working directory. Export that session as
+raw JSON with `opencode export SESSION_ID`, read the conversation, and then apply the selected context to that
+transcript. Use this skill's `bin/oc` helper when available, resolved relative to this `SKILL.md`; it queries the global
+database, exports the latest session by default, and strips OpenCode's leading status line so stdout is valid JSON.
+Prefer the helper over piping `opencode export` directly, because raw export can truncate through a pipe; if the helper
+is unavailable, query `opencode db` directly and redirect the export to a temporary file before parsing it. Do not use
+`--sanitize` unless the user explicitly requests sanitized output. Do not paste the full raw export into the chat;
+quote or summarize only the parts needed to answer or continue the task.
 
 If `INSTRUCTION` is empty, summarize the latest session's goal, outcome, failures, and concrete follow-up actions.
 

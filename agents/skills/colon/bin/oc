@@ -41,7 +41,9 @@ export_session() {
 }
 
 latest_id() {
-	opencode session list -n 1 --format json | ruby -rjson -e '
+	opencode db \
+		"SELECT id FROM session WHERE parent_id IS NULL AND time_archived IS NULL ORDER BY time_updated DESC LIMIT 1" \
+		--format json | ruby -rjson -e '
 		sessions = JSON.parse(STDIN.read)
 		abort("no opencode sessions") if sessions.empty?
 		puts sessions.fetch(0).fetch("id")
