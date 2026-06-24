@@ -39,6 +39,32 @@ if command -v nvim >/dev/null; then
 fi
 ```
 
+## Linux
+
+### Configure
+
+Expose the Homebrew-managed Neovim executable through sudo's system path without adding the whole user-writable
+Homebrew `bin` directory to `secure_path`.
+
+```bash
+nvim=$(command -v nvim || true)
+target=/usr/local/bin/nvim
+
+[[ -n $nvim ]] || exit 0
+
+if [[ -L $target && $(readlink "$target") == "$nvim" ]]; then
+	exit 0
+fi
+
+if [[ -e $target || -L $target ]]; then
+	printf 'E: refusing to replace existing %s\n' "$target" >&2
+	exit 1
+fi
+
+sudo install -d "${target%/*}"
+sudo ln -s "$nvim" "$target"
+```
+
 ## Update
 
 ```bash
