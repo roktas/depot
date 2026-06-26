@@ -1,12 +1,6 @@
 ---
-all:
-  level: minimal
-  packages:
-    - ca-certificates
-    - curl
-    - gh
-    - gnupg
-    - zoxide
+level: minimal
+linux:
 ---
 
 # Linux

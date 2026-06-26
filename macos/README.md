@@ -1,12 +1,10 @@
 ---
-all:
-  level: minimal
+level: minimal
+macos:
   packages:
     - dockutil
     - duti
-    - gh
     - mole
-    - zoxide
 ---
 
 # macOS
