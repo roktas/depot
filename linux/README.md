@@ -72,6 +72,10 @@ install_desktop_packages() {
 		remmina-plugin-rdp \
 		wl-clipboard \
 		xdg-utils
+
+	flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+	flatpak info --user be.alexandervanhee.gradia >/dev/null 2>&1 ||
+		flatpak install -y --user flathub be.alexandervanhee.gradia
 }
 
 install_locales() {
