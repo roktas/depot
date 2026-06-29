@@ -36,6 +36,9 @@
 - Prefer existing repo patterns over new abstractions.
 - Keep code self-documenting; avoid obvious comments and commented-out code.
 - Run scripts with shebangs directly, e.g. `./bin/foo`; do not prefix with `bash`, `ruby`, `python`, or similar.
+- For literal `rg` searches, wrap the search pattern in single quotes so the shell does not evaluate backticks, `$`,
+  globs, or other metacharacters. Prefer `rg -e 'pattern'` when the pattern might be read as an option or contains
+  punctuation-heavy text.
 - Treat chat code blocks like repository code.
 - In tracked repository files, do not write expanded home paths. Use `~` for home-relative paths and repo- or
   module-relative paths for repo files.
