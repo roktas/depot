@@ -7,8 +7,9 @@ all:
     - poppler
     - qpdf
     - typst
+    - zola
 ---
 
 # All-
 
-Normal-level shared command-line tools for document and asset processing on Linux and macOS hosts.
+Normal-level shared command-line tools for document, site, and asset processing on Linux and macOS hosts.
