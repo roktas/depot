@@ -8,8 +8,13 @@ Use this reference as generic `.agents/` layout guidance. More specific instruct
 
 1. The user's current request
 2. Root repository instructions such as `AGENTS.md`
-3. Durable specs under `.agents/specs/`
-4. This reference
+3. Loaded operational guides under `.agents/guides/`
+4. Durable specs under `.agents/specs/`
+5. This reference
+
+If a guide and a spec disagree, prefer the spec for durable behavior, invariants, interfaces, data formats, and
+acceptance criteria. Prefer the guide for operational command selection and closeout workflow. Do not leave the
+disagreement in place; update the stale file when the correct source is clear.
 
 If a future agent runtime provides native task, memory, or TODO behavior, prefer the platform feature when it clearly
 supersedes a repo-local convention. Keep tracked repo-local files only for artifacts that remain useful to review,
@@ -19,6 +24,7 @@ version, or share across tools.
 
 ```text
 .agents/
+  guides/  long-form agent-facing operational guidance
   skills/  reusable agent capabilities
   specs/   durable repo-level or feature-level specifications
   tests/   agent-facing validation harnesses and fixtures
@@ -28,6 +34,7 @@ version, or share across tools.
 Mental model:
 
 ```text
+guides/ = how agents should operate in this repository
 specs/  = what must be true
 skills/ = reusable agent behavior
 tests/  = how agent-facing behavior is validated
@@ -46,7 +53,7 @@ PLAN.md       project incubation, boot planning, or living project plan
 TODO.md       shared current queue for humans and agents
 CHANGELOG.md  append-only project record
 README.md     human-facing project invariant
-AGENTS.md     agent-facing operational invariant
+AGENTS.md     agent-facing operational invariant, bootstrap instructions, and progressive-disclosure index
 ```
 
 Root `TODO.md` is the shared queue. Use this shape unless the repository defines a more specific one:
@@ -63,6 +70,10 @@ Add new unprioritized ideas to `Inbox`. Move items into `Now` or `Next` only whe
 that priority clear. Do not add a `Done` section; completed work is represented by the commit history and
 `CHANGELOG.md`.
 
+Root `AGENTS.md` should stay short enough to be read on every session. Use it for always-on rules, precedence, canonical
+file locations, validation entrypoints, and links to relevant `.agents/guides/` files. It may act as a table of
+contents for long operational guidance; keep enough context in the root file for an agent to know which guide to load.
+
 Root `PLAN.md` is the first source for boot decisions and planning rationale. When planning material becomes durable
 project truth, place it where it belongs:
 
@@ -73,6 +84,66 @@ project truth, place it where it belongs:
 - completed work or milestones -> `CHANGELOG.md`
 
 Load `references/project.md` for project-start templates, boot closeout, and `PLAN.md` handling.
+
+## Guides
+
+Common shapes:
+
+```text
+.agents/guides/build.md
+.agents/guides/review.md
+.agents/guides/deploy.md
+.agents/guides/troubleshooting.md
+```
+
+Use `guides/` for long-form agent-facing operational guidance delegated from root `AGENTS.md`. A guide answers:
+
+> How should an agent operate for this kind of work in this repository?
+
+Good guide topics include build and test procedures, review expectations, release or deploy checklists, data-handling
+procedures, debugging playbooks, and other repository-specific operating instructions. Guides are tracked and shared;
+they are not local task notes.
+
+When splitting a large `AGENTS.md`, keep the root file as the bootstrap and progressive-disclosure index:
+
+```md
+# Agent Instructions
+
+Always apply this file.
+
+## Always
+
+- Follow existing repository patterns.
+- Keep generated state out of tracked files.
+- Do not run destructive cleanup without explicit approval.
+
+## Load When Relevant
+
+- For build, test, lint, and verification commands, read `.agents/guides/build.md`.
+- For code review expectations, read `.agents/guides/review.md`.
+- For release and publishing work, read `.agents/guides/release.md`.
+- For deployment work, read `.agents/guides/deploy.md`.
+
+## Canonical Truth
+
+- Architecture and invariants live under `.agents/specs/`.
+- Reusable agent workflows live under `.agents/skills/`.
+- Validation harnesses live under `.agents/tests/`.
+```
+
+Do not force all split `AGENTS.md` content into `specs/`. Use the content type:
+
+- durable behavior, interfaces, invariants, acceptance criteria, formats, or architecture -> `.agents/specs/`
+- reusable multi-step agent workflows, helper commands, and portable task capabilities -> `.agents/skills/`
+- reviewable validation harnesses, fixtures, smoke tests, and prompt or skill contracts -> `.agents/tests/`
+- long operational guidance that remains mostly prose -> `.agents/guides/`
+- local execution notes, logs, scratch files, and handoff state -> `.agents/state/`
+
+Keep guides focused. Each guide should have a clear load condition near the top, such as "Load for release work" or
+"Load before changing generated API clients." Do not put temporary decisions, task history, raw logs, or session notes
+in guides. If a guide becomes durable product truth, promote that part into `specs/`. If it becomes a reusable
+capability, promote it into `skills/`. If it starts carrying executable fixtures or harnesses, move those assets into
+`tests/` and leave the guide as the explanation or entrypoint.
 
 ## Specs
 
@@ -249,12 +320,13 @@ instead of leaving it ambiguous.
 ## Repository Instructions
 
 If the repository has an `AGENTS.md` or similar root instruction file, keep it short and operational. Use it for
-repository-wide conventions, canonical file locations, validation commands, and whether `PLAN.md` is boot-only or a
-living plan. Do not put detailed task history or temporary decisions there.
+repository-wide conventions, canonical file locations, validation entrypoints, progressive-disclosure guide links, and
+whether `PLAN.md` is boot-only or a living plan. Do not put detailed task history or temporary decisions there.
 
-When updating `.agents/specs/`, `.agents/skills/`, or long-lived task state, check root instructions for drift. If root
-instructions and a spec disagree, prefer the spec for detailed behavior and update root instructions to point to it or
-summarize it accurately.
+When updating `.agents/guides/`, `.agents/specs/`, `.agents/skills/`, `.agents/tests/`, or long-lived task state, check
+root instructions for drift. If root instructions and a spec disagree, prefer the spec for detailed behavior and update
+root instructions to point to it or summarize it accurately. If root instructions and a guide disagree, update the stale
+copy or make the guide load condition more precise.
 
 Prompt shortcuts belong to the focused `colon` skill; this layout reference should not duplicate shortcut semantics.
 
@@ -263,10 +335,11 @@ Prompt shortcuts belong to the focused `colon` skill; this layout reference shou
 After meaningful `.agents/` changes, check that:
 
 - Specs contain durable behavior, not temporary execution notes.
+- Guides contain operational guidance, not durable product truth or local task history.
 - Durable decisions from local task state have been promoted to specs or root project docs when needed.
 - Root `TODO.md` reflects the current state of shared work.
 - Agent-facing tests still match the specs, skills, and root validation commands they support.
-- Root repository instructions still point to the right canonical files and validation commands.
+- Root repository instructions still point to the right guides, canonical files, and validation commands.
 - Skill instructions do not contain project-specific details unless the skill is intentionally repo-local.
 - Local runtime residue remains under `.agents/state/` or is summarized into root project docs or specs.
 
@@ -275,8 +348,11 @@ After meaningful `.agents/` changes, check that:
 Avoid creating:
 
 ```text
+.agents/agents/
 .agents/docs/
+.agents/instructions/
 .agents/logs/
+.agents/rules/
 .agents/tmp/
 .agents/cache/
 .agents/scratch/
