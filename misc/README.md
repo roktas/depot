@@ -13,6 +13,7 @@ all:
     - optipng
     - rclone
     - ripgrep
+    - scc
     - slides
     - socat
     - tree
