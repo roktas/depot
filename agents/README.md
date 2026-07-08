@@ -1,5 +1,7 @@
 ---
 all:
+  packages:
+    - playwright-cli
   links:
     AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
