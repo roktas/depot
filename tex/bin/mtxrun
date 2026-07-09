@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -eu
+unset CDPATH
+
+root=${CONTEXT_ROOT:-"$HOME/.local/share/context"}
+os=$(uname -s)
+machine=$(uname -m)
+
+case "$os:$machine" in
+Linux:x86_64 | Linux:amd64)
+	platform="linux-64"
+	;;
+Linux:aarch64 | Linux:arm64)
+	platform="linux-aarch64"
+	;;
+Darwin:arm64)
+	platform="osx-arm64"
+	;;
+Darwin:x86_64 | Darwin:amd64)
+	platform="osx-64"
+	;;
+*)
+	printf "Unsupported platform: %s/%s\n" "$os" "$machine" >&2
+	exit 1
+	;;
+esac
+
+exec "$root/tex/texmf-$platform/bin/mtxrun" "$@"

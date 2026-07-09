@@ -1,6 +1,9 @@
 ---
 all:
   level: extra
+  links:
+    bin/context: ~/.local/bin/context
+    bin/mtxrun: ~/.local/bin/mtxrun
   packages:
     - pandoc
     - texlive
@@ -50,13 +53,24 @@ Darwin:x86_64 | Darwin:amd64)
 	;;
 esac
 
-runner_bindir="$root/bin"
 platform_bindir="$root/tex/texmf-$platform/bin"
-mtxrun="$runner_bindir/mtxrun"
+context="$platform_bindir/context"
+mtxrun="$platform_bindir/mtxrun"
 luametatex="$platform_bindir/luametatex"
 
 context_installed() {
-	[[ -x $mtxrun && -x $luametatex ]]
+	[[ -x $context && -x $mtxrun && -x $luametatex ]] || return 1
+
+	case $(file -bL "$luametatex" 2>/dev/null || true) in
+	ELF* | Mach-O*)
+		;;
+	*)
+		return 1
+		;;
+	esac
+
+	"$context" --version >/dev/null 2>&1 &&
+		"$mtxrun" --version >/dev/null 2>&1
 }
 
 install_context() {
@@ -67,10 +81,10 @@ install_context() {
 		fi
 	done
 
-	mkdir -p "$root"
-
 	tmpdir=$(mktemp -d)
 	trap 'rm -rf "$tmpdir"' EXIT HUP INT TERM
+
+	mkdir -p "$root"
 
 	curl \
 		--fail \
@@ -78,6 +92,8 @@ install_context() {
 		--show-error \
 		--output "$tmpdir/$archive" \
 		"$base_url/$archive"
+
+	rm -f "$context" "$mtxrun" "$luametatex"
 
 	unzip -oq "$tmpdir/$archive" -d "$root"
 
@@ -91,7 +107,7 @@ install_context() {
 
 context_installed || install_context
 
-for source in "$mtxrun" "$luametatex"; do
+for source in "$context" "$mtxrun" "$luametatex"; do
 	if [[ ! -x $source ]]; then
 		printf "Expected executable not found: %s\n" "$source" >&2
 		exit 1
@@ -101,46 +117,9 @@ done
 mkdir -p "$bindir"
 ln -sfn "$luametatex" "$bindir/luametatex"
 
-cat > "$bindir/mtxrun" <<EOF
-#!/bin/sh
-
-set -eu
-unset CDPATH
-
-root=\${CONTEXT_ROOT:-"$root"}
-texroot="\$root/tex"
-
-exec "\$root/bin/mtxrun" --tree="\$texroot" "\$@"
-EOF
-
-chmod +x "$bindir/mtxrun"
-
-cat > "$runner_bindir/context" <<EOF
-#!/bin/sh
-
-set -eu
-unset CDPATH
-
-root=\${CONTEXT_ROOT:-"$root"}
-texroot="\$root/tex"
-texmf="\$texroot/texmf-context:\$texroot/texmf"
-
-for tree in "\$texroot"/texmf-*; do
-	if [ -d "\$tree" ]; then
-		texmf="\$texmf:\$tree"
-	fi
-done
-
-export TEXMF=\${TEXMF:-"\$texmf"}
-
-exec "\$root/bin/mtxrun" --tree="\$texroot" --script context "\$@"
-EOF
-
-chmod +x "$runner_bindir/context"
-ln -sfn "$runner_bindir/context" "$bindir/context"
-
 printf "ConTeXt installed in %s\n" "$root"
-printf "Commands installed into %s\n" "$bindir"
+printf "LuaMetaTeX installed into %s\n" "$bindir"
 
-"$bindir/context" --version >/dev/null
+"$context" --version >/dev/null 2>&1
+"$mtxrun" --version >/dev/null 2>&1
 ```
