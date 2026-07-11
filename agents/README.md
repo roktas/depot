@@ -18,6 +18,6 @@ Keep this module model-neutral. If an asset is only for one agent CLI, put it in
 ```bash
 cd "$HOME" || exit
 
-playwright-cli install
+playwright-cli install-browser chrome-for-testing
 playwright-cli install --skills agents
 ```
