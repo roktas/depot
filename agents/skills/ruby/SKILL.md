@@ -1,17 +1,11 @@
 ---
 name: ruby
-description: Use when working on Ruby code, gems, Rails-adjacent projects, MiniTest or RSpec tests, Ruby packaging, Ruby style review, Ruby typing with RBI/RBS, or modern Ruby syntax choices.
-metadata:
-  author: https://github.com/roktas
-  version: "1.0.0"
+description: >-
+  Use when working on Ruby code, gems, Rails-adjacent projects, Minitest or RSpec tests, Ruby packaging, Ruby style
+  review, Ruby typing with RBI/RBS, modern Ruby syntax choices, or public API documentation with YARD.
 ---
 
-# Ruby Skills
-
-## When to Use This Skill
-
-- Building Ruby applications with modern patterns
-- Writing comprehensive MiniTest test suites
+# Ruby
 
 ## References
 
@@ -20,6 +14,7 @@ Load detailed guidance based on context:
 | Topic | Reference | Load When |
 |-------|-----------|-----------|
 | Resources | `references/resources.md` | Up-to-date Ruby resources, mostly documentation |
+| YARD | `references/yard.md` | Writing or reviewing Ruby public API documentation |
 
 ## General
 
@@ -49,3 +44,42 @@ Load detailed guidance based on context:
   - Obvious comments ("increment counter")
   - Comments instead of good naming
   - Comments about updates to old code (e.g. `# now supports xyz`)
+- **Autocorrection** - Treat broad RuboCop autocorrection, especially `rubocop -A`, as unsafe until reviewed. Inspect
+  the diff before committing autocorrected Ruby.
+- **Lint and APIs** - Do not rename public keywords, abstract method parameters, or CLI interface parameters only to
+  satisfy lint; those names can be API contracts.
+
+## Visibility
+
+- For a cohesive run of private singleton helpers defined in one lexical scope, define the group under
+  `class << self` after `private` instead of maintaining a trailing `private_class_method` name list.
+- Keep `private_class_method` for isolated methods and constructors, inherited or generated methods, and cases where
+  visibility is intentionally changed after definition.
+
+## Minitest
+
+- Use the narrowest command that covers a change, then broaden when touched code is shared.
+- Before changing behavior, add or verify characterization coverage for the current contract. Do not start a major
+  refactor until the relevant behavior has enough coverage. Test-helper and snapshot-policy changes are normal
+  exceptions to the tests-first rule.
+- Mirror the runtime file path under `test`, and put the test class in the same namespace as the code under test.
+- Name test methods as compact behavior contracts. Optimize for failure output: the name should identify which contract
+  failed without opening the file, while relying on file, class, and namespace context instead of restating everything.
+- Prefer `test_<subject>_<behavior>` when the subject helps group output. Use stable domain or method words for related
+  tests, and behavior verbs such as `returns`, `raises`, `rejects`, `extracts`, `preserves`, `caches`, `exposes`, and
+  `allows`.
+- Name the observable result, not merely the setup. Avoid bare labels such as `simple`, `basics`, `usual`, `default`,
+  `empty`, `valid`, `invalid`, `with_*`, or `without_*` unless the complete name still states the contract.
+- Use `with_*` or `without_*` only for a meaningful variant of a behavior already named by the rest of the method.
+- Use punctuation suffixes only when they are part of the public API under test, such as bang methods or predicates.
+- Keep the complete method name, including `test_`, at 60 characters or less. Do not enforce a numeric minimum; short
+  names are fine when they still state a behavior in context.
+- Do not make every assertion in a table appear in the method name, and do not split a coherent table-driven test into
+  tiny methods merely to name every case. Prefer a focused table using `each_slice(2)` for expected/actual pairs when
+  the cases exercise the same behavior.
+- When renaming a test, keep its body and placement unchanged unless they violate a separate rule.
+- Do not add migration-style absence tests for removed, unused, or never-working APIs unless absence is an active
+  contract such as sandboxing, namespace-pollution prevention, or invalid-input rejection. Remove dead APIs and retain
+  positive tests for supported behavior.
+- Do not leave placeholder tests, unexplained skips, commented-out assertions, or commented-out test bodies. Specify
+  the behavior now or remove the placeholder.
