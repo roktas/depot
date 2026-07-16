@@ -19,12 +19,11 @@ set reverse_realname=yes
 set save_history=1000
 set sort_aux=date-sent
 set sort=threads
-set status_format="%f%> %?n?(%n)? %?M?%M/?%m%?n? "
+set status_format="%f%> %?n?(%n)? %?M?%M/?%m"
 set status_on_top=yes
 set tilde=yes
 set text_flowed=yes
 set editor='vim "+setlocal filetype=mail fo+=naw tw=72 comments+=nb:>"'
-set visual='vim "+setlocal filetype=mail fo+=naw tw=72 comments+=nb:>"'
 
 set certificate_file="~/.cache/mutt/certificates"
 set header_cache="~/.cache/mutt/headers"
@@ -54,8 +53,6 @@ set folder="imaps://imap.gmail.com:993"
 set spoolfile="+INBOX"
 set postponed="+[Gmail]/Taslaklar"
 set query_command="goobook query '%s'"
-
-set smtp_url=smtp://$imap_user:$imap_pass@smtp.gmail.com:587/
 
 # Colors
 
