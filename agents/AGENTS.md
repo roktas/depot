@@ -78,3 +78,36 @@ Use a name that violates this preflight only for a concrete reason, and state it
 - On resumed git workspaces, inspect branch, `HEAD`, and dirty state before editing.
 - Follow repository handoff conventions when present; if branch, `HEAD`, or dirty state changed since the last handoff
   or visible session context, summarize drift first.
+
+# RTK - Rust Token Killer (Codex CLI)
+
+**Usage**: Token-optimized CLI proxy for shell commands.
+
+## Rule
+
+Always prefix shell commands with `rtk`.
+
+Examples:
+
+```bash
+rtk git status
+rtk cargo test
+rtk npm run build
+rtk pytest -q
+```
+
+## Meta Commands
+
+```bash
+rtk gain            # Token savings analytics
+rtk gain --history  # Recent command savings history
+rtk proxy <cmd>     # Run raw command without filtering
+```
+
+## Verification
+
+```bash
+rtk --version
+rtk gain
+which rtk
+```
