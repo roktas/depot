@@ -2,6 +2,7 @@
 all:
   packages:
     - playwright-cli
+    - rtk
   links:
     AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
