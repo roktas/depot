@@ -2,9 +2,6 @@
 all:
   links:
     alacritty.toml: ~/.config/alacritty/alacritty.toml
-macos:
-  packages:
-    - cask:alacritty
 ---
 
 # Alacritty
