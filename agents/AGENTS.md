@@ -2,53 +2,85 @@
 
 ## Scope
 
-- User-wide defaults for agents reading `~/.agents`; more specific repository, task, or tool instructions win.
-- This is not `~/AGENTS.md`; target-home layout and preference policy belong there.
+- User-wide defaults for agents reading `~/.agents`; more-specific repository, task, or tool instructions override them.
+- This is not `~/AGENTS.md`; keep target-home layout and preference policy there.
+
+## Skills (Mandatory)
+
+- Before work, load relevant language, workflow, repository, and task skills.
+- Mandatory dispatch: `bash` for shell code or snippets, `commits` for commit messages, and `dotagents` for `.agents/`
+  artifacts. Dispatch selects context. Choose implementation after reading the skill.
+- Load `turkish` only for Turkish prose, translation, terminology, tone, grammar, documentation, or UI text;
+  conversation language alone is insufficient.
+
+## Shell Commands (Mandatory)
+
+- Prefix every shell command with `rtk`. In a chain or pipeline, prefix each command.
+- Use `rtk proxy <cmd>` for raw output. Use `rtk gain` or `rtk gain --history` for savings data.
+- Run scripts with shebangs directly, e.g. `rtk ./bin/foo`; do not invoke them through `bash`, `ruby`, `python`, or
+  similar interpreters.
+- For literal `rg` searches, single-quote the pattern. Prefer `-e 'pattern'` when the pattern may look like an option or
+  contains punctuation-heavy text.
 
 ## Communication
 
-- Continue in the latest conversation language unless explicitly asked to switch; if unclear, use Turkish.
-- Do not switch language because of context compaction, model changes, tool output, or quoted English source text.
+### Language and Style
+
+- Continue in the latest conversation language unless asked to switch; if unclear, use Turkish. Never switch because
+  of context compaction, model changes, tool output, or quoted English text.
 - Keep code-facing text in English: comments, identifiers, file names, commit messages, and repository docs.
 - Be concise, direct, and explicit about errors, risks, tradeoffs, and uncertainty.
 - Prefer correctness over agreement.
-- For current or high-stakes facts, use official, up-to-date sources when possible and cite them.
-- When you need a binary (yes/no, do/don't) answer from the user (e.g., commit messages, destructive actions),
-  use the `question` tool. Set the first (Enter-selectable) option to the positive action (e.g., "Evet, komit et")
-  and the negative option second.
+- Verify current or high-stakes facts against official, up-to-date sources when possible and cite them.
+- For a required binary user decision, use the `question` tool if available. Put the positive action first (e.g.
+  `Evet, komit et`) and the negative action second. Otherwise ask a concise yes/no question in chat.
+
+### Questions and Uncertainty
+
+- Treat user questions as genuine unless explicitly marked rhetorical. They imply no answer, decision, or command.
+- Treat hedges as uncertainty, not conclusions. Turkish `gibi`, `sanıyorum`, `galiba`, `muhtemelen`, and similar forms
+  can mark doubt. Preserve it instead of silently turning the statement into a definite assertion.
+
+For a question or expression of doubt:
+
+1. Inspect the relevant context and evidence.
+2. Evaluate the claim and plausible alternatives.
+3. State the supported conclusion and reasoning. Say when no change is needed; implement only when warranted and
+   authorized.
+
+- `Bu fonksiyon fazla büyüdü gibi` -> assess whether it is actually too large; do not automatically refactor it.
+- `Sanıyorum bu tasarım sorunlu` -> verify the concern; do not accept it as a verdict.
+- `Değişken adı uygun?` -> evaluate the name; do not assume it is unsuitable.
 
 ## Engineering
 
-- Inspect context before acting; make deliberate, justified changes.
-- Track the user's underlying goal, not just the literal request; use it to guide scope, tradeoffs, and verification.
-- If the goal is missing or ambiguous enough to change the approach, ask before acting; otherwise state the reasonable
-  assumption and proceed.
-- Stay inside user-bounded review or edit scope unless a required dependency is missing or the user expands scope.
-- Keep repositories clean: no leftover temp files, dead code, or unnecessary structure.
-- Keep persistent desired-state code free of one-off migrations. When migration is needed, run it as an explicit
-  operator step and leave only the final steady-state behavior in tracked modules or docs.
-- Do not paper over defects with sentinel or dummy state, narrow special cases, compatibility shims, or migration code
-  that merely bypasses the failure. Find the root cause in the model, parser, runtime, architecture, or instructions and
-  fix that cause directly.
-- When the correct fix requires a broad or architectural change, plan it deliberately, add or update tests first, and
-  validate the design before relying on it. Temporary workarounds are allowed only as explicit one-off operator recovery
-  steps; do not leave them in persistent code, desired state, or documentation.
-- Prefer existing repo patterns over new abstractions.
-- Keep code self-documenting; avoid obvious comments and commented-out code.
-- Run scripts with shebangs directly, e.g. `./bin/foo`; do not prefix with `bash`, `ruby`, `python`, or similar.
-- For literal `rg` searches, wrap the search pattern in single quotes so the shell does not evaluate backticks, `$`,
-  globs, or other metacharacters. Prefer `rg -e 'pattern'` when the pattern might be read as an option or contains
-  punctuation-heavy text.
-- Treat chat code blocks like repository code.
-- In tracked repository files, do not write expanded home paths. Use `~` for home-relative paths and repo- or
-  module-relative paths for repo files.
+### Workflow
+
+- Before acting, inspect relevant instructions, files, and context. Identify the user's underlying goal.
+- On resumed Git work, inspect the branch, `HEAD`, and dirty state before editing. First summarize drift from the last
+  handoff or visible session context.
+- If ambiguity could materially change the approach, ask before acting. Otherwise state a reasonable assumption and
+  proceed.
+- Stay within the user's review or edit scope. Report any required dependency that would expand it.
+- Prefer existing repository patterns over new abstractions; verify changes in proportion to risk.
+- Keep repositories clean: leave no temporary files, dead code, or unnecessary structure.
+
+### Fixes and Code
+
+- Fix root causes in the model, parser, runtime, architecture, or instructions. Do not bypass defects with sentinel or
+  dummy state, narrow special cases, compatibility shims, or migration code.
+- For a broad or architectural fix, plan deliberately, add or update tests first, and validate the design.
+- Keep persistent desired state free of one-off migrations and recovery workarounds. Run them as explicit operator
+  steps; track only the final steady-state code or documentation.
+- Keep code self-documenting; avoid obvious comments and commented-out code. Treat chat code blocks like repository
+  code.
+- In tracked files, use `~` for home-relative paths and repository- or module-relative paths for repository files. Never
+  write expanded home paths.
 
 ## Naming Things
 
-These rules are mandatory when creating, renaming, or proposing names for files, directories, commands, skills, modules,
-classes, functions, variables, public APIs, or concepts. Project- or language-specific naming rules override.
-
-Before choosing a name, apply this preflight:
+When creating, renaming, or proposing a file, directory, command, skill, module, class, function, variable, public API,
+or concept, apply this mandatory preflight. Project- or language-specific naming rules override it.
 
 1. Prefer one simple, meaningful word when context allows.
 2. Do not repeat context supplied by the containing project, directory, module, class, or command.
@@ -62,52 +94,4 @@ Before choosing a name, apply this preflight:
 8. Avoid generic modeling words unless they name a real domain role. Name what the thing is for, not the container or
    implementation shape.
 
-Use a name that violates this preflight only for a concrete reason, and state it briefly.
-
-## Skills
-
-- Before matching work, load relevant language, workflow, repository, and task-specific skills.
-- Treat required dispatch rules as mandatory context loading; they do not dictate implementation after loading.
-- Required dispatch: `bash` for shell or shell snippets, `commits` for commit messages, `dotagents` for `.agents/`
-  artifacts.
-- Do not load `turkish` just because the conversation is Turkish; load it only for Turkish prose, translation,
-  terminology, tone, grammar, Turkish-facing docs, or UI text.
-
-## Session Continuity
-
-- On resumed git workspaces, inspect branch, `HEAD`, and dirty state before editing.
-- Follow repository handoff conventions when present; if branch, `HEAD`, or dirty state changed since the last handoff
-  or visible session context, summarize drift first.
-
-# RTK - Rust Token Killer (Codex CLI)
-
-**Usage**: Token-optimized CLI proxy for shell commands.
-
-## Rule
-
-Always prefix shell commands with `rtk`.
-
-Examples:
-
-```bash
-rtk git status
-rtk cargo test
-rtk npm run build
-rtk pytest -q
-```
-
-## Meta Commands
-
-```bash
-rtk gain            # Token savings analytics
-rtk gain --history  # Recent command savings history
-rtk proxy <cmd>     # Run raw command without filtering
-```
-
-## Verification
-
-```bash
-rtk --version
-rtk gain
-which rtk
-```
+Break this preflight only for a concrete reason, and state it briefly.
