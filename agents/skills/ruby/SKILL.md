@@ -24,6 +24,25 @@ Load detailed guidance based on context:
   disambiguate real siblings or are part of an established interface.
 - **Ruby Version** - **Always** use modern Ruby syntax/version if Ruby version is unspecified. **Do not** write code in legacy syntax.
 
+## Loading
+
+- Preserve gem entrypoint boundaries. Keep `bin/foo` thin: load the established executable implementation with
+  `require "foo/binaries/foo"` or `require "foo/cli"`, then invoke it. Do not reach into `lib` with `require_relative`.
+  Let the installed gem, Bundler, or the test harness provide the load path unless the repository explicitly promises
+  bare checkout execution.
+- For bare checkout execution, allow `bin/foo` to prepend only its adjacent `lib/` directory to `$LOAD_PATH` when
+  absent, then keep the normal `require`. Treat this as a narrow package-discovery bootstrap; do not use it to assemble
+  library internals or search arbitrary paths.
+- In an executable implementation, load the public library entrypoint with `require "foo"` and then any
+  executable-only features. Do not load executable implementations from `lib/foo.rb`.
+- Make each public library or component entrypoint own its internal file tree with `require_relative`. Use normal
+  `require` for external gems and independently loadable component entrypoints.
+- Keep standard-library requires near the files that use them unless the repository consistently centralizes them.
+  Keep leaf files free of sibling requires when their owning entrypoint already establishes the load order.
+- Before changing gem loading, inspect the repository's existing library entrypoints, executable implementations, and
+  package tests. Validate every promised mode: bare checkout execution without Bundler or `RUBYLIB`, explicitly
+  configured source execution when applicable, and installed-gem execution.
+
 ## Style
 
 - **Formatting** - Use `rubyfmt` as the formatting source of truth. Do not hand-align code or fight formatter output.
