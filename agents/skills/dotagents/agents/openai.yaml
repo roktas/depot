@@ -1,4 +1,0 @@
-interface:
-  display_name: "Dotagents Workspace"
-  short_description: "Place agent assets and project docs"
-  default_prompt: "Use $dotagents to place agent-facing assets under .agents/ and keep root project docs in the right files."
