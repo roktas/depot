@@ -12,7 +12,7 @@ local_cache_dir() {
 }
 
 direnv_layout_dir() {
-	echo "${direnv_layout_dir:-$PWD/.cache}"
+	echo "${direnv_layout_dir:-$PWD/.local/var}"
 }
 
 use-() {
