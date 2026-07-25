@@ -24,6 +24,11 @@ Load detailed guidance based on context:
   disambiguate real siblings or are part of an established interface.
 - **Ruby Version** - **Always** use modern Ruby syntax/version if Ruby version is unspecified. **Do not** write code in legacy syntax.
 
+## Bundler
+
+- Use `bundle update --all` when intentionally updating every dependency; argumentless `bundle update` is deprecated
+  in Bundler 4. Pass gem names for targeted updates.
+
 ## Loading
 
 - Preserve gem entrypoint boundaries. Keep `bin/foo` thin: load the established executable implementation with
