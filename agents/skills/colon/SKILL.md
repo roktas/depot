@@ -73,7 +73,7 @@ display numbers; if the number is stale, invalid, or ambiguous, list the TODO ag
 Work on the numbered shared TODO item now. Restate the selected item briefly, treat it as the current task, and do not
 mark it done unless the user explicitly asks for `:ok NUMBER` or otherwise clearly asks to close it. If the selected
 work is broad, risky, multi-file, multi-step, likely to span sessions, or needs reviewable decisions, create or update a
-bounded `.agents/state/tasks/` task before implementation and promote durable conclusions into `.agents/specs/`.
+bounded `.local/var/agents/tasks/` task before implementation and promote durable conclusions into `.agents/specs/`.
 
 ### `:learn [ERROR_DESCRIPTION]`, `:le [ERROR_DESCRIPTION]`
 

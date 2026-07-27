@@ -1,4 +1,3 @@
-.agents/state/
 !agents/skills/_/
 !agents/skills/_/**
 __pycache__/
