@@ -1,0 +1,4 @@
+interface:
+  display_name: "Local"
+  short_description: "Organize project-local and agent files"
+  default_prompt: "Use $local to place project-local side files and agent artifacts."

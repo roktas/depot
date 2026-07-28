@@ -21,6 +21,7 @@ Thumbs.db
 /.envrc
 
 .../
+/.agents/state/
 .local/
 
 /.cache

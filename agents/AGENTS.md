@@ -8,7 +8,7 @@
 ## Skills (Mandatory)
 
 - Before work, load relevant language, workflow, repository, and task skills.
-- Mandatory dispatch: `bash` for shell code or snippets, `commits` for commit messages, and `lokal` for `.agents/`
+- Mandatory dispatch: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/`
   artifacts and project-local ownership or placement. Dispatch selects context. Choose implementation after reading
   the skill.
 - Load `turkish` only for Turkish prose, translation, terminology, tone, grammar, documentation, or UI text;
