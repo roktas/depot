@@ -21,9 +21,10 @@ Thumbs.db
 /.envrc
 
 .../
-/.agents/state/
+**/.agents/state/
 .local/
 
 /.cache
 /.codex
+__pycache__/
 /coverage/
