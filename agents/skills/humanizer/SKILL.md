@@ -4,7 +4,7 @@ description: Remove clustered AI-writing habits without flattening the author's 
 license: MIT
 metadata:
   source: https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing
-  version: "2.9.0"
+  version: "2.10.0"
 ---
 
 # Humanizer
@@ -41,10 +41,13 @@ to make the text feel human.
 2. Establish the genre, audience, language, register, and protected material. If any is explicit, do not guess a
    replacement.
 3. Find clusters of the patterns below. A single watched word or punctuation mark is not enough.
-4. Plan the smallest coherent edits that remove those clusters while preserving the text's obligations and voice.
-5. Rewrite once, then audit the result internally for lost meaning, changed claim strength, fabricated detail,
+4. Before a substantial rewrite, a passage with several cluster types, or a case where false positives are plausible,
+   read [examples.md](references/examples.md) completely. For a short edit with one obvious cluster, the rules here are
+   sufficient.
+5. Plan the smallest coherent edits that remove those clusters while preserving the text's obligations and voice.
+6. Rewrite once, then audit the result internally for lost meaning, changed claim strength, fabricated detail,
    flattened voice, repetitive rhythm, and remaining pattern clusters.
-6. Return the final rewrite only, unless the user asks for diagnosis, a comparison, or an edit summary. If no
+7. Return the final rewrite only, unless the user asks for diagnosis, a comparison, or an edit summary. If no
    meaningful cluster exists, say that no humanizing change is needed instead of rewriting for activity's sake.
 
 Do not expose draft-and-critique scaffolding merely to prove that the pass occurred.
@@ -61,8 +64,10 @@ Treat these as diagnostic signals, not banned forms.
 - Generic `Challenges`, `Future outlook`, or conclusion sections that repeat abstractions instead of adding facts
 - Lists of media mentions, followers, or authorities used as substitutes for a relevant supported point
 
-Replace inflation with the concrete supported claim. When no support exists, qualify or remove the claim; never make up
-a source or specific detail.
+Remove empty intensifiers, but restate the underlying claim directly and at the same strength. Do not infer that a claim
+lacks support merely because its evidence is absent from an isolated excerpt. Qualify or remove a claim only when the
+user authorizes substantive editing and the supplied context establishes that it is unsupported; otherwise preserve it
+or flag it separately. Never make up a source or specific detail.
 
 ### Vague or evasive language
 
@@ -72,8 +77,10 @@ a source or specific detail.
 - Excessive hedging, filler, abstract nouns, and elaborate substitutes for `is`, `has`, or a direct verb
 - False ranges such as `from X to Y` when the endpoints do not form a meaningful scale
 
-Name and cite an authority only when the source is available. Otherwise state the uncertainty plainly or omit the
-unsupported sentence.
+Name and cite an authority only when the source is available. Without that source, preserve the original attribution
+and uncertainty rather than turning the claim into the narrator's assertion or deleting it. If substantive source
+cleanup is in scope and the supplied context establishes that the attribution is a placeholder, flag or revise it
+without inventing a replacement.
 
 ### Formulaic rhetoric
 
@@ -137,7 +144,8 @@ titles, proper names, examples, templates, and house style can legitimately cont
 
 Look for repetition plus functional weakness: several signals should make the prose vaguer, more inflated, more
 uniform, or less faithful to its intended voice. If an edit would only make a human choice more generic, keep the
-original.
+original. Use the preservation cases in [examples.md](references/examples.md) when punctuation, passive voice, or
+personal cadence may be legitimate.
 
 ## Output
 
