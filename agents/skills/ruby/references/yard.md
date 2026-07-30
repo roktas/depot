@@ -4,7 +4,9 @@ Load this reference when writing or reviewing Ruby public API documentation.
 
 ## Contract
 
-- Document every public class, module, and method. Describe semantics and observable behavior, not implementation.
+- Document every new or changed public class, module, and method in scope. Do not turn a focused change into a
+  repository-wide legacy documentation sweep unless the user requests it. Describe semantics and observable behavior,
+  not implementation.
 - Keep documentation in English unless the user requests otherwise.
 - Give classes and modules a concise responsibility summary.
 - For each public method, document every applicable part of its contract:
@@ -23,6 +25,7 @@ Load this reference when writing or reviewing Ruby public API documentation.
 
 ## Workflow
 
-1. Identify new or changed public surfaces after implementation and update their YARD blocks.
-2. Add an explicit YARD subtask after implementation work in task lists that change public Ruby APIs.
-3. Run `yard stats --list-undoc` to find undocumented surfaces, then run `yard doc` to verify generation.
+1. Identify new or changed public surfaces before implementation so their contracts inform the design.
+2. Update their YARD blocks with the implementation and tests; do not postpone documentation until context is lost.
+3. Run the repository's narrowest YARD validation, then `yard stats --list-undoc` or `yard doc` when the project uses
+   those whole-project checks. Review newly reported legacy gaps separately from regressions introduced by the change.

@@ -6,8 +6,12 @@ Read this file only when exact docs or command syntax matter.
   `https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliusing.htm`
 - OCI CLI advanced JSON options:
   `https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions`
+- Token-based CLI authentication:
+  `https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/clitoken.htm`
 - `oci session authenticate` reference:
   `https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/session/authenticate.html`
+- `oci session validate` reference:
+  `https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/session/validate.html`
 - `oci session refresh` reference:
   `https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/session/refresh.html`
 - `oci compute instance launch` reference:
@@ -20,5 +24,9 @@ Read this file only when exact docs or command syntax matter.
   `https://docs.oracle.com/en-us/iaas/Content/General/Concepts/resourcequotas.htm`
 - Creating a quota:
   `https://docs.oracle.com/en-us/iaas/Content/Quotas/Tasks/create-quota.htm`
+- Free Tier overview:
+  `https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier.htm`
 - Always Free resources:
   `https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm`
+- Service limits:
+  `https://docs.oracle.com/en-us/iaas/Content/General/service-limits/default.htm`

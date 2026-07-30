@@ -10,7 +10,7 @@ abort() {
 }
 
 warn() {
-	echo -e "$*" >&2
+	printf '%s\n' "$*" >&2
 }
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -26,9 +26,16 @@ append_item() {
 	local line
 	local tempfile
 
-	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
+	[[ $item != *$'\n'* && $item != *$'\r'* ]] || abort "todo item must be one line"
 
-	while IFS= read -r line; do
+	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
+	cp -p "$todo_file" "$tempfile" || {
+		rm -f "$tempfile"
+		return 1
+	}
+	: >"$tempfile"
+
+	while IFS= read -r line || [[ -n $line ]]; do
 		if [[ -n $in_inbox && -z $inserted && $line == "## "* ]]; then
 			printf '%s\n\n' "- [ ] $item" >>"$tempfile"
 			inserted=true
@@ -55,7 +62,12 @@ append_item() {
 editor() {
 	local todo_file=$1
 
-	${VISUAL:-${EDITOR:-vi}} "$todo_file"
+	local editor=${VISUAL:-${EDITOR:-vi}}
+	local -a editor_command
+
+	read -r -a editor_command <<<"$editor"
+	((${#editor_command[@]} > 0)) || abort "editor command is empty"
+	"${editor_command[@]}" "$todo_file"
 }
 
 emit_todo() {
@@ -109,8 +121,13 @@ remove_item() {
 	[[ $item =~ ^[0-9]+$ ]] || abort "todo item must be a number: $item"
 
 	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
+	cp -p "$todo_file" "$tempfile" || {
+		rm -f "$tempfile"
+		return 1
+	}
+	: >"$tempfile"
 
-	while IFS= read -r line; do
+	while IFS= read -r line || [[ -n $line ]]; do
 		case $line in
 		"- [ ] "* | "- [x] "*)
 			((current += 1))
@@ -146,6 +163,12 @@ prompt_ok_item() {
 
 repo_root() {
 	git rev-parse --show-toplevel 2>/dev/null || abort "not inside a Git repository"
+}
+
+require_file() {
+	local todo_file=$1
+
+	[[ -f $todo_file ]] || abort "TODO file not found: $todo_file"
 }
 
 todo_path() {
@@ -194,11 +217,18 @@ main() {
 	local root
 	local todo_file
 
+	case ${1:-} in
+	--help | -h | help)
+		usage
+		return
+		;;
+	esac
+
 	root=$(repo_root)
 	todo_file=$(todo_path "$owner" "$root")
-	ensure_file "$todo_file"
 
 	if (($# == 0)); then
+		require_file "$todo_file"
 		emit_todo "$todo_file"
 		return
 	fi
@@ -206,6 +236,7 @@ main() {
 	case $1 in
 	--ok | ok | --done | done)
 		shift
+		require_file "$todo_file"
 
 		item=${1:-}
 
@@ -217,15 +248,14 @@ main() {
 		printf '%s\n' "$todo_file"
 		;;
 	--edit | edit)
+		ensure_file "$todo_file"
 		editor "$todo_file"
 		;;
 	--path | path)
 		printf '%s\n' "$todo_file"
 		;;
-	--help | -h | help)
-		usage
-		;;
 	*)
+		ensure_file "$todo_file"
 		append_item "$todo_file" "$*"
 		printf '%s\n' "$todo_file"
 		;;

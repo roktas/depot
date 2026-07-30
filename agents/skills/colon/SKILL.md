@@ -11,6 +11,10 @@ metadata:
 Use this skill only when the user message starts with `:`. The first token selects the shortcut; the remaining text is
 the shortcut input. Do not treat incidental `:` characters inside normal prose as shortcuts.
 
+Match the first token exactly against the shortcuts below. If it is unknown, report the supported shortcuts instead of
+guessing a near match or executing the text as a shell command. Preserve the remaining input verbatim except for the
+explicit trimming rule under `:opencode`.
+
 When a shortcut matches, behave as if the user had written the corresponding prompt below.
 
 ## Prompt Expansions
@@ -60,13 +64,15 @@ If `INSTRUCTION` is empty, summarize the latest session's goal, outcome, failure
 Use the shared repository queue at root `TODO.md`. With text, append it as an unchecked item under `Inbox`. With no
 input, print the TODO contents with numbered checklist items. With `edit`/`--edit`, open the file in the default
 editor. With `path`/`--path`, print the file path. Use this skill's `bin/todo` helper when available, resolved relative
-to this `SKILL.md`, not from the target repository root.
+to this `SKILL.md`, not from the target repository root. Appending or editing may create a missing `TODO.md`; listing,
+help, path lookup, and completion must not create one as a side effect.
 
 ### `:ok [TODO_NUMBER]`
 
 Remove the numbered shared TODO checklist item from root `TODO.md` after it has been completed or deliberately
 resolved. If no number is provided, list the TODO items and ask for a number before editing. TODO numbers are transient
-display numbers; if the number is stale, invalid, or ambiguous, list the TODO again before acting.
+display numbers; if the number is stale, invalid, or ambiguous, list the TODO again before acting. If the queue does not
+exist, report that fact without creating it.
 
 ### `:do [TODO_NUMBER]`
 

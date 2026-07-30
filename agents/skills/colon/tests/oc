@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+TEST_DIR=$(cd "${BASH_SOURCE[0]%/*}" && pwd -P) || exit
+readonly TEST_DIR
+readonly OC_BIN=$TEST_DIR/../bin/oc
+
+abort() {
+	printf 'E: %s\n' "$*" >&2
+	exit 1
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+main() {
+	local output
+
+	output=$(PATH=/usr/bin:/bin "$OC_BIN" --help)
+	[[ $output == *'oc SESSION_ID'* ]] || abort 'help output is incomplete'
+}
+
+main "$@"

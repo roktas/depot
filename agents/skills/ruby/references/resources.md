@@ -11,6 +11,8 @@ Authoritative resources for Ruby development. Use these sources rather than sear
 
 **Primary source:** <https://docs.ruby-lang.org/en/>
 
+- Bundler command reference: <https://bundler.io/man/bundle-update.1.html>
+
 ### Other Useful Resources
 
 - <https://rubyreferences.github.io/rubychanges/> - Version-by-version changelog with examples

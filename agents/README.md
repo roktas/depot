@@ -14,6 +14,19 @@ Common agent instructions and skills installed through the shared `~/.agents` su
 
 Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.
 
+## Validate
+
+Run from the repository root after changing skills or their helpers:
+
+```bash
+rtk agents/tests/skills
+rtk agents/skills/colon/tests/todo
+rtk shellcheck agents/skills/colon/bin/* agents/skills/colon/tests/*
+```
+
+The general audit validates repository-owned skill packages and checks that external skill links still resolve. Validate
+an external skill in its canonical repository as well when that repository changes.
+
 ## Configure
 
 ```bash

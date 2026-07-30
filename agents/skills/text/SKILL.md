@@ -1,15 +1,15 @@
 ---
 name: text
 description: >-
-  Create, revise, synchronize, and render prose through a human-controlled
-  seed/spec (TEXT-.md), an authoritative master (TEXT.md), optional auxiliary
-  skills and sources, and optional derived outputs. Use $text help for
-  read-only guidance on invocation, frontmatter, and directives.
+  Use for direct $text invocations, projects that explicitly adopt the
+  TEXT-.md seed/spec and TEXT.md master workflow, or requests to reconcile or
+  render that pair with auxiliary skills, sources, and derived outputs. Do not
+  use for ordinary prose editing that has not adopted this file model.
 ---
 
 # Text
 
-Use this skill to write or maintain a document through the following model:
+Use this skill only for direct `$text` invocations or a project that explicitly adopts the following document model:
 
 ```text
 TEXT-.md  ->  TEXT.md  ->  output

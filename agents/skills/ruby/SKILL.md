@@ -20,14 +20,19 @@ Load detailed guidance based on context:
 
 - Follow the conversation language, but keep code comments, variables, and file names in English.
 - Skip basics unless asked; prefer simple Ruby over clever Ruby.
+- Resolve the supported Ruby range from `.ruby-version`, version-manager files, `required_ruby_version`, CI, lockfiles,
+  and repository instructions before choosing syntax or APIs. The installed interpreter is evidence about the current
+  machine, not the project's compatibility floor.
 - Prefer short contextual file and command names. Do not include backend or implementation details in names unless they
   disambiguate real siblings or are part of an established interface.
-- **Ruby Version** - **Always** use modern Ruby syntax/version if Ruby version is unspecified. **Do not** write code in legacy syntax.
+- When no version evidence exists, use clear broadly supported syntax and state a version assumption only when it affects
+  the design. Do not silently upgrade syntax across unrelated code.
 
 ## Bundler
 
-- Use `bundle update --all` when intentionally updating every dependency; argumentless `bundle update` is deprecated
-  in Bundler 4. Pass gem names for targeted updates.
+- Use `bundle update --all` when intentionally updating every dependency; do not rely on argumentless `bundle update`,
+  because current Bundler configurations can require the explicit flag. Pass gem names for targeted updates. Inspect the
+  lockfile diff and run relevant tests after either form.
 
 ## Loading
 
@@ -50,7 +55,9 @@ Load detailed guidance based on context:
 
 ## Style
 
-- **Formatting** - Use `rubyfmt` as the formatting source of truth. Do not hand-align code or fight formatter output.
+- **Formatting** - Use the formatter already configured by the repository, whether `rubyfmt`, RuboCop, Syntax Tree, or
+  another tool. When none is configured, follow surrounding style and do not introduce a formatter as an incidental
+  change. Do not hand-align code against formatter output.
 - **Methods** - Use `def foo = ...` syntax for simple expression methods when it improves clarity.
 - **Order**
   1. `include`/`extend`
@@ -82,6 +89,8 @@ Load detailed guidance based on context:
 
 ## Minitest
 
+- Follow the repository's selected test framework and helper. Do not translate between Minitest and RSpec merely to
+  apply this skill.
 - Use the narrowest command that covers a change, then broaden when touched code is shared.
 - Before changing behavior, add or verify characterization coverage for the current contract. Do not start a major
   refactor until the relevant behavior has enough coverage. Test-helper and snapshot-policy changes are normal

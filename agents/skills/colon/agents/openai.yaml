@@ -1,4 +1,4 @@
----
-name: colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:opencode TEXT`, `:oc TEXT`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
----
+interface:
+  display_name: "Colon Shortcuts"
+  short_description: "Expand leading-colon workflow shortcuts"
+  default_prompt: "Use $colon to interpret and execute this leading-colon shortcut."

@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+[[ -z ${TRACE:-} ]] || set -x
+unset CDPATH
+
+TEST_DIR=$(cd "${BASH_SOURCE[0]%/*}" && pwd -P) || exit
+readonly TEST_DIR
+readonly TODO_BIN=$TEST_DIR/../bin/todo
+
+abort() {
+	printf 'E: %s\n' "$*" >&2
+	exit 1
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------------------------------------------------
+
+assert_absent() {
+	local path=$1
+
+	[[ ! -e $path ]] || abort "unexpected path: $path"
+}
+
+assert_contains() {
+	local haystack=$1
+	local needle=$2
+
+	[[ $haystack == *"$needle"* ]] || abort "missing text: $needle"
+}
+
+assert_equal() {
+	local actual=$1
+	local expected=$2
+
+	[[ $actual == "$expected" ]] || abort "expected '$expected', got '$actual'"
+}
+
+# ------------------------------------------------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------------------------------------------------
+
+main() {
+	local output
+	local repo
+	local tempdir
+	local todo_file
+
+	tempdir=$(mktemp -d) || exit
+	trap 'status=$?; rm -rf "$tempdir"; exit "$status"' EXIT HUP INT QUIT TERM
+
+	repo=$tempdir/'repo with spaces'
+	mkdir -p "$repo"
+	git -C "$repo" init -q
+	todo_file=$repo/TODO.md
+
+	output=$(cd "$tempdir" && "$TODO_BIN" shared --help)
+	assert_contains "$output" 'todo shared TEXT'
+
+	output=$(cd "$repo" && "$TODO_BIN" shared --path)
+	assert_equal "$output" "$todo_file"
+	assert_absent "$todo_file"
+
+	output=$(cd "$repo" && "$TODO_BIN" shared --help)
+	assert_contains "$output" 'todo shared TEXT'
+	assert_absent "$todo_file"
+
+	if output=$(cd "$repo" && "$TODO_BIN" shared 2>&1); then
+		abort 'listing a missing queue unexpectedly succeeded'
+	fi
+	assert_contains "$output" 'TODO file not found'
+	assert_absent "$todo_file"
+
+	output=$(cd "$repo" && "$TODO_BIN" shared 'first item')
+	assert_equal "$output" "$todo_file"
+	assert_contains "$(<"$todo_file")" '- [ ] first item'
+
+	output=$(cd "$repo" && "$TODO_BIN" shared)
+	assert_contains "$output" ' 1  - [ ] first item'
+
+	output=$(cd "$repo" && "$TODO_BIN" shared --ok 1)
+	assert_equal "$output" "$todo_file"
+	[[ $(<"$todo_file") != *'first item'* ]] || abort 'completed item was not removed'
+
+	rm -rf "$tempdir"
+	trap - EXIT HUP INT QUIT TERM
+}
+
+main "$@"

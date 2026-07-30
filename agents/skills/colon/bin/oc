@@ -10,7 +10,7 @@ abort() {
 }
 
 warn() {
-	echo -e "$*" >&2
+	printf '%s\n' "$*" >&2
 }
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -64,13 +64,17 @@ usage() {
 }
 
 main() {
+	case ${1:-} in
+	-h | --help | help)
+		usage
+		return
+		;;
+	esac
+
 	command -v opencode >/dev/null || abort "opencode is not on PATH"
 	command -v ruby >/dev/null || abort "ruby is not on PATH"
 
 	case ${1:-} in
-	-h | --help | help)
-		usage
-		;;
 	--id | id)
 		latest_id
 		;;
