@@ -25,7 +25,8 @@ rtk shellcheck agents/skills/colon/bin/* agents/skills/colon/tests/*
 ```
 
 The general audit validates repository-owned skill packages and checks that external skill links still resolve. Validate
-an external skill in its canonical repository as well when that repository changes.
+an external skill in its canonical repository as well when that repository changes. Pass another skill directory as
+the optional argument when a related repository reuses this audit.
 
 ## Configure
 

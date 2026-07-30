@@ -106,4 +106,14 @@ class Audit
   end
 end
 
-Audit.new(Pathname(__dir__).join("../skills").cleanpath).run
+abort("usage: #{File.basename($PROGRAM_NAME)} [SKILL_ROOT]") if ARGV.length > 1
+
+root = if ARGV.empty?
+  Pathname(__dir__).join("../skills").cleanpath
+else
+  Pathname(ARGV.fetch(0)).expand_path
+end
+
+abort("skill root not found: #{root}") unless root.directory?
+
+Audit.new(root).run
