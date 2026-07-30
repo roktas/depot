@@ -6,27 +6,14 @@ metadata:
   version: "1.0.0"
 ---
 
-# Bash
+# Bash Skills
 
 ## General
 
 - Follow the conversation language, but keep code comments, variables, and file names in English.
 - Skip basics unless asked; prefer simple Bash over clever Bash.
-- Inspect repository instructions, the shebang, callers, and existing tests before choosing syntax. Preserve the target
-  interpreter; do not turn a POSIX `sh` script into Bash merely to use a preferred Bash construct.
-- Follow an established project formatter and style when they conflict with this skill's defaults.
 - Prefer short contextual command and file names. Do not include backend or implementation details in names unless they
   disambiguate real siblings or are part of an established interface.
-
-## Workflow
-
-1. Classify the target as Bash or POSIX `sh` before editing. When a snippet has no explicit interpreter, choose the
-   narrowest shell that supports its required behavior and state a consequential assumption.
-2. Inspect how arguments, environment variables, standard streams, exit statuses, and signals form the script's public
-   contract.
-3. Make the smallest coherent change and preserve unrelated user edits.
-4. Check syntax with the target shell, run `shellcheck -s bash` or `shellcheck -s sh` when available, then run the
-   narrowest direct executable test. Review every suppression rather than disabling a class of warnings broadly.
 
 ## Style
 
@@ -34,10 +21,8 @@ metadata:
 - **Scope** - Use `local` for local vars, `readonly` for globals.
 - **Local order** - In functions, declare locals assigned from positional arguments first, in positional order. Then leave
   one blank line and declare the function's other local variables alphabetically.
-- **Conditions** - In Bash, use `[[ ... ]]` and `&&`/`||` instead of `-a`/`-o`. In POSIX `sh`, use `[ ... ]` or `case`.
-- **Quotes** - Quote parameter expansions and command substitutions by default. Leave an expansion unquoted only when
-  word splitting or glob expansion is intentional and safe. Prefer `"$HOME/path/to/file"` and always use `"$@"` when
-  forwarding arguments.
+- **Conditions** - Always use `[[ ... ]]`. Use `&&`/`||` instead of `-a`/`-o`.
+- **Quotes** - Quote only necessary elements (e.g., `"$HOME"/path/to/file`).
 - **Ops** - Use `$(...)` for capture, `=` for string equality.
 - **Case** - No indent for case patterns, 1 tab for body.
 
@@ -137,35 +122,35 @@ metadata:
   }
 
   warn() {
-	printf '%s\n' "$*" >&2
+  	echo -e "$*" >&2
   }
   ```
 
 - **Main function** - Use `main() { ... }` and call `main "$@"`.
 - **Efficiency** - Use shell substitution (`${0##*/}`) over external tools (`basename`)
-- **Silence** - If the command offers a quiet option for silent operation, use it, such as `grep -q`; otherwise redirect
-  explicitly with `>/dev/null 2>&1`.
-- **Arrays** - In Bash, use `mapfile` for line-oriented output capture when the producer's exit status is not part of the
-  contract: `mapfile -t arr < <(CMD)`. Process substitution does not propagate `CMD` failure through `mapfile`; use a
-  temporary file or another explicit status check when failure matters.
-- **Temporary paths** - Create private temporary files or directories with `mktemp`, quote the resolved path, constrain
-  every cleanup to that exact path, and preserve the original status. Install cleanup before work that can fail. For a
-  script-level temporary directory:
+- **Silence** - If the command offers a quiet option for silent operation, use that option, ie. `grep -q`; otherwise,
+  use the `&>/dev/null` shell redirection.
+- **Arrays** - Use `mapfile` for output capture: `mapfile -t arr < <(CMD)`.
+- **Temp Files** - Use `mktemp` + `trap`.
 
   ```bash
-	tempdir=$(mktemp -d) || exit 1
-	readonly tempdir
-	trap 'status=$?; rm -rf -- "$tempdir" || :; exit "$status"' EXIT
+  local tempfile
+  tempfile=$(mktemp) || exit
+  trap 'err=$? && rm -f "'"$tempfile"'" || exit $err' EXIT HUP INT QUIT TERM
   ```
 
-  If the path is local to a function, clean it before that function returns or capture its value in the trap; an `EXIT`
-  trap cannot safely read a local variable after its scope ends. Add signal traps only when the script needs behavior
-  beyond the shell's ordinary exit handling.
+- **Temp Dirs**
+
+  ```bash
+  local tempdir
+  tempdir=$(mktemp -d) || exit
+  trap 'err=$? && rm -rf "'"$tempdir"'" || exit $err' EXIT HUP INT QUIT TERM
+  ```
 
 ## Gotchas
 
 - **Local** - `local x=$(...)` swallows exit codes. Define `local x` first, then assign.
 - **Unbound** - With `set -u`, use `${var:-}` to avoid errors on unbound vars.
-- **Locale** - Sorting, character classes, case conversion, and number formatting depend on locale. Set a locale only
-  when the operation requires fixed semantics: use `LC_ALL=C` for bytewise behavior, or first verify that the chosen
-  UTF-8 locale exists. Do not assume `en_US.UTF-8` is installed.
+- **Locale** - Sorting, character classes (`[a-z]`), and number formatting depend on locale. Add
+  `export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8` to the prelude in locale-dependent scripts for predictable
+  behavior.
