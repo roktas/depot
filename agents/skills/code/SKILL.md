@@ -123,10 +123,11 @@ and ordinary validation.
 1. Re-read the request, active contracts, and each affected file or module as a whole, not only the changed hunks. Check
    structural integrity, control and data flow, terminology, assumptions, interfaces, error behavior, and agreement
    among code, tests, documentation, configuration, specifications, and desired state.
-2. Inspect the final diff and bounded adjacent surfaces aggressively for leftovers, stale state, and slop: superseded
-   names or concepts, dead or unreachable code, unused imports or dependencies, obsolete branches, stale tests or
-   fixtures, outdated documentation or configuration, unjustified compatibility paths, duplicated logic, TODOs or
-   placeholders, debug output, generated or temporary files, and accidental formatting or naming churn.
+2. When source code is under review, read [smells.md](references/smells.md) completely and use it as a heuristic
+   baseline. Inspect the final diff and bounded adjacent surfaces aggressively for leftovers, stale state, and slop:
+   superseded names or concepts, dead or unreachable code, unused imports or dependencies, obsolete branches, stale
+   tests or fixtures, outdated documentation or configuration, unjustified compatibility paths, duplicated logic,
+   TODOs or placeholders, debug output, generated or temporary files, and accidental formatting or naming churn.
 3. Use one-time searches keyed to renamed or removed concepts and inspect the supported path positively. Do not turn
    historical absence into permanent tests unless absence is itself a current security or interface contract.
 4. During implementation, fix every in-scope finding introduced by the change, including any issue that must be resolved
