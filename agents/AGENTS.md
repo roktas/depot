@@ -72,14 +72,28 @@ For a question or expression of doubt:
 ### Fixes and Code
 
 - Fix root causes in the model, parser, runtime, architecture, or instructions. Do not bypass defects with sentinel or
-  dummy state, narrow special cases, compatibility shims, or migration code.
+  dummy state or narrow special cases.
+- Choose the simplest implementation that fully meets current requirements and invariants. Do not remove useful domain
+  structure merely to reduce the amount of code.
+- Prefer established, well-maintained libraries when they materially reduce complexity or risk and fit the project's
+  constraints. Do not add a dependency for trivial code.
 - For a broad or architectural fix, plan deliberately, add or update tests first, and validate the design.
-- Keep persistent desired state free of one-off migrations and recovery workarounds. Run them as explicit operator
-  steps; track only the final steady-state code or documentation.
 - Keep code self-documenting; avoid obvious comments and commented-out code. Treat chat code blocks like repository
   code.
 - In tracked files, use `~` for home-relative paths and repository- or module-relative paths for repository files. Never
   write expanded home paths.
+
+### Compatibility and Design Changes
+
+- Preserve backward compatibility only for a concrete current contract: released public APIs, external consumers,
+  persisted user data, deployed state, or an explicit repository or task requirement. If no such contract exists, do
+  not add shims, aliases, fallbacks, dual paths, or legacy formats.
+- When a design decision changes, make the new decision canonical across code, tests, documentation, configuration, and
+  desired state. Remove superseded concepts; current-state artifacts should read as if the old decision had never
+  existed.
+- Use migrations only to transform real persisted or deployed state. Keep migration and recovery behavior explicit and
+  outside steady-state code, documentation, configuration, and desired state; retain migration artifacts only when the
+  project requires a durable history.
 
 ## Naming Things
 
