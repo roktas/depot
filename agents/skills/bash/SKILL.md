@@ -6,14 +6,7 @@ metadata:
   version: "1.0.0"
 ---
 
-# Bash Skills
-
-## General
-
-- Follow the conversation language, but keep code comments, variables, and file names in English.
-- Skip basics unless asked; prefer simple Bash over clever Bash.
-- Prefer short contextual command and file names. Do not include backend or implementation details in names unless they
-  disambiguate real siblings or are part of an established interface.
+# Bash
 
 ## Style
 
@@ -35,7 +28,6 @@ metadata:
   	;;
   esac
   ```
-
 
 - **Alphabetize** arrays, dicts, assignments, and functions if order is irrelevant.
 - **Script layout** - In standalone scripts, group content in this order:
@@ -62,13 +54,6 @@ metadata:
 - **Main section** - Put non-command functions used directly by `main`, such as `usage`, `dispatch`, or `help`, in the
   `Main` section alphabetically. The `main` function itself is always the last function in the `Main` section regardless
   of alphabetical order.
-- **Comments** - Code should be self-documenting. If you need a comment to explain WHAT the code does, consider
-  refactoring to make it clearer. Unacceptable comments:
-  - Comments that repeat what code does
-  - Commented-out code (delete it)
-  - Obvious comments ("increment counter")
-  - Comments instead of good naming
-  - Comments about updates to old code (e.g. `# now supports xyz`)
 
 ## Patterns
 

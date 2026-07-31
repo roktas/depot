@@ -2,17 +2,22 @@
 
 ## Scope
 
-- User-wide defaults for agents reading `~/.agents`; more-specific repository, task, or tool instructions override them.
+- User-wide defaults for agents reading `~/.agents`; more-specific repository, task, or tool instructions refine them
+  and override them only for a concrete conflict.
 - This is not `~/AGENTS.md`; keep target-home layout and preference policy there.
 
 ## Skills (Mandatory)
 
 - Before work, load relevant language, workflow, repository, and task skills.
-- Mandatory dispatch: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/`
-  artifacts and project-local ownership or placement. Dispatch selects context. Choose implementation after reading
-  the skill.
-- Load a language skill only when text in that language is the user-requested work product; conversation or response
-  language alone is insufficient.
+- Mandatory dispatch: `code` for engineering and code-review tasks; `write` for substantive prose planning, drafting,
+  or structural revision.
+- Also mandatory: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/` artifacts
+  and project-local ownership or placement.
+- Dispatch selects context, not implementation. Choose implementation after reading every applicable skill.
+- Apply overlapping instructions cumulatively. Loading a skill does not suspend unrelated user-wide rules, and a
+  narrower rule's silence is not a waiver. Override a default only for a concrete conflict; otherwise keep both.
+- Load a natural-language skill only when text in that language is the user-requested work product; conversation or
+  response language alone is insufficient. When `write` applies, let it orchestrate the target-language skill.
 
 ## Shell Commands (Mandatory)
 
@@ -56,49 +61,35 @@ For a question or expression of doubt:
 - `Sanıyorum bu tasarım sorunlu` -> verify the concern; do not accept it as a verdict.
 - `Değişken adı uygun?` -> evaluate the name; do not assume it is unsuitable.
 
-## Engineering
+## Repository Work
 
-### Workflow
-
-- Before acting, inspect relevant instructions, files, and context. Identify the user's underlying goal.
-- On resumed Git work, inspect the branch, `HEAD`, and dirty state before editing. First summarize drift from the last
+- Before acting in a repository, inspect applicable instructions, relevant files, and the user's underlying goal.
+- On resumed Git work, inspect the branch, `HEAD`, and dirty state before editing, then summarize drift from the last
   handoff or visible session context.
-- If ambiguity could materially change the approach, ask before acting. Otherwise state a reasonable assumption and
-  proceed.
-- Stay within the user's review or edit scope. Report any required dependency that would expand it.
-- Prefer existing repository patterns over new abstractions; verify changes in proportion to risk.
-- Keep repositories clean: leave no temporary files, dead code, or unnecessary structure.
+- If ambiguity could materially change the approach, ask before acting. Otherwise state a reasonable assumption, stay
+  within the requested review or edit scope, and report any dependency that would expand it.
+- Prefer existing repository patterns, verify changes in proportion to risk, and leave no temporary files, dead code,
+  or unnecessary structure.
+- For engineering changes, apply the code-review rules below to the final diff and affected artifacts before closeout.
+  Fix in-scope findings; report unrelated pre-existing debt instead of silently expanding scope.
 
-### Fixes and Code
+## Code Review Rules
 
-- Fix root causes in the model, parser, runtime, architecture, or instructions. Do not bypass defects with sentinel or
-  dummy state or narrow special cases.
-- Choose the simplest implementation that fully meets current requirements and invariants. Do not remove useful domain
-  structure merely to reduce the amount of code.
-- Prefer established, well-maintained libraries when they materially reduce complexity or risk and fit the project's
-  constraints. Do not add a dependency for trivial code.
-- For a broad or architectural fix, plan deliberately, add or update tests first, and validate the design.
-- Keep code self-documenting; avoid obvious comments and commented-out code. Treat chat code blocks like repository
-  code.
-- In tracked files, use `~` for home-relative paths and repository- or module-relative paths for repository files. Never
-  write expanded home paths.
-
-### Compatibility and Design Changes
-
-- Preserve backward compatibility only for a concrete current contract: released public APIs, external consumers,
-  persisted user data, deployed state, or an explicit repository or task requirement. If no such contract exists, do
-  not add shims, aliases, fallbacks, dual paths, or legacy formats.
-- When a design decision changes, make the new decision canonical across code, tests, documentation, configuration, and
-  desired state. Remove superseded concepts; current-state artifacts should read as if the old decision had never
-  existed.
-- Use migrations only to transform real persisted or deployed state. Keep migration and recovery behavior explicit and
-  outside steady-state code, documentation, configuration, and desired state; retain migration artifacts only when the
-  project requires a durable history.
+- Review the selected change and its bounded affected surfaces, not only the changed hunks.
+- Aggressively search those surfaces for leftovers, stale state, and slop: superseded names or concepts, dead code,
+  unused dependencies, obsolete branches, stale tests, fixtures, documentation, or configuration, unjustified
+  compatibility paths, duplicated logic, TODOs, placeholders, debug output, temporary files, and accidental churn.
+- Re-read each affected artifact or module as a whole. Check structural integrity, control and data flow, terminology,
+  assumptions, interfaces, error behavior, and agreement among code, tests, documentation, configuration,
+  specifications, and desired state.
+- Report actionable in-scope defects with evidence and consequences. Treat unrelated pre-existing debt as separate
+  context, not as a finding against the reviewed change, unless the change worsens it or relies on it.
 
 ## Naming Things
 
 When creating, renaming, or proposing a file, directory, command, skill, module, class, function, variable, public API,
-or concept, apply this mandatory preflight. Project- or language-specific naming rules override it.
+or concept, apply this mandatory preflight. Project- or language-specific naming rules refine it and override it only
+for a concrete conflict.
 
 1. Prefer one simple, meaningful word when context allows.
 2. Do not repeat context supplied by the containing project, directory, module, class, or command.

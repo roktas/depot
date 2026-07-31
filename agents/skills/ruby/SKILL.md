@@ -18,13 +18,9 @@ Load detailed guidance based on context:
 
 ## General
 
-- Follow the conversation language, but keep code comments, variables, and file names in English.
-- Skip basics unless asked; prefer simple Ruby over clever Ruby.
 - Resolve the supported Ruby range from `.ruby-version`, version-manager files, `required_ruby_version`, CI, lockfiles,
   and repository instructions before choosing syntax or APIs. The installed interpreter is evidence about the current
   machine, not the project's compatibility floor.
-- Prefer short contextual file and command names. Do not include backend or implementation details in names unless they
-  disambiguate real siblings or are part of an established interface.
 - When no version evidence exists, use clear broadly supported syntax and state a version assumption only when it affects
   the design. Do not silently upgrade syntax across unrelated code.
 
@@ -80,13 +76,6 @@ Load detailed guidance based on context:
   6. `private` methods (Alpha)
 
 - **Alphabetize** arrays, dicts, assignments, and methods if order is irrelevant.
-- **Comments** - Code should be self-documenting. If you need a comment to explain WHAT the code does, consider
-  refactoring to make it clearer. Unacceptable comments:
-  - Comments that repeat what code does
-  - Commented-out code (delete it)
-  - Obvious comments ("increment counter")
-  - Comments instead of good naming
-  - Comments about updates to old code (e.g. `# now supports xyz`)
 - **Autocorrection** - Treat broad RuboCop autocorrection, especially `rubocop -A`, as unsafe until reviewed. Inspect
   the diff before committing autocorrected Ruby.
 - **Lint and APIs** - Do not rename public keywords, abstract method parameters, or CLI interface parameters only to
@@ -123,8 +112,5 @@ Load detailed guidance based on context:
   tiny methods merely to name every case. Prefer a focused table using `each_slice(2)` for expected/actual pairs when
   the cases exercise the same behavior.
 - When renaming a test, keep its body and placement unchanged unless they violate a separate rule.
-- Do not add migration-style absence tests for removed, unused, or never-working APIs unless absence is an active
-  contract such as sandboxing, namespace-pollution prevention, or invalid-input rejection. Remove dead APIs and retain
-  positive tests for supported behavior.
 - Do not leave placeholder tests, unexplained skips, commented-out assertions, or commented-out test bodies. Specify
   the behavior now or remove the placeholder.

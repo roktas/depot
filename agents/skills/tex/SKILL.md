@@ -10,13 +10,9 @@ metadata:
 
 ## General
 
-- Follow the conversation language, but keep TeX comments, macros, labels, and file names in English.
-- Skip basics unless asked; prefer publication-quality source with simple structure.
 - Inspect `latexmkrc`, build scripts, CI, document class, engine directives, package set, bibliography backend, and
   existing generated-file policy before editing. Preserve the established engine and toolchain unless the task requires
   a migration.
-- Prefer short contextual file names. Do not include backend or implementation details in names unless they
-  disambiguate real siblings or are part of an established interface.
 - For a new Unicode document with no project constraints, prefer LuaLaTeX when it is available. State the choice and do
   not assume the current machine's engine exists in the user's publication environment.
 
@@ -32,13 +28,6 @@ metadata:
 ## Style
 
 - **Indent** - 2 spaces.
-- **Comments** - Code should be self-documenting. If you need a comment to explain WHAT the code does, consider
-  refactoring to make it clearer. Unacceptable comments:
-  - Comments that repeat what code does
-  - Commented-out code (delete it)
-  - Obvious comments ("increment counter")
-  - Comments instead of good naming
-  - Comments about updates to old code (e.g. `% now supports xyz`)
 
 ## Patterns
 
