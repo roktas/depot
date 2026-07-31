@@ -217,15 +217,14 @@ Prefer explicit mappings and the smallest non-conflicting set of useful skills.
 Relevant skills may cover language, academic writing, technical writing,
 citation practice, genre, or another document-specific concern.
 
-For prose creation, translation, substantive rewriting, or finalization,
-include `humanizer` by default when available. Do not couple this default merely
-to loading a language skill: skip it for help, planning, metadata-only work,
-source inventory, and runs that make no prose change. Apply it after domain,
-genre, and language work stabilizes, then revalidate higher-priority rules;
-repeat it after any corrective prose edit. Preserve directives, human edits,
-meaning, uncertainty, claim strength, evidence, citations, identifiers, and
-register. More-specific project or genre rules override its generic deliverable
-format. An explicit user or `AGENTS.md` instruction may disable this default.
+For English prose creation, translation into English, substantive rewriting, or finalization, include `english` by
+default when available. Do not infer the target language from the conversation or source: skip it when the target is not
+English and for help, planning, metadata-only work, source inventory, or runs that make no prose change. Once domain,
+genre, and language requirements are known, use its composition guidance during drafting and ordinary editing. After
+content, structure, terminology, evidence, and citations stabilize, run its de-AI pass last; repeat it only after a
+later corrective prose edit. Preserve directives, human edits, meaning, uncertainty, claim strength, evidence,
+citations, identifiers, and register. More-specific project or genre rules override its generic deliverable format. An
+explicit user or `AGENTS.md` instruction may disable this default.
 
 The `text` skill governs lifecycle, authority, reconciliation, and directive
 semantics. Auxiliary skills govern language and writing behavior. An auxiliary

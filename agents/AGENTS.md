@@ -11,15 +11,17 @@
 - Mandatory dispatch: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/`
   artifacts and project-local ownership or placement. Dispatch selects context. Choose implementation after reading
   the skill.
-- Load `turkish` only for Turkish prose, translation, terminology, tone, grammar, documentation, or UI text;
-  conversation language alone is insufficient.
+- Load a language skill only when text in that language is the user-requested work product; conversation or response
+  language alone is insufficient.
 
 ## Shell Commands (Mandatory)
 
 - Prefix every shell command with `rtk`. In a chain or pipeline, prefix each command.
 - Use `rtk proxy <cmd>` for raw output. Use `rtk gain` or `rtk gain --history` for savings data.
-- Run scripts with shebangs directly, e.g. `rtk ./bin/foo`; do not invoke them through `bash`, `ruby`, `python`, or
-  similar interpreters.
+- Run executable scripts with shebangs directly, e.g. `rtk ./bin/foo`; do not invoke them through `bash`, `ruby`,
+  `python`, or similar interpreters.
+- If a required shebang script is not executable, use a repository-supported wrapper. If none exists, fix its mode only
+  when the file is in edit scope; otherwise report the packaging defect. Do not bypass the mode with an interpreter.
 - For literal `rg` searches, single-quote the pattern. Prefer `-e 'pattern'` when the pattern may look like an option or
   contains punctuation-heavy text.
 
@@ -38,7 +40,8 @@
 
 ### Questions and Uncertainty
 
-- Treat user questions as genuine unless explicitly marked rhetorical. They imply no answer, decision, or command.
+- Treat user questions as genuine unless explicitly marked rhetorical. Do not treat a question as supplying its own
+  answer, decision, or command.
 - Treat hedges as uncertainty, not conclusions. Turkish `gibi`, `sanıyorum`, `galiba`, `muhtemelen`, and similar forms
   can mark doubt. Preserve it instead of silently turning the statement into a definite assertion.
 

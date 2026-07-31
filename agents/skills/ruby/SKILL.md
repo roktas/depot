@@ -28,6 +28,18 @@ Load detailed guidance based on context:
 - When no version evidence exists, use clear broadly supported syntax and state a version assumption only when it affects
   the design. Do not silently upgrade syntax across unrelated code.
 
+## Design
+
+- Use the number of classes the problem domain requires to give each real concept, invariant, and behavior a coherent
+  home. Do not over-engineer with speculative abstractions, but do not avoid classes so aggressively that an anemic
+  model pushes domain behavior into procedural services, hashes, or conditionals.
+- For simple record-like values, use `Data.define` when the supported Ruby range permits immutable member semantics, and
+  use `Struct.new` when mutation is part of the contract. Do not write a bespoke class solely to hold fields; use one
+  when validation, invariants, behavior, inheritance, or a stable public API justifies it.
+- Reduce an owning class's internal complexity with cohesive nested helper modules or classes when useful. Keep these
+  helpers inside the owning namespace, mark their constants with `private_constant`, and do not expose them through
+  public signatures unless they are intentionally part of the API.
+
 ## Bundler
 
 - Use `bundle update --all` when intentionally updating every dependency; do not rely on argumentless `bundle update`,
