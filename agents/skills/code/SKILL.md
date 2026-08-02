@@ -23,6 +23,7 @@ skills supply their narrower constraints.
   decisions that cross language-specific concerns.
 - Let each implementation-language skill own its syntax, idiom, safety rules, style, tooling, and language-specific
   test practices.
+- Use ASD-STE100-compliant language for code-facing prose.
 - Prefer existing repository patterns over new abstractions. Do not replace useful domain structure merely to reduce
   the amount of code.
 - Review and diagnosis do not authorize implementation. Change and build requests include the smallest complete
@@ -74,14 +75,16 @@ Break this preflight only for a concrete reason, and state it briefly.
 
 ## Workflow
 
-1. Inspect relevant instructions, files, interfaces, tests, build configuration, and current behavior. Identify the
-   user's underlying goal before choosing a change.
+1. Inspect relevant instructions, files, interfaces, tests, build configuration, and current behavior. Search for
+   existing implementations and helpers before adding another. Identify the user's underlying goal before choosing a
+   change.
 2. On resumed Git work, inspect the branch, `HEAD`, and dirty state before editing, then summarize drift from the last
    handoff or visible session context.
 3. If ambiguity could materially change the approach, ask before acting. Otherwise state a reasonable assumption and
    proceed within the requested review or edit scope.
-4. Trace the affected behavior and contracts. For a defect, locate the root cause in the model, parser, runtime,
-   architecture, or instructions rather than bypassing it with sentinel state, dummy state, or a narrow special case.
+4. Trace the affected behavior, its callers, and its contracts. For a defect, locate the root cause in the model,
+   parser, runtime, architecture, or instructions rather than bypassing it with sentinel state, dummy state, or a
+   narrow special case.
 5. For a broad or architectural change, plan deliberately and add or update tests first. For a bounded change, verify
    or add the smallest useful characterization or regression coverage when practical.
 6. Test the new positive contract and the behavior affected by the change. Tests and current-state artifacts must
@@ -94,10 +97,14 @@ Break this preflight only for a concrete reason, and state it briefly.
    as capability discovery.
 8. Choose the simplest implementation that fully meets current requirements and invariants. Prefer an established,
    well-maintained library when it materially reduces complexity or risk and fits project constraints; do not add a
-   dependency for trivial code.
-9. Make the smallest coherent change. Keep source self-documenting; avoid obvious comments, commented-out code, dead
-   code, comments that merely narrate the code or a past edit, temporary files, and unnecessary structure. Treat code
-   in chat as repository-quality code.
+   dependency for trivial code. Prefer deriving a value from canonical state already in scope over passing or storing
+   duplicate state.
+9. Make the smallest coherent change. Keep source self-documenting. Use one codebase term for each concept, and do not
+   reuse it for unrelated concepts. Write a comment only for a non-obvious constraint, decision, behavior, or side
+   effect that the code cannot show. Names, comments, tests, and documentation must make sense without the conversation
+   or diff. Avoid commented-out code, dead code, temporary files, and unnecessary structure. When no stronger
+   convention governs file order, put public or significant entry points before their helpers. Treat code in chat as
+   repository-quality code.
 10. Run the narrowest relevant checks first, then broaden when the changed behavior is shared or risk warrants it.
 11. Perform the final review below, then report any validation that could not be run.
 
@@ -106,6 +113,7 @@ Break this preflight only for a concrete reason, and state it briefly.
 - Preserve backward compatibility only for a concrete current contract: a released public API, external consumer,
   persisted user data, deployed state, or explicit repository or task requirement. Without such a contract, do not add
   shims, aliases, fallbacks, dual paths, or legacy formats.
+- Earlier versions of unshipped work are not compatibility contracts; update their callers and remove the old paths.
 - When a design decision changes, make the new decision canonical across code, tests, documentation, configuration,
   and desired state. Remove superseded concepts so current-state artifacts read as if the old decision had never
   existed.
