@@ -11,8 +11,17 @@ local_cache_dir() {
 	echo "$LOCAL_CACHE_ROOT"/"${dir//\//+}"
 }
 
+local_platform() {
+	local machine
+	local system
+
+	machine=$(uname -m)
+	system=$(uname -s)
+	printf "%s-%s\n" "$system" "$machine" | tr "[:upper:]" "[:lower:]"
+}
+
 direnv_layout_dir() {
-	echo "${direnv_layout_dir:-$PWD/.local/var}"
+	echo "${direnv_layout_dir:-$PWD/.local/var/$(local_platform)}"
 }
 
 use-() {
@@ -31,6 +40,30 @@ layout_vagrant() {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Librsvg
+# ----------------------------------------------------------------------------------------------------------------------
+
+use_librsvg() {
+	local brew_prefix
+	local pkgconfig
+	local rsvg_prefix
+	local system
+
+	command -v brew >/dev/null || return 0
+	brew_prefix=$(brew --prefix)
+	rsvg_prefix=$(brew --prefix librsvg)
+	system=$(uname -s)
+
+	if [[ -d $brew_prefix/Cellar ]]; then
+		pkgconfig=$(find "$brew_prefix/Cellar" \( -path '*/lib/pkgconfig' -o -path '*/share/pkgconfig' \) -type d | sort | paste -sd: -)
+		[[ -z $pkgconfig ]] || export PKG_CONFIG_PATH=$pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+	fi
+
+	path_add GI_TYPELIB_PATH "$rsvg_prefix"/lib/girepository-1.0
+	[[ $system != Linux ]] || path_add LD_LIBRARY_PATH "$rsvg_prefix"/lib
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Ruby
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +79,13 @@ use_ruby() {
 	fi
 
 	layout ruby
+}
+
+use_rubygems() {
+	local file=${XDG_CONFIG_HOME:-$HOME/.config}/direnv/rubygems
+
+	source_env "$file" || return
+	env_vars_required GEM_HOST_API_KEY
 }
 
 # ----------------------------------------------------------------------------------------------------------------------

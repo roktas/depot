@@ -11,3 +11,6 @@ all:
 # Direnv
 
 Minimal Direnv setup for project-local environment loading.
+
+Projects opt into Homebrew librsvg paths with `use librsvg`. Projects that publish gems opt into the private
+RubyGems credential with `use rubygems`.
