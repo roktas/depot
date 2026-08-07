@@ -21,15 +21,19 @@ between similar messages.
    imply that uncommitted work is already in the commit.
 2. Identify the single reader-visible purpose of the commit. If unrelated purposes are mixed, recommend or create
    separate commits when the task authorizes history changes.
-3. Choose the type from the effect, not the files touched:
+3. Keep routine dependency refreshes separate. Before `bundle update`, lockfile regeneration, or another broad version
+   refresh, commit pending functional work. Commit the dependency-only diff as `chore(deps)` using repository wording.
+   Combine it with behavior only when that dependency change is required for the same behavior and cannot be reviewed
+   independently.
+4. Choose the type from the effect, not the files touched:
    - `fix` corrects faulty behavior.
    - `feat` adds a capability or supported behavior.
    - `refactor` changes implementation without intended behavior change.
    - `docs`, `test`, `build`, `ci`, `perf`, and `style` describe their specific surfaces.
    - `chore` is a fallback for maintenance that fits no more informative type.
-4. Choose a scope only when it gives stable project context. Do not repeat the repository name or invent a component
+5. Choose a scope only when it gives stable project context. Do not repeat the repository name or invent a component
    merely to fill the slot.
-5. Check the final message against the diff. Do not claim tests, fixes, compatibility, or breaking behavior that the
+6. Check the final message against the diff. Do not claim tests, fixes, compatibility, or breaking behavior that the
    evidence does not show.
 
 ## Format
