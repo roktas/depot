@@ -45,6 +45,8 @@ layout_vagrant() {
 
 use_librsvg() {
 	local brew_prefix
+	local dir
+	local -a dirs
 	local pkgconfig
 	local rsvg_prefix
 	local system
@@ -54,10 +56,19 @@ use_librsvg() {
 	rsvg_prefix=$(brew --prefix librsvg)
 	system=$(uname -s)
 
-	if [[ -d $brew_prefix/Cellar ]]; then
-		pkgconfig=$(find "$brew_prefix/Cellar" \( -path '*/lib/pkgconfig' -o -path '*/share/pkgconfig' \) -type d | sort | paste -sd: -)
-		[[ -z $pkgconfig ]] || export PKG_CONFIG_PATH=$pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+	if [[ -d $brew_prefix/lib/pkgconfig ]]; then
+		for dir in "$rsvg_prefix"/lib/pkgconfig "$brew_prefix"/lib/pkgconfig "$brew_prefix"/share/pkgconfig; do
+			[[ -d $dir ]] || continue
+			pkgconfig=${pkgconfig:+$pkgconfig:}$dir
+		done
+	elif [[ -d $brew_prefix/Cellar ]]; then
+		shopt -s nullglob
+		dirs=("$brew_prefix"/Cellar/*/*/{lib,share}/pkgconfig)
+		if ((${#dirs[@]})); then
+			pkgconfig=$(printf '%s\n' "${dirs[@]}" | sort | paste -sd: -)
+		fi
 	fi
+	[[ -z $pkgconfig ]] || export PKG_CONFIG_PATH=$pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 
 	path_add GI_TYPELIB_PATH "$rsvg_prefix"/lib/girepository-1.0
 	[[ $system != Linux ]] || path_add LD_LIBRARY_PATH "$rsvg_prefix"/lib
