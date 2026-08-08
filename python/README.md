@@ -5,6 +5,7 @@ all:
     - pylint
     - uv
     - uv:pyyaml
+    - uv:rich
   links:
     pylintrc: ~/.config/pylintrc
 ---
