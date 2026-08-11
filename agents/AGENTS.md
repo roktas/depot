@@ -9,7 +9,7 @@
 ## Skills (Mandatory)
 
 - Before work, load relevant language, workflow, repository, and task skills.
-- Mandatory dispatch: `code` for engineering and code-review tasks; `write` for substantive prose planning, drafting,
+- Mandatory dispatch: `code` for engineering and code-review tasks; `text` for substantive prose planning, drafting,
   or structural revision.
 - Also mandatory: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/` artifacts
   and project-local ownership or placement.
@@ -17,7 +17,7 @@
 - Apply overlapping instructions cumulatively. Loading a skill does not suspend unrelated user-wide rules, and a
   narrower rule's silence is not a waiver. Override a default only for a concrete conflict; otherwise keep both.
 - Load a natural-language skill only when text in that language is the user-requested work product; conversation or
-  response language alone is insufficient. When `write` applies, let it orchestrate the target-language skill.
+  response language alone is insufficient. When `text` applies, let it orchestrate the target-language skill.
 
 ## Shell Commands (Mandatory)
 

@@ -45,7 +45,7 @@ skills supply their narrower constraints.
    [local](../local/SKILL.md) completely.
 6. Let repository and domain skills retain authority over project-specific architecture, interfaces, facts, tools, and
    validation entrypoints. When substantive prose inside a TeX or code-facing document is also in scope, additionally
-   use the `write` and target-natural-language skills when available.
+   use the `text` and target-natural-language skills when available.
 
 Implementation-language and workflow skills do not invoke or reload `code`. When dispatch loads both, follow this
 order rather than creating a cycle.
