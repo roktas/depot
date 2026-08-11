@@ -220,11 +220,12 @@ citation practice, genre, or another document-specific concern.
 For English prose creation, translation into English, substantive rewriting, or finalization, include `english` by
 default when available. Do not infer the target language from the conversation or source: skip it when the target is not
 English and for help, planning, metadata-only work, source inventory, or runs that make no prose change. Once domain,
-genre, and language requirements are known, use its composition guidance during drafting and ordinary editing. After
-content, structure, terminology, evidence, and citations stabilize, run its de-AI pass last; repeat it only after a
-later corrective prose edit. Preserve directives, human edits, meaning, uncertainty, claim strength, evidence,
-citations, identifiers, and register. More-specific project or genre rules override its generic deliverable format. An
-explicit user or `AGENTS.md` instruction may disable this default.
+genre, and language requirements are known, use its composition guidance during drafting and ordinary editing. An
+ordinary `$text` run is not a de-AI trigger, regardless of document length or the amount of prose changed. Run the
+language skill's de-AI route only when the user directly requests it; a separately invoked `$write revise`, `$write
+polish`, or `$write revise-` targeting `TEXT.md` follows `write`'s own contract. Preserve directives, human edits,
+meaning, uncertainty, claim strength, evidence, citations, identifiers, and register. More-specific project or genre
+rules override its generic deliverable format. An explicit user or `AGENTS.md` instruction may disable this default.
 
 The `text` skill governs lifecycle, authority, reconciliation, and directive
 semantics. Auxiliary skills govern language and writing behavior. An auxiliary
