@@ -1,4 +1,0 @@
-interface:
-  display_name: "Text"
-  short_description: "Maintain seed-driven text and derived outputs"
-  default_prompt: "Use $text to reconcile the document seed and master, then generate the requested output."
