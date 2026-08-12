@@ -1,8 +1,8 @@
 ---
 name: ruby
 description: >-
-  Use when working on Ruby code, gems, Rails-adjacent projects, Minitest or RSpec tests, Ruby packaging, Ruby style
-  review, Ruby typing with RBI/RBS, modern Ruby syntax choices, or public API documentation with YARD.
+  Use when working on Ruby source, gems, Ruby-facing Rails code, Minitest or RSpec tests, Ruby packaging, Ruby style
+  review, Ruby typing with RBI/RBS, modern Ruby syntax choices, or Ruby public API documentation with YARD.
 ---
 
 # Ruby

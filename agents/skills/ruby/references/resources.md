@@ -24,7 +24,7 @@ Authoritative resources for Ruby development. Use these sources rather than sear
 | ---- | ------- |
 | Default gem | Ships with Ruby, cannot uninstall |
 | Bundled gem | Ships with Ruby, can uninstall/replace |
-| Standard library | Part of Ruby itself, not a gem |
+| Standard library | APIs distributed with Ruby; an implementation may be built in, a default gem, or a bundled gem |
 
 | Version | Documentation | Standard Library |
 | ------- | ------------- | ---------------- |
@@ -36,8 +36,8 @@ Authoritative resources for Ruby development. Use these sources rather than sear
 
 ## Testing Ecosystem
 
-- [MiniTest](https://docs.seattlerb.org/minitest/) - Provides a complete suite of testing facilities supporting TDD, BDD, and benchmarking
-- [Rspec](https://rspec.info/documentation/) - Ruby DSL for BDD
+- [Minitest](https://docs.seattlerb.org/minitest/) - Provides testing facilities for TDD, BDD, and benchmarking
+- [RSpec](https://rspec.info/documentation/) - Ruby DSL for BDD
 
 ## Typing Ecosystem
 
@@ -48,7 +48,8 @@ Two type definition formats exist in Ruby:
 
 ### Sorbet Ecosystem
 
-[Sorbet](https://github.com/sorbet/sorbet) is a static and runtime type checker for Ruby, maintained by Stripe. Key companion tools:
+[Sorbet](https://github.com/sorbet/sorbet) is a static and runtime type checker for Ruby, maintained by Stripe. Key
+companion tools:
 
 - [Tapioca](https://github.com/Shopify/tapioca) - Generates RBI files for gems and DSLs (Rails, ActiveRecord, etc.)
 - [Spoom](https://github.com/Shopify/spoom) - Coverage analysis, strictness bumping, dead code detection, signature migration
@@ -58,8 +59,10 @@ Two type definition formats exist in Ruby:
 - [rbs](https://github.com/ruby/rbs) - Official CLI for working with RBS files (prototype, list, methods)
 - [Steep](https://github.com/soutaro/steep) - Type checker that uses RBS
 
-### RBS Inline Comments
+### RBS Comments in Sorbet
 
-Sorbet supports RBS-style inline type annotations using `#:` comment syntax. This eliminates the need for separate `.rbi` files or verbose `sig` blocks.
+Sorbet's RBS-style `#:` comments are experimental, require `--enable-experimental-rbs-comments`, lack runtime checking,
+and are discouraged for production dependence by the Sorbet project. Preserve the repository's established RBI or
+`sig` system by default; use RBS comments only for an explicitly experimental codebase that accepts those constraints.
 
-Docs: <https://sorbet.org/docs/rbs-comments>
+Docs: <https://sorbet.org/docs/rbs-support>

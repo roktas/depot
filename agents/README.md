@@ -20,13 +20,16 @@ Run from the repository root after changing skills or their helpers:
 
 ```bash
 rtk agents/tests/skills
+rtk agents/tests/skills agents/tests/fixtures/skills
+rtk agents/skills/colon/tests/oc
 rtk agents/skills/colon/tests/todo
 rtk shellcheck agents/skills/colon/bin/* agents/skills/colon/tests/*
 ```
 
-The general audit validates repository-owned skill packages and checks that external skill links still resolve. Validate
-an external skill in its canonical repository as well when that repository changes. Pass another skill directory as
-the optional argument when a related repository reuses this audit.
+The general audit validates repository-owned skill packages, their Markdown links, and external skill links. The
+fixture invocation checks code and comment exclusions, site-root URLs, and titled package links. Validate an external
+skill in its canonical repository as well when that repository changes. Pass another skill directory as the optional
+argument when a related repository reuses this audit.
 
 ## Configure
 

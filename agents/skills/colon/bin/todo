@@ -17,7 +17,7 @@ warn() {
 # Helpers
 # ------------------------------------------------------------------------------------------------------------------------
 
-append_item() {
+append_item() (
 	local todo_file=$1
 	local item=$2
 
@@ -29,10 +29,13 @@ append_item() {
 	[[ $item != *$'\n'* && $item != *$'\r'* ]] || abort "todo item must be one line"
 
 	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
-	cp -p "$todo_file" "$tempfile" || {
-		rm -f "$tempfile"
-		return 1
-	}
+	trap 'status=$?; rm -f -- "$tempfile" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
+
+	cp -p "$todo_file" "$tempfile" || return 1
 	: >"$tempfile"
 
 	while IFS= read -r line || [[ -n $line ]]; do
@@ -57,7 +60,7 @@ append_item() {
 	fi
 
 	mv "$tempfile" "$todo_file"
-}
+)
 
 editor() {
 	local todo_file=$1
@@ -109,7 +112,7 @@ ensure_file() {
 	EOF
 }
 
-remove_item() {
+remove_item() (
 	local todo_file=$1
 	local item=$2
 
@@ -121,10 +124,13 @@ remove_item() {
 	[[ $item =~ ^[0-9]+$ ]] || abort "todo item must be a number: $item"
 
 	tempfile=$(mktemp "${todo_file%/*}/todo.XXXXXXXX") || exit
-	cp -p "$todo_file" "$tempfile" || {
-		rm -f "$tempfile"
-		return 1
-	}
+	trap 'status=$?; rm -f -- "$tempfile" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
+
+	cp -p "$todo_file" "$tempfile" || return 1
 	: >"$tempfile"
 
 	while IFS= read -r line || [[ -n $line ]]; do
@@ -142,12 +148,11 @@ remove_item() {
 	done <"$todo_file"
 
 	if [[ -z $found ]]; then
-		rm -f "$tempfile"
 		abort "todo item not found: $item"
 	fi
 
 	mv "$tempfile" "$todo_file"
-}
+)
 
 prompt_ok_item() {
 	local todo_file=$1
@@ -236,6 +241,7 @@ main() {
 	case $1 in
 	--ok | ok | --done | done)
 		shift
+		(($# <= 1)) || abort "usage: todo shared --ok [NUMBER]"
 		require_file "$todo_file"
 
 		item=${1:-}
@@ -248,10 +254,12 @@ main() {
 		printf '%s\n' "$todo_file"
 		;;
 	--edit | edit)
+		(($# == 1)) || abort "usage: todo shared --edit"
 		ensure_file "$todo_file"
 		editor "$todo_file"
 		;;
 	--path | path)
+		(($# == 1)) || abort "usage: todo shared --path"
 		printf '%s\n' "$todo_file"
 		;;
 	*)

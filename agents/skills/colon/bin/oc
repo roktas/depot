@@ -17,15 +17,19 @@ warn() {
 # Helpers
 # ------------------------------------------------------------------------------------------------------------------------
 
-export_session() {
+export_session() (
 	local session_id=$1
 
-	local status
 	local tempfile
 
 	tempfile=$(mktemp) || exit
+	trap 'status=$?; rm -f -- "$tempfile" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
+
 	if ! opencode export "$session_id" >"$tempfile"; then
-		rm -f "$tempfile"
 		return 1
 	fi
 
@@ -35,10 +39,7 @@ export_session() {
 		abort("opencode export did not emit JSON") unless start
 		print input[start..]
 	' "$tempfile"
-	status=$?
-	rm -f "$tempfile"
-	return "$status"
-}
+)
 
 latest_id() {
 	opencode db \

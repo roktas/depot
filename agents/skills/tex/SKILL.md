@@ -1,9 +1,8 @@
 ---
 name: tex
-description: Use when working on TeX, LaTeX, ConTeXt, BibTeX, document build systems, typographic cleanup, TeX package choices, multilingual documents, or publication-quality source edits.
-metadata:
-  author: https://github.com/roktas
-  version: "1.0.0"
+description: >-
+  Use when working on TeX-family sources or their build surface: TeX, LaTeX, ConTeXt, BibTeX, document build systems,
+  typographic cleanup, package choices, multilingual TeX, or publication-quality TeX source edits.
 ---
 
 # TeX

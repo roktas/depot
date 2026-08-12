@@ -1,15 +1,13 @@
 ---
 name: colon
-description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:opencode TEXT`, `:oc TEXT`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`.
-metadata:
-  author: https://github.com/roktas
-  version: "1.0.0"
+description: Use when the user message starts with `:` to interpret prompt shortcuts such as `:commit`, `:co`, `:push`, `:pu`, `:ship`, `:sh`, `:opencode TEXT`, `:oc TEXT`, `:todo TEXT`, `:to TEXT`, `:ok NUMBER`, `:do NUMBER`, `:learn TEXT`, `:le TEXT`, `:close`, or `:cl`; also use an explicit bare `$colon` invocation to list those shortcuts without executing one.
 ---
 
 # Colon Shortcuts
 
-Use this skill only when the user message starts with `:`. The first token selects the shortcut; the remaining text is
-the shortcut input. Do not treat incidental `:` characters inside normal prose as shortcuts.
+Use this skill when the user message starts with `:`. The first token selects the shortcut; the remaining text is the
+shortcut input. Do not treat incidental `:` characters inside normal prose as shortcuts. When the skill is explicitly
+invoked without a leading-colon token, list the supported shortcuts and execute nothing.
 
 Match the first token exactly against the shortcuts below. If it is unknown, report the supported shortcuts instead of
 guessing a near match or executing the text as a shell command. Preserve the remaining input verbatim except for the

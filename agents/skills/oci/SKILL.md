@@ -1,14 +1,6 @@
 ---
 name: oci
 description: Use when working with Oracle Cloud Infrastructure via the OCI CLI, especially for session auth, budgets, quotas, networking, and compute operations. Read workspace AGENTS.md, if present, for workspace-specific tenancy and VPS state.
-metadata:
-  author: https://github.com/roktas
-  version: "1.0.0"
-  triggers: OCI, Oracle Cloud, Oracle Cloud Infrastructure, oci CLI, budget, quota, VCN, compute instance
-  role: specialist
-  scope: operations
-  output-format: command-oriented
-  related-skills: ~
 ---
 
 # OCI
@@ -31,13 +23,19 @@ Validate auth before inferring resource state:
 
 ```bash
 oci session validate --config-file ~/.oci/config --profile SESSION --auth security_token
-oci session refresh --config-file ~/.oci/config --profile SESSION --auth security_token
 ```
 
 Validation checks the token before a resource query; it does not prove the selected tenancy, region, or compartment is
-the intended target. If refresh is not enough, use `oci session authenticate ... --no-browser`, ask the user to open
-the printed URL and finish login, then return to the terminal flow. Never paste a token, private key, full config, or
-signed request into chat or tracked files.
+the intended target. Refresh only when the session is invalid or near expiry and the established authentication flow
+permits it:
+
+```bash
+oci session refresh --config-file ~/.oci/config --profile SESSION --auth security_token
+```
+
+If refresh is unavailable or unsuccessful, use `oci session authenticate ... --no-browser`, ask the user to open the
+printed URL and finish login, then return to the terminal flow. Never paste a token, private key, full config, or signed
+request into chat or tracked files.
 
 ## Working Rules
 

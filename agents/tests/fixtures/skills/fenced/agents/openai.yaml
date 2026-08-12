@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fenced Link Fixture"
+  short_description: "Verify fenced Markdown link handling"
+  default_prompt: "Use $fenced to exercise the fenced-link validation fixture."

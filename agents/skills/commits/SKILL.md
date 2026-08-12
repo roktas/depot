@@ -2,9 +2,6 @@
 name: commits
 description: Use when creating, editing, reviewing, or explaining git commit messages, commit scopes, changelog-friendly history, semantic-release compatibility, or Conventional Commits formatting. Always load this skill before preparing a commit message, even if only suggesting one.
 license: MIT
-metadata:
-  author: github.com/bastos
-  version: "2.1"
 ---
 
 # Conventional Commits

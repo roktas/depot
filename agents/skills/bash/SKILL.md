@@ -100,37 +100,58 @@ metadata:
 
 - **Error Handling**
 
-  ```bash
-  abort() {
-  	warn "E: $*"
-  	exit 1
-  }
+```bash
+abort() {
+	warn "E: $*"
+	exit 1
+}
 
-  warn() {
-  	echo -e "$*" >&2
-  }
-  ```
+warn() {
+	printf '%s\n' "$*" >&2
+}
+```
 
 - **Main function** - Use `main() { ... }` and call `main "$@"`.
 - **Efficiency** - Use shell substitution (`${0##*/}`) over external tools (`basename`)
 - **Silence** - If the command offers a quiet option for silent operation, use that option, ie. `grep -q`; otherwise,
   use the `&>/dev/null` shell redirection.
-- **Arrays** - Use `mapfile` for output capture: `mapfile -t arr < <(CMD)`.
-- **Temp Files** - Use `mktemp` + `trap`.
+- **Version** - For Bash scripts, require Bash 4 or newer. If the target has only macOS system Bash 3.2, warn the user
+  before relying on Bash 4+ behavior; do not silently add compatibility code or change the interpreter.
+- **Arrays** - Use `mapfile` for output capture: `mapfile -t arr < <(CMD)`. This follows the Bash 4+ requirement above.
+- **Temp Files** - Use `mktemp` and scope traps to `main` or a subshell. Keep the cleanup body on one line, preserve the
+  original exit status, and separate `EXIT` cleanup from signal handling.
 
-  ```bash
-  local tempfile
-  tempfile=$(mktemp) || exit
-  trap 'err=$? && rm -f "'"$tempfile"'" || exit $err' EXIT HUP INT QUIT TERM
-  ```
+```bash
+work() (
+	local tempfile
 
-- **Temp Dirs**
+	tempfile=$(mktemp) || exit
+	trap 'status=$?; rm -f -- "$tempfile" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
 
-  ```bash
-  local tempdir
-  tempdir=$(mktemp -d) || exit
-  trap 'err=$? && rm -rf "'"$tempdir"'" || exit $err' EXIT HUP INT QUIT TERM
-  ```
+	# Work with "$tempfile".
+)
+```
+
+- **Temp Dirs** - Apply the same scoped, one-line trap pattern.
+
+```bash
+work() (
+	local tempdir
+
+	tempdir=$(mktemp -d) || exit
+	trap 'status=$?; rm -rf -- "$tempdir" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
+
+	# Work inside "$tempdir".
+)
+```
 
 ## Gotchas
 

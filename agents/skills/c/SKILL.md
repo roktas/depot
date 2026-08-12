@@ -1,9 +1,6 @@
 ---
 name: c
-description: Use when working on C source, headers, build integration, native libraries, memory management bugs, Linux or Unix systems code, C style review, or C-oriented tests and tooling.
-metadata:
-  author: https://github.com/roktas
-  version: "1.0.0"
+description: Use when working on C source or headers, C build integration, C-native libraries, C memory or ABI defects, C-based Linux or Unix systems code, C style review, or C-oriented tests and tooling.
 ---
 
 # C
@@ -30,8 +27,8 @@ metadata:
 - **Default** - When the repository has no established style, use the structural conventions of
   [Linux kernel coding style](https://docs.kernel.org/process/coding-style.html).
 - **Indent** - 1 tab (8 spaces). Do NOT convert tabs to spaces.
-- **Braces** - Use 1TBS (One True Brace Style).
-- **Functions** - Opening brace **must** be on the next line (first column).
+- **Braces** - Put control-statement opening braces on the same line and function opening braces on the next line in
+  the first column.
 
   ```c
   void function(void)

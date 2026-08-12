@@ -7,6 +7,8 @@ unset CDPATH
 TEST_DIR=$(cd "${BASH_SOURCE[0]%/*}" && pwd -P) || exit
 readonly TEST_DIR
 readonly TODO_BIN=$TEST_DIR/../bin/todo
+TEST_ROOT=$(mktemp -d) || exit
+readonly TEST_ROOT
 
 abort() {
 	printf 'E: %s\n' "$*" >&2
@@ -20,7 +22,9 @@ abort() {
 assert_absent() {
 	local path=$1
 
-	[[ ! -e $path ]] || abort "unexpected path: $path"
+	if compgen -G "$path" >/dev/null; then
+		abort "unexpected path matching: $path"
+	fi
 }
 
 assert_contains() {
@@ -42,25 +46,31 @@ assert_equal() {
 # ------------------------------------------------------------------------------------------------------------------------
 
 main() {
+	local failure_bin
 	local output
 	local repo
-	local tempdir
+	local status
 	local todo_file
 
-	tempdir=$(mktemp -d) || exit
-	trap 'status=$?; rm -rf "$tempdir"; exit "$status"' EXIT HUP INT QUIT TERM
+	trap 'status=$?; rm -rf -- "$TEST_ROOT" || :; exit "$status"' EXIT
+	trap 'exit 129' HUP
+	trap 'exit 130' INT
+	trap 'exit 131' QUIT
+	trap 'exit 143' TERM
 
-	repo=$tempdir/'repo with spaces'
+	repo=$TEST_ROOT/'repo with spaces'
 	mkdir -p "$repo"
 	git -C "$repo" init -q
 	todo_file=$repo/TODO.md
 
-	output=$(cd "$tempdir" && "$TODO_BIN" shared --help)
+	output=$(cd "$TEST_ROOT" && "$TODO_BIN" shared --help)
 	assert_contains "$output" 'todo shared TEXT'
 
 	output=$(cd "$repo" && "$TODO_BIN" shared --path)
 	assert_equal "$output" "$todo_file"
 	assert_absent "$todo_file"
+	output=$(cd "$repo" && "$TODO_BIN" human --path)
+	assert_equal "$output" "$todo_file"
 
 	output=$(cd "$repo" && "$TODO_BIN" shared --help)
 	assert_contains "$output" 'todo shared TEXT'
@@ -76,14 +86,47 @@ main() {
 	assert_equal "$output" "$todo_file"
 	assert_contains "$(<"$todo_file")" '- [ ] first item'
 
+	failure_bin=$TEST_ROOT/failure-bin
+	mkdir -p "$failure_bin"
+	cat >"$failure_bin/mv" <<-'STUB'
+		#!/usr/bin/env bash
+
+		exit 9
+	STUB
+	cat >"$failure_bin/rm" <<-'STUB'
+		#!/usr/bin/env bash
+
+		/bin/rm "$@"
+		exit 97
+	STUB
+	chmod +x "$failure_bin/mv" "$failure_bin/rm"
+	if output=$(cd "$repo" && PATH=$failure_bin:$PATH "$TODO_BIN" shared 'second item' 2>&1); then
+		abort 'failed replacement unexpectedly succeeded'
+	else
+		status=$?
+	fi
+	assert_equal "$status" 9
+	assert_absent "$repo/todo.????????"
+	[[ $(<"$todo_file") != *'second item'* ]] || abort 'failed replacement changed the queue'
+	if output=$(cd "$repo" && PATH=$failure_bin:$PATH "$TODO_BIN" shared --ok 2 2>&1); then
+		abort 'missing item removal unexpectedly succeeded'
+	else
+		status=$?
+	fi
+	assert_equal "$status" 1
+	assert_contains "$output" 'todo item not found: 2'
+	assert_absent "$repo/todo.????????"
+	assert_contains "$(<"$todo_file")" 'first item'
+
 	output=$(cd "$repo" && "$TODO_BIN" shared)
 	assert_contains "$output" ' 1  - [ ] first item'
 
 	output=$(cd "$repo" && "$TODO_BIN" shared --ok 1)
 	assert_equal "$output" "$todo_file"
 	[[ $(<"$todo_file") != *'first item'* ]] || abort 'completed item was not removed'
+	assert_absent "$repo/todo.????????"
 
-	rm -rf "$tempdir"
+	rm -rf "$TEST_ROOT"
 	trap - EXIT HUP INT QUIT TERM
 }
 
