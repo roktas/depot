@@ -102,8 +102,11 @@ metadata:
 
 ```bash
 abort() {
-	warn "E: $*"
-	exit 1
+	local message=$1
+	local status=${2:-1}
+
+	warn "E: $message"
+	exit "$status"
 }
 
 warn() {
