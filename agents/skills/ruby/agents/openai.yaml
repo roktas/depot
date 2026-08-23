@@ -1,4 +1,0 @@
-interface:
-  display_name: "Ruby"
-  short_description: "Modern Ruby, tests, gems, APIs, and YARD"
-  default_prompt: "Use $ruby to write or review modern Ruby code and API documentation."

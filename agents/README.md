@@ -3,9 +3,19 @@ all:
   packages:
     - playwright-cli
     - rtk
+    - skill:github.com/roktas/covit
   links:
     AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
+    ~/.agents/skills/covit/skills/bash: ~/.agents/skills/bash
+    ~/.agents/skills/covit/skills/c: ~/.agents/skills/c
+    ~/.agents/skills/covit/skills/code: ~/.agents/skills/code
+    ~/.agents/skills/covit/skills/english: ~/.agents/skills/english
+    ~/.agents/skills/covit/skills/ruby: ~/.agents/skills/ruby
+    ~/.agents/skills/covit/skills/tex: ~/.agents/skills/tex
+    ~/.agents/skills/covit/skills/text: ~/.agents/skills/text
+    ~/.agents/skills/covit/skills/turkish: ~/.agents/skills/turkish
+    ~/.agents/skills/covit/skills/view: ~/.agents/skills/view
 ---
 
 # Agents
@@ -14,6 +24,10 @@ Common agent instructions and skills installed through the shared `~/.agents` su
 
 Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.
 
+Covit is installed as the managed external checkout `~/.agents/skills/covit`. Its component skills are linked into the
+shared top-level skill directory so roots and specialists remain sibling-addressable. Repository-owned public skills
+remain under `skills/`.
+
 ## Validate
 
 Run from the repository root after changing skills or their helpers:
@@ -21,9 +35,6 @@ Run from the repository root after changing skills or their helpers:
 ```bash
 rtk agents/tests/skills
 rtk agents/tests/skills agents/tests/fixtures/skills
-rtk agents/skills/colon/tests/oc
-rtk agents/skills/colon/tests/todo
-rtk shellcheck agents/skills/colon/bin/* agents/skills/colon/tests/*
 ```
 
 The general audit validates repository-owned skill packages, their Markdown links, and external skill links. The

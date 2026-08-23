@@ -1,4 +1,0 @@
-interface:
-  display_name: "TeX Documents"
-  short_description: "TeX, LaTeX, and publication-quality source"
-  default_prompt: "Use $tex to edit or review TeX and LaTeX documents."

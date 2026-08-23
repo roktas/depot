@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code"
-  short_description: "Orchestrate engineering reviews across languages"
-  default_prompt: "Use $code to review, diagnose, design, implement, and verify this engineering change."

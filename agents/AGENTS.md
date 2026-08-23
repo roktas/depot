@@ -11,8 +11,11 @@
 - Before work, load relevant language, workflow, repository, and task skills.
 - Mandatory dispatch: `code` for engineering and code-review tasks; `text` for substantive prose planning, drafting,
   or structural revision.
-- Also mandatory: `bash` for shell code or snippets, `commits` for commit messages, and `local` for `.agents/` artifacts
-  and project-local ownership or placement.
+- Also mandatory: `bash` for shell code or snippets, and `local` for `.agents/` artifacts and project-local ownership or
+  placement.
+- For a commit-specific decision under an active Covit root, load that root's `concerns/commit.md`. For Git-only work
+  with no active root, inspect the staged diff and follow repository convention; do not activate a root only to obtain
+  commit policy.
 - Dispatch selects context, not implementation. Choose implementation after reading every applicable skill.
 - Apply overlapping instructions cumulatively. Loading a skill does not suspend unrelated user-wide rules, and a
   narrower rule's silence is not a waiver. Override a default only for a concrete conflict; otherwise keep both.
