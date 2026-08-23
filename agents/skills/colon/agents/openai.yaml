@@ -1,4 +1,0 @@
-interface:
-  display_name: "Colon Shortcuts"
-  short_description: "Expand leading-colon workflow shortcuts"
-  default_prompt: "Use $colon to list the supported leading-colon shortcuts without executing one."
