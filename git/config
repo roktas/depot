@@ -42,7 +42,7 @@
 	stat             = true
 [core]
 	editor           = editor
-	hookspath        = $HOME/.config/git/hooks
+	hookspath        = ~/.config/git/hooks
 [credential "https://github.com"]
 	helper           =
 	helper           = !gh auth git-credential

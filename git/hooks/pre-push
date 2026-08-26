@@ -33,6 +33,15 @@ check() {
 # ------------------------------------------------------------------------------------------------------------------------
 
 main() {
+	local ref
+
+	for ref in $(git for-each-ref --format='%(refname)'); do
+		if git grep -q 'filter=lfs' "$ref" -- ':(glob)**/.gitattributes' 2>/dev/null; then
+			git lfs pre-push "$@"
+			break
+		fi
+	done
+
 	if [[ $(git config hooks.conventional-commits 2>/dev/null || true) != true ]]; then
 		exit 0
 	fi

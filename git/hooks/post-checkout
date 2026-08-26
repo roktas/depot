@@ -1,0 +1,4 @@
+#!/bin/sh
+
+git grep -q 'filter=lfs' HEAD -- ':(glob)**/.gitattributes' 2>/dev/null || exit 0
+exec git lfs post-checkout "$@"
