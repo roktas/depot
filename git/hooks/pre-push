@@ -1,58 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-set -Eeuo pipefail; shopt -s nullglob; [[ -z ${TRACE:-} ]] || set -x; unset CDPATH; IFS=$' \n'
-
-abort() {
-	printf '\e[1m\e[38;5;9m✗\e[0m   \e[1m%s\e[0m\n' "$*" >&2
-	exit 1
-}
-
-warn() {
-	printf '\e[1m\e[38;5;11m!\e[0m   \e[1m%s\e[0m\n' "$*" >&2
-}
-
-# ------------------------------------------------------------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------------------------------------------------------------
-
-check() {
-	if ! command -v cog &>/dev/null; then
-		warn 'Cog required to check commit'
-		return 0
+for ref in $(git for-each-ref --format='%(refname)'); do
+	if git grep -q 'filter=lfs' "$ref" -- ':(glob)**/.gitattributes' 2>/dev/null; then
+		exec git lfs pre-push "$@"
 	fi
-
-	if cog check; then
-		return 0
-	fi
-
-	abort "Invalid commits were found, force push with '--no-verify'"
-}
-
-# ------------------------------------------------------------------------------------------------------------------------
-# Main
-# ------------------------------------------------------------------------------------------------------------------------
-
-main() {
-	local ref
-
-	for ref in $(git for-each-ref --format='%(refname)'); do
-		if git grep -q 'filter=lfs' "$ref" -- ':(glob)**/.gitattributes' 2>/dev/null; then
-			git lfs pre-push "$@"
-			break
-		fi
-	done
-
-	if [[ $(git config hooks.conventional-commits 2>/dev/null || true) != true ]]; then
-		exit 0
-	fi
-	if [[ $(git config hooks.pre-push 2>/dev/null || true) == false ]]; then
-		exit 0
-	fi
-	if [[ $(git for-each-ref --format='%(refname)' refs/heads/ | wc -l) -le 1 ]]; then
-		exit 0
-	fi
-
-	check
-}
-
-main "$@"
+done
