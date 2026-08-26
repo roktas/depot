@@ -4,6 +4,7 @@ all:
   packages:
     - gh
     - git
+    - git-lfs
     - lazygit
     - tig
   links:
