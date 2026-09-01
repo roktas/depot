@@ -3,19 +3,22 @@ all:
   packages:
     - playwright-cli
     - rtk
-    - skill:github.com/roktas/covit
+    - skill:github.com/AminBlg/SimpleEnglish
+    - skill:github.com/roktas/ajans
   links:
     AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
-    ~/.agents/skills/covit/skills/bash: ~/.agents/skills/bash
-    ~/.agents/skills/covit/skills/c: ~/.agents/skills/c
-    ~/.agents/skills/covit/skills/code: ~/.agents/skills/code
-    ~/.agents/skills/covit/skills/english: ~/.agents/skills/english
-    ~/.agents/skills/covit/skills/ruby: ~/.agents/skills/ruby
-    ~/.agents/skills/covit/skills/tex: ~/.agents/skills/tex
-    ~/.agents/skills/covit/skills/text: ~/.agents/skills/text
-    ~/.agents/skills/covit/skills/turkish: ~/.agents/skills/turkish
-    ~/.agents/skills/covit/skills/view: ~/.agents/skills/view
+    ~/.agents/skills/ajans/skills/bash: ~/.agents/skills/bash
+    ~/.agents/skills/ajans/skills/c: ~/.agents/skills/c
+    ~/.agents/skills/ajans/skills/deai: ~/.agents/skills/deai
+    ~/.agents/skills/ajans/skills/go: ~/.agents/skills/go
+    ~/.agents/skills/ajans/skills/grilling: ~/.agents/skills/grilling
+    ~/.agents/skills/ajans/skills/naming: ~/.agents/skills/naming
+    ~/.agents/skills/ajans/skills/ruby: ~/.agents/skills/ruby
+    ~/.agents/skills/ajans/skills/testing: ~/.agents/skills/testing
+    ~/.agents/skills/ajans/skills/tex: ~/.agents/skills/tex
+    ~/.agents/skills/ajans/skills/writing: ~/.agents/skills/writing
+    ~/.agents/skills/SimpleEnglish/skills/simple-english: ~/.agents/skills/simple-english
 ---
 
 # Agents
@@ -24,9 +27,10 @@ Common agent instructions and skills installed through the shared `~/.agents` su
 
 Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.
 
-Covit is installed as the managed external checkout `~/.agents/skills/covit`. Its component skills are linked into the
-shared top-level skill directory so roots and specialists remain sibling-addressable. Repository-owned public skills
-remain under `skills/`.
+Ajans is installed as the managed external checkout `~/.agents/skills/ajans`. Its component skills are linked into the
+shared top-level skill directory so they remain directly addressable by skill name. SimpleEnglish is installed separately
+at `~/.agents/skills/SimpleEnglish`, with its `simple-english` skill exposed on the same shared surface. Repository-owned
+public skills remain under `skills/`.
 
 ## Validate
 
