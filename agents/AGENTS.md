@@ -13,6 +13,8 @@
   or structural revision.
 - Also mandatory: `bash` for shell code or snippets, and `local` for `.agents/` artifacts and project-local ownership or
   placement.
+- Before creating, renaming, or proposing a durable name or path, load `naming`; apply project and language naming rules
+  with it.
 - For a commit-specific decision under an active Covit root, load that root's `concerns/commit.md`. For Git-only work
   with no active root, inspect the staged diff and follow repository convention; do not activate a root only to obtain
   commit policy.
@@ -90,20 +92,5 @@ For a question or expression of doubt:
 
 ## Naming Things
 
-When creating, renaming, or proposing a file, directory, command, skill, module, class, function, variable, public API,
-or concept, apply this mandatory preflight. Project- or language-specific naming rules refine it and override it only
-for a concrete conflict.
-
-1. Prefer one simple, meaningful word when context allows.
-2. Do not repeat context supplied by the containing project, directory, module, class, or command.
-   For example, in `provision`, prefer `Plan` over `ProvisionPlan`.
-3. Before using `-`, `_`, `:`, `/`, camel/Pascal compounds, or multiword names, look for a simpler one-word name.
-4. Match sibling names in the same scope: style, length, and specificity.
-5. Public names should be short, polished, and memorable. Internal names may be plainer or more explicit.
-6. Let name length follow scope: longer globally, shorter locally.
-7. Add a qualifier only when it separates real sibling concepts in the current scope; do not add one just to sound more
-   precise.
-8. Avoid generic modeling words unless they name a real domain role. Name what the thing is for, not the container or
-   implementation shape.
-
-Break this preflight only for a concrete reason, and state it briefly.
+- Treat naming as a preflight, not cleanup: load `naming` before choosing any durable name or path.
+- Project vocabulary and language-specific `## Naming` rules refine the general naming skill.
