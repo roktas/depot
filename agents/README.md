@@ -3,11 +3,9 @@ all:
   packages:
     - playwright-cli
     - rtk
-    - skill:github.com/AminBlg/SimpleEnglish
   links:
     ../../ajans/agents/AGENTS.md: ~/.agents/AGENTS.md
     ../../ajans/skills/: ~/.agents/skills
-    ~/.agents/skills/SimpleEnglish/skills/simple-english: ~/.agents/skills/simple-english
 ---
 
 # Agents
@@ -16,7 +14,8 @@ Expose shared agent tooling and public agent assets through the `~/.agents` surf
 
 The canonical public agent configuration lives in the sibling Ajans checkout. This manifest links the shared agent
 instructions and all direct children of `ajans/skills`. The module does not contain copies or symlinks for Ajans assets.
-Tilde owns its runtime link outside this module. SimpleEnglish is installed separately.
+Tilde owns its runtime link outside this module. The Configure section installs only the SimpleEnglish skill. It skips
+this installation when `npx` is not available.
 
 Dropbox-backed hosts use `~/Dropbox/ajans`. Git-backed hosts use the matching sibling checkout at
 `~/.local/src/ajans`. The controller must refresh this Git-backed checkout before the target plan. Module-relative source
@@ -86,6 +85,27 @@ install_browser() {
 	esac
 }
 
+install_simple_english() {
+	local skill_dir=$HOME/.agents/skills/simple-english
+
+	if [[ -f $skill_dir/SKILL.md && ! -L $skill_dir ]]; then
+		return 0
+	fi
+
+	if [[ -e $skill_dir || -L $skill_dir ]]; then
+		printf 'E: cannot install SimpleEnglish: target exists and is not a skill directory\n' >&2
+		return 1
+	fi
+
+	if ! command -v npx &>/dev/null; then
+		printf 'W: skipping SimpleEnglish install: npx is not available\n' >&2
+		return 0
+	fi
+
+	npx -y skills add AminBlg/SimpleEnglish --skill simple-english --global --agent codex --yes
+}
+
 install_browser
+install_simple_english
 playwright-cli install --skills agents
 ```
