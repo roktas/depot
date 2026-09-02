@@ -20,7 +20,6 @@ Use an agent session with the Tilde skill enabled:
 /tilde deploy dry-run
 /tilde deploy
 /tilde update
-/tilde adopt neovim
 ```
 
 These are agent prompt examples, not shell commands.

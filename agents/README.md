@@ -19,8 +19,27 @@ under `skills/` are relative links into `../ajans`, following the same sibling-c
 The local `skills/tilde` link continues to point at the sibling Tilde checkout. SimpleEnglish is installed separately and
 exposed on the same shared skill surface.
 
+Dropbox-backed hosts use `~/Dropbox/ajans`. Git-backed hosts use the matching sibling checkout at
+`~/.local/src/ajans`. The controller must refresh this Git-backed checkout before the target plan. The relative links in
+this module work with both layouts.
+
 This module owns projection and deployment only. Public user-wide instructions, reusable skills, and their validation
 belong in Ajans; private agent assets belong in the private companion repository.
+
+## Prerequisites
+
+The Ajans sibling checkout must be present. Dropbox synchronizes the checkout on interactive hosts. The Tilde controller
+delivers it to Git-backed hosts.
+
+```bash
+if [[ -d $HOME/Dropbox ]]; then
+	readonly TARGET=$HOME/Dropbox/ajans
+else
+	readonly TARGET=$HOME/.local/src/ajans
+fi
+
+[[ -d $TARGET/.git ]]
+```
 
 ## Configure
 
