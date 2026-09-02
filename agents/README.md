@@ -5,8 +5,8 @@ all:
     - rtk
     - skill:github.com/AminBlg/SimpleEnglish
   links:
-    AGENTS.md: ~/.agents/AGENTS.md
-    skills/: ~/.agents/skills
+    ../../ajans/agents/AGENTS.md: ~/.agents/AGENTS.md
+    ../../ajans/skills/: ~/.agents/skills
     ~/.agents/skills/SimpleEnglish/skills/simple-english: ~/.agents/skills/simple-english
 ---
 
@@ -14,14 +14,13 @@ all:
 
 Expose shared agent tooling and public agent assets through the `~/.agents` surface.
 
-The canonical public agent configuration lives in the sibling Ajans checkout. `AGENTS.md` and the Ajans-owned entries
-under `skills/` are relative links into `../ajans`, following the same sibling-checkout model used for the Tilde skill.
-The local `skills/tilde` link continues to point at the sibling Tilde checkout. SimpleEnglish is installed separately and
-exposed on the same shared skill surface.
+The canonical public agent configuration lives in the sibling Ajans checkout. This manifest links the shared agent
+instructions and all direct children of `ajans/skills`. The module does not contain copies or symlinks for Ajans assets.
+Tilde owns its runtime link outside this module. SimpleEnglish is installed separately.
 
 Dropbox-backed hosts use `~/Dropbox/ajans`. Git-backed hosts use the matching sibling checkout at
-`~/.local/src/ajans`. The controller must refresh this Git-backed checkout before the target plan. The relative links in
-this module work with both layouts.
+`~/.local/src/ajans`. The controller must refresh this Git-backed checkout before the target plan. Module-relative source
+paths select the applicable sibling checkout in both layouts.
 
 This module owns projection and deployment only. Public user-wide instructions, reusable skills, and their validation
 belong in Ajans; private agent assets belong in the private companion repository.
