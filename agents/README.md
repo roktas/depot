@@ -6,14 +6,16 @@ all:
     - skill:github.com/AminBlg/SimpleEnglish
     - skill:github.com/roktas/ajans
   links:
-    AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
+    ~/.agents/skills/ajans/agents/AGENTS.md: ~/.agents/AGENTS.md
     ~/.agents/skills/ajans/skills/bash: ~/.agents/skills/bash
     ~/.agents/skills/ajans/skills/c: ~/.agents/skills/c
     ~/.agents/skills/ajans/skills/deai: ~/.agents/skills/deai
     ~/.agents/skills/ajans/skills/go: ~/.agents/skills/go
     ~/.agents/skills/ajans/skills/grilling: ~/.agents/skills/grilling
+    ~/.agents/skills/ajans/skills/local: ~/.agents/skills/local
     ~/.agents/skills/ajans/skills/naming: ~/.agents/skills/naming
+    ~/.agents/skills/ajans/skills/oci: ~/.agents/skills/oci
     ~/.agents/skills/ajans/skills/ruby: ~/.agents/skills/ruby
     ~/.agents/skills/ajans/skills/testing: ~/.agents/skills/testing
     ~/.agents/skills/ajans/skills/tex: ~/.agents/skills/tex
@@ -23,28 +25,14 @@ all:
 
 # Agents
 
-Common agent instructions and skills installed through the shared `~/.agents` surface.
+Install shared agent tooling and project canonical public instructions and reusable skills into the `~/.agents` surface.
 
-Keep this module model-neutral. If an asset is only for one agent CLI, put it in that CLI's own module.
+Ajans is installed as the managed external checkout `~/.agents/skills/ajans`. Its `agents/AGENTS.md` is projected to
+`~/.agents/AGENTS.md`, and its component skills are linked into the shared top-level skill directory so they remain
+directly addressable by skill name. SimpleEnglish is installed separately and exposed on the same surface.
 
-Ajans is installed as the managed external checkout `~/.agents/skills/ajans`. Its component skills are linked into the
-shared top-level skill directory so they remain directly addressable by skill name. SimpleEnglish is installed separately
-at `~/.agents/skills/SimpleEnglish`, with its `simple-english` skill exposed on the same shared surface. Repository-owned
-public skills remain under `skills/`.
-
-## Validate
-
-Run from the repository root after changing skills or their helpers:
-
-```bash
-rtk agents/tests/skills
-rtk agents/tests/skills agents/tests/fixtures/skills
-```
-
-The general audit validates repository-owned skill packages, their Markdown links, and external skill links. The
-fixture invocation checks code and comment exclusions, site-root URLs, and titled package links. Validate an external
-skill in its canonical repository as well when that repository changes. Pass another skill directory as the optional
-argument when a related repository reuses this audit.
+This module owns deployment only. Public user-wide agent instructions, reusable skills, and their validation belong in
+Ajans. The local `skills/` directory is reserved for deployment links such as the maintainer's Tilde checkout.
 
 ## Configure
 
