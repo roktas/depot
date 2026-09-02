@@ -2,7 +2,8 @@
 
 Public home data for a Tilde-managed workspace.
 
-This repository contains dotfiles, provisioning modules, package declarations, and shared agent assets. The Tilde
+This repository contains dotfiles, provisioning modules, and package declarations. Public user-wide agent instructions
+and reusable agent skills live in the sibling Ajans repository and are consumed by the `agents` module. The Tilde
 control plane lives in the installed `tilde` skill, normally at `~/.agents/skills/tilde`, and is developed in the sibling
 `tilde` repository.
 
@@ -47,7 +48,7 @@ Platform-specific commands use platform headings with lifecycle sections nested 
 
 Do not add placeholder frontmatter just to make a platform-scoped section run.
 
-- `agents/`: shared user-wide agent instructions and common skills exposed through `~/.agents`.
+- `agents/`: deployment module for the shared `~/.agents` surface and external agent packages.
 - `linux/`, `macos/`, `windows/`: platform modules.
 - `linux-`, `macos-`, `windows-`: private or extra platform variants when present.
 
