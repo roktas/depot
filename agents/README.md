@@ -4,35 +4,23 @@ all:
     - playwright-cli
     - rtk
     - skill:github.com/AminBlg/SimpleEnglish
-    - skill:github.com/roktas/ajans
   links:
+    AGENTS.md: ~/.agents/AGENTS.md
     skills/: ~/.agents/skills
-    ~/.agents/skills/ajans/agents/AGENTS.md: ~/.agents/AGENTS.md
-    ~/.agents/skills/ajans/skills/bash: ~/.agents/skills/bash
-    ~/.agents/skills/ajans/skills/c: ~/.agents/skills/c
-    ~/.agents/skills/ajans/skills/deai: ~/.agents/skills/deai
-    ~/.agents/skills/ajans/skills/go: ~/.agents/skills/go
-    ~/.agents/skills/ajans/skills/grilling: ~/.agents/skills/grilling
-    ~/.agents/skills/ajans/skills/local: ~/.agents/skills/local
-    ~/.agents/skills/ajans/skills/naming: ~/.agents/skills/naming
-    ~/.agents/skills/ajans/skills/oci: ~/.agents/skills/oci
-    ~/.agents/skills/ajans/skills/ruby: ~/.agents/skills/ruby
-    ~/.agents/skills/ajans/skills/testing: ~/.agents/skills/testing
-    ~/.agents/skills/ajans/skills/tex: ~/.agents/skills/tex
-    ~/.agents/skills/ajans/skills/writing: ~/.agents/skills/writing
     ~/.agents/skills/SimpleEnglish/skills/simple-english: ~/.agents/skills/simple-english
 ---
 
 # Agents
 
-Install shared agent tooling and project canonical public instructions and reusable skills into the `~/.agents` surface.
+Expose shared agent tooling and public agent assets through the `~/.agents` surface.
 
-Ajans is installed as the managed external checkout `~/.agents/skills/ajans`. Its `agents/AGENTS.md` is projected to
-`~/.agents/AGENTS.md`, and its component skills are linked into the shared top-level skill directory so they remain
-directly addressable by skill name. SimpleEnglish is installed separately and exposed on the same surface.
+The canonical public agent configuration lives in the sibling Ajans checkout. `AGENTS.md` and the Ajans-owned entries
+under `skills/` are relative links into `../ajans`, following the same sibling-checkout model used for the Tilde skill.
+The local `skills/tilde` link continues to point at the sibling Tilde checkout. SimpleEnglish is installed separately and
+exposed on the same shared skill surface.
 
-This module owns deployment only. Public user-wide agent instructions, reusable skills, and their validation belong in
-Ajans. The local `skills/` directory is reserved for deployment links such as the maintainer's Tilde checkout.
+This module owns projection and deployment only. Public user-wide instructions, reusable skills, and their validation
+belong in Ajans; private agent assets belong in the private companion repository.
 
 ## Configure
 
