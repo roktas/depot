@@ -1,6 +1,7 @@
 ---
 all:
   packages:
+    - brew:ecylmz/tap/cx
     - playwright-cli
     - rtk
   links:
