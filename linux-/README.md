@@ -165,3 +165,29 @@ sudo find /var/cache -type f -delete || true
 sudo find /var/log -type f -exec truncate -s 0 {} + || true
 sudo rm -f /var/lib/dhcp/* || true
 ```
+
+## Notes
+
+### Canon G6000 series (USB)
+
+Use `ipp-usb` on the loopback interface and create a direct CUPS IPP queue. This avoids the auto-discovered
+`implicitclass://` queue that can hang GNOME's print dialog.
+
+In `/etc/ipp-usb/ipp-usb.conf`, use:
+
+```ini
+[network]
+interface = loopback
+dns-sd = disable
+```
+
+The printer endpoint is `ipp://localhost:60000/ipp/print`. Use the `everywhere` driver and set the direct queue as the
+default:
+
+```bash
+sudo lpadmin -p Canon_G6000_series_USB -E \
+	-v ipp://localhost:60000/ipp/print -m everywhere
+lpoptions -d Canon_G6000_series_USB
+```
+
+The relevant services are `cups`, `cups-browsed`, and `ipp-usb`.
